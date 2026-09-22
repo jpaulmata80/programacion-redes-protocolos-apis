@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Subtema 1.1.4: preparación del entorno de programación y manejo básico de dependencias para proyectos de redes.">
+  <meta name="theme-color" content="#10212a">
+  <title>1.1.4 | Entorno de programación y dependencias</title>
+  <style>
+    :root{
+      --ink:#18212a;--muted:#586775;--line:#cbd5dc;--soft:#f3f6f8;--paper:#ffffff;
+      --cyan:#007c91;--cyan-dark:#005b6a;--cyan-light:#6ed2e2;--green:#16734a;--green-soft:#e8f5ee;
+      --amber:#8a5600;--amber-soft:#fff3d8;--red:#9b2c2c;--red-soft:#fff0f0;--focus:#005fcc;
+      --navy:#10212a;--navy-deep:#07141a;--max:1180px;--radius:8px;--shadow:0 16px 38px rgba(24,33,42,.08)
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;min-width:280px;color:var(--ink);background:var(--paper);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55;overflow-x:hidden}
+    img,svg,canvas,video{display:block;max-width:100%}
+    button,input,select,textarea{font:inherit;max-width:100%}
+    button,input[type="radio"],input[type="checkbox"],select{cursor:pointer}
+    a{color:var(--cyan-dark)}
+    a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+    .skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}.skip-link:focus{top:1rem}
+    header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+    .progress-track{height:4px;background:#e6ecef}.progress-bar{height:100%;width:0;background:var(--cyan);transition:width .15s linear}
+    .header-inner{width:min(100%,var(--max));min-height:66px;margin:0 auto;padding:.55rem 1.25rem;display:flex;gap:.75rem;align-items:center;min-width:0}
+    .brand{min-width:190px}.brand strong{display:block;font-size:.95rem}.brand span{display:block;color:var(--muted);font-size:.78rem}
+    .nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+    nav a{color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;border-bottom:2px solid transparent;font-size:.84rem}
+    nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+    .top-link{flex:0 0 auto;text-decoration:none;border:1px solid var(--line);border-radius:5px;padding:.48rem .72rem;color:var(--ink);font-weight:750;white-space:nowrap;background:#fff}
+    .top-link:hover{border-color:var(--cyan);color:var(--cyan-dark)}
+    main{overflow:hidden}section{scroll-margin-top:90px;border-bottom:1px solid var(--line)}.band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+    .hero{min-height:calc(100svh - 70px);display:grid;align-items:center;background:var(--navy);color:#fff}
+    .hero-grid{width:min(100%,var(--max));margin:0 auto;padding:3.4rem 1.25rem;display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.25fr);gap:3rem;align-items:center}.hero-grid>*{min-width:0}
+    .eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+    h1{font-size:clamp(2rem,5vw,4.2rem);line-height:1.02;margin:.65rem 0 1.15rem;max-width:18ch;overflow-wrap:normal;word-break:normal;hyphens:none}
+    h2{font-size:clamp(1.75rem,3.3vw,2.8rem);line-height:1.12;margin:0 0 .8rem;overflow-wrap:normal;word-break:normal;hyphens:none}
+    h3{font-size:1.22rem;margin:0 0 .55rem}h4{font-size:1rem;margin:.2rem 0 .35rem}p{max-width:72ch}.hero p{color:#d7e5ea;font-size:1.08rem}
+    .hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}.hero-actions{margin-top:1.45rem}
+    .btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cyan-dark);background:var(--cyan);color:#fff;text-decoration:none;padding:.72rem 1rem;border-radius:5px;font-weight:750}
+    .btn:hover{background:var(--cyan-dark)}.btn.secondary{background:transparent;color:inherit;border-color:currentColor}.btn.secondary:hover{background:rgba(255,255,255,.1)}
+    .btn.light{background:#fff;color:var(--ink);border-color:var(--line)}.btn.light:hover{background:var(--soft);color:var(--cyan-dark)}.btn:disabled{opacity:.55;cursor:not-allowed}
+    .hero-board{min-width:0;background:var(--navy-deep);border:1px solid #3b5965;border-radius:8px;padding:1.35rem}
+    .env-hero{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:.7rem;align-items:center}.env-node{min-width:0;border:1px solid #48616b;border-radius:7px;padding:.85rem;background:#102a35}.env-node strong{display:block;color:#fff}.env-node span{display:block;color:#bfd1d7;font-size:.82rem;margin-top:.18rem}.env-arrow{color:var(--cyan-light);font-size:1.5rem;font-weight:900}.hero-list{display:grid;gap:.5rem;margin-top:1rem}.hero-item{border-left:3px solid var(--cyan-light);padding:.4rem .6rem;color:#d7e5ea;font-size:.86rem}.hero-caption{margin-top:1rem;color:#b8cbd2;font-size:.82rem}
+    .section-head{display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem}.section-head>*{min-width:0}.section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}.lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+    .outcomes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}.outcome:last-child{border-right:0}.outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+    .callout{margin-top:1.35rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}.callout strong{color:var(--ink)}
+    .concept-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.concept-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.25rem;background:#fff;box-shadow:var(--shadow)}
+    .concept-card .tag{display:inline-block;margin-bottom:.7rem;padding:.25rem .48rem;background:#d9eef2;color:var(--cyan-dark);border-radius:4px;font-size:.78rem;font-weight:850;text-transform:uppercase;letter-spacing:.05em}.concept-card p{margin:.3rem 0;color:var(--muted)}.concept-card ul{padding-left:1.1rem;margin:.7rem 0 0}
+    .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px;margin-top:1.2rem}table{width:100%;border-collapse:collapse;min-width:760px;background:#fff}th,td{text-align:left;padding:.78rem .85rem;border-bottom:1px solid var(--line);vertical-align:top}th{background:var(--soft);font-size:.9rem}tr:last-child td{border-bottom:0}
+    .activity{margin-top:2rem;padding:1.35rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--soft);min-width:0}.activity h3{margin-top:0}.activity-instruction{color:var(--muted);margin-top:0}
+    .feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}.feedback.success{background:var(--green-soft);border-color:var(--green)}.feedback.warn{background:var(--amber-soft);border-color:var(--amber)}.feedback.error{background:var(--red-soft);border-color:var(--red)}
+    .prediction{display:grid;gap:.6rem;margin:.85rem 0 1rem}.prediction label,.decision-list label{display:block;padding:.75rem .8rem;background:#fff;border:1px solid var(--line);border-radius:5px}.prediction input,.decision-list input{margin-right:.45rem}
+    .workspace{display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:1.2rem;align-items:start}.workspace>*{min-width:0}
+    .control-panel{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1rem}.control-panel label{display:block;font-weight:750;margin:.8rem 0 .3rem}.control-panel select,.control-panel input{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+    .project-stage{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1rem;min-width:0}.project-tree{display:grid;gap:.55rem}.tree-row{display:flex;gap:.6rem;align-items:flex-start;padding:.7rem;border:1px solid var(--line);border-radius:5px;background:var(--soft);min-width:0}.tree-row .icon{width:2rem;height:2rem;flex:0 0 2rem;border:1px solid var(--line);border-radius:4px;display:grid;place-items:center;background:#fff;font-weight:850;color:var(--cyan-dark)}.tree-row span{min-width:0}.tree-row strong{display:block}.tree-row small{display:block;color:var(--muted);overflow-wrap:anywhere}
+    .sequence-grid{display:grid;grid-template-columns:minmax(0,1fr) 100px;gap:.65rem;align-items:center}.sequence-grid label{min-width:0}.sequence-grid select{width:100%;padding:.55rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+    .terminal{background:#09161d;color:#dce9ed;border:1px solid #314b56;border-radius:7px;padding:1rem;margin-top:1rem;overflow-x:auto}.terminal strong{color:var(--cyan-light)}.terminal-line{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;margin:.35rem 0}.terminal .muted-line{color:#9db2ba}
+    .package-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}.package-card{border:1px solid var(--line);border-radius:6px;padding:.9rem;background:#fff;min-width:0}.package-card strong{display:block;margin-bottom:.2rem}.package-card span{display:block;color:var(--muted);font-size:.84rem}.package-card select{width:100%;margin-top:.7rem;padding:.55rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+    .exercise-box{border:1px solid var(--line);border-radius:var(--radius);background:#fff;overflow:hidden}.exercise-head{display:grid;grid-template-columns:120px minmax(0,1fr);gap:1rem;padding:1rem 1.2rem;background:var(--navy);color:#fff}.exercise-head span{color:var(--cyan-light);font-weight:850}.exercise-body{padding:1.2rem}.steps{display:grid;gap:.7rem}.step{border:1px solid var(--line);border-radius:6px;padding:.85rem;background:var(--soft)}.step .solution{display:none;margin-top:.55rem;color:var(--muted)}.step.revealed .solution{display:block}.step.revealed{border-color:#9bc9b1;background:var(--green-soft)}
+    .practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.practice-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.05rem;background:#fff}.practice-card label{display:block;font-weight:750;margin:.7rem 0 .3rem}.practice-card select{width:100%;padding:.6rem;border:1px solid var(--line);border-radius:5px;background:#fff}.mini-feedback{margin-top:.75rem;padding:.7rem;border-left:3px solid var(--cyan);background:var(--soft);font-size:.9rem}.mini-feedback.success{background:var(--green-soft);border-color:var(--green)}.mini-feedback.warn{background:var(--amber-soft);border-color:var(--amber)}
+    .case-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1rem}.case-panel{border:1px solid var(--line);border-radius:6px;padding:1rem;background:#fff}.case-panel select{width:100%;padding:.6rem;border:1px solid var(--line);border-radius:5px;background:#fff;margin:.3rem 0 .7rem}.case-panel ul{padding-left:1.1rem}
+    .quiz{display:grid;gap:.9rem}.question{border:1px solid var(--line);border-radius:6px;padding:1rem;background:#fff}.question fieldset{border:0;padding:0;margin:0}.question legend{font-weight:800;margin-bottom:.65rem}.question label{display:block;margin:.45rem 0;padding:.45rem .55rem;border-radius:4px}.question label:hover{background:var(--soft)}
+    textarea{width:100%;min-height:150px;padding:.8rem;border:1px solid var(--line);border-radius:6px;resize:vertical}
+    .reference-list{display:grid;gap:.65rem;margin-top:1rem}.reference-item{padding:.8rem 0;border-bottom:1px solid var(--line)}.reference-item:last-child{border-bottom:0}.reference-item cite{font-style:normal;font-weight:750}.reference-item span{display:block;color:var(--muted);font-size:.9rem;margin-top:.15rem}
+    .bottom-nav{display:flex;justify-content:space-between;gap:.8rem;flex-wrap:wrap;margin-top:2rem}
+    footer{background:var(--navy-deep);color:#c8d8de}.footer-inner{width:min(100%,var(--max));margin:0 auto;padding:1.5rem 1.25rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}.footer-inner a{color:#d7edf2}
+    @media(max-width:900px){.hero-grid,.workspace,.case-grid{grid-template-columns:1fr}.outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}.outcome:nth-child(2){border-right:0}.outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}.package-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.practice-grid{grid-template-columns:1fr}.hero{min-height:auto}.hero-grid{padding-top:4rem;padding-bottom:4rem}}
+    @media(max-width:680px){.band{padding:3.2rem 1rem}.hero-grid{padding:2.7rem 1rem}.section-head{grid-template-columns:1fr;gap:.45rem}.outcomes,.concept-grid,.package-grid{grid-template-columns:1fr}.outcome{border-right:0;border-bottom:1px solid var(--line)}.outcome:last-child{border-bottom:0}.top-link{flex:1 1 auto;text-align:center}.exercise-head{grid-template-columns:1fr;gap:.25rem}.env-hero{grid-template-columns:1fr}.env-arrow{transform:rotate(90deg);text-align:center}.sequence-grid{grid-template-columns:minmax(0,1fr) 78px}}
+    @media(max-width:480px){h1{font-size:clamp(2rem,10vw,2.8rem);max-width:none}.header-inner{padding:.5rem .8rem;flex-wrap:wrap}.brand{min-width:0;flex:1 1 100%}.nav-scroll{order:3;flex-basis:100%}.bottom-nav .btn{width:100%}.sequence-grid{grid-template-columns:1fr}.sequence-grid select{max-width:120px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <header>
+    <div class="progress-track" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="header-inner">
+      <div class="brand"><strong>Programación de Redes</strong><span>Bloque 1 · Tema 1.1 · Subtema 1.1.4</span></div>
+      <div class="nav-scroll">
+        <nav aria-label="Secciones del subtema">
+          <a href="#conceptos">Conceptos</a><a href="#predice">Predice</a><a href="#experimenta">Experimenta</a><a href="#ejercicio-resuelto">Resuelto</a><a href="#practica">Practica</a><a href="#caso">Caso profesional</a><a href="#comprueba">Comprueba</a><a href="#reflexion">Reflexión</a>
+        </nav>
+      </div>
+      <a class="top-link" href="tema-1-1-fundamentos-programacion-aplicada-redes.html" aria-label="Volver al Tema 1.1">← Tema 1.1</a>
+      <a class="top-link" href="index.html" aria-label="Volver a la pantalla principal del curso">Curso</a>
+    </div>
+  </header>
+
+  <main id="contenido">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">Subtema 1.1.4 · Preparación para desarrollar</div>
+          <h1 id="hero-title">Entorno de programación y dependencias</h1>
+          <p>Antes de programar una aplicación de red conviene asegurar que el proyecto tenga un intérprete conocido, un entorno aislado y dependencias controladas. Eso reduce conflictos y permite reproducir el trabajo en otro computador.</p>
+          <div class="hero-actions"><a class="btn" href="#orientacion">Comenzar recorrido</a><a class="btn secondary" href="tema-1-1-fundamentos-programacion-aplicada-redes.html">Volver al Tema 1.1</a></div>
+        </div>
+        <div class="hero-board" role="img" aria-label="Representación conceptual de un proyecto aislado con intérprete, biblioteca estándar y paquetes externos">
+          <div class="env-hero">
+            <div class="env-node"><strong>Computador</strong><span>Sistema operativo + instalación de Python</span></div>
+            <div class="env-arrow" aria-hidden="true">→</div>
+            <div class="env-node"><strong>Proyecto aislado</strong><span>Entorno propio + dependencias del proyecto</span></div>
+          </div>
+          <div class="hero-list">
+            <div class="hero-item"><strong>Runtime:</strong> versión con la que se ejecutará el programa.</div>
+            <div class="hero-item"><strong>Entorno virtual:</strong> separación lógica de paquetes por proyecto.</div>
+            <div class="hero-item"><strong>Dependencias:</strong> paquetes externos necesarios y registrados.</div>
+          </div>
+          <div class="hero-caption">Objetivo profesional: que “funciona en mi computador” se transforme en “puede reproducirse de forma controlada”.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="orientacion" aria-labelledby="orientacion-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">CÓMO TRABAJAR ESTE TEMA</div><div><h2 id="orientacion-title">Comprende primero el problema que resuelve cada herramienta</h2><p class="lead">No memorices comandos aislados. Relaciona cada paso con una necesidad: conocer el runtime, aislar el proyecto, instalar solo lo necesario y dejar evidencia de esas dependencias.</p></div></div>
+        <div class="outcomes" aria-label="Resultados del recorrido">
+          <div class="outcome"><b>1 · Interpretar</b>Distinguir runtime, entorno virtual, biblioteca estándar y paquete externo.</div>
+          <div class="outcome"><b>2 · Preparar</b>Ordenar correctamente las etapas para crear un entorno de proyecto reproducible.</div>
+          <div class="outcome"><b>3 · Decidir</b>Reconocer cuándo una funcionalidad ya pertenece a la biblioteca estándar y cuándo requiere una dependencia.</div>
+          <div class="outcome"><b>4 · Justificar</b>Explicar por qué el aislamiento y el registro de dependencias reducen problemas de despliegue y colaboración.</div>
+        </div>
+        <div class="callout"><strong>Conexión con el siguiente paso del curso:</strong> en el Tema 1.2 empezarás a implementar comunicaciones mediante sockets. Preparar correctamente el entorno evita que los problemas de instalación se confundan con problemas de red o de programación.</div>
+      </div>
+    </section>
+
+    <section id="conceptos" aria-labelledby="conceptos-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">DESARROLLO CONCEPTUAL</div><div><h2 id="conceptos-title">Cuatro piezas que conviene no confundir</h2><p class="lead">Un proyecto puede ejecutarse con Python y, al mismo tiempo, utilizar módulos incluidos con Python y otros paquetes instalados aparte.</p></div></div>
+        <div class="concept-grid">
+          <article class="concept-card"><span class="tag">Runtime</span><h3>Intérprete y versión</h3><p>Es el software que ejecuta el programa. Conocer la versión importa porque el lenguaje y las bibliotecas evolucionan.</p><ul><li>Debe verificarse antes de comenzar.</li><li>El equipo de trabajo debería acordar una versión compatible.</li></ul></article>
+          <article class="concept-card"><span class="tag">Aislamiento</span><h3>Entorno virtual</h3><p>Es un espacio asociado al proyecto que mantiene sus paquetes separados de otros proyectos.</p><ul><li>Reduce conflictos entre versiones.</li><li>Evita depender innecesariamente de paquetes instalados globalmente.</li></ul></article>
+          <article class="concept-card"><span class="tag">Incluido</span><h3>Biblioteca estándar</h3><p>Conjunto de módulos distribuidos con Python. Para los primeros ejercicios de redes, <strong>socket</strong>, <strong>json</strong> y <strong>ipaddress</strong> son ejemplos relevantes.</p><ul><li>No se instalan con pip por separado.</li><li>Su disponibilidad depende de la versión de Python.</li></ul></article>
+          <article class="concept-card"><span class="tag">Externo</span><h3>Dependencia de terceros</h3><p>Paquete que el proyecto utiliza pero que no forma parte de la biblioteca estándar. Debe instalarse y conviene registrar su versión.</p><ul><li><strong>requests</strong> es un ejemplo habitual para trabajar con HTTP.</li><li>El paquete debe instalarse en el entorno correcto.</li></ul></article>
+        </div>
+        <div class="table-wrap" role="region" aria-label="Comparación de elementos del entorno" tabindex="0">
+          <table>
+            <thead><tr><th>Elemento</th><th>Pregunta que responde</th><th>Ejemplo</th><th>Riesgo si se ignora</th></tr></thead>
+            <tbody>
+              <tr><td>Versión de Python</td><td>¿Con qué runtime se ejecuta?</td><td>Python 3.x compatible con el curso</td><td>Diferencias de comportamiento o APIs disponibles.</td></tr>
+              <tr><td>Entorno virtual</td><td>¿Dónde viven los paquetes de este proyecto?</td><td>Carpeta local <strong>.venv</strong></td><td>Conflictos entre proyectos o dependencia de instalaciones globales.</td></tr>
+              <tr><td>Biblioteca estándar</td><td>¿Ya viene con Python?</td><td>socket, json, ipaddress</td><td>Instalar paquetes innecesarios o confundir responsabilidades.</td></tr>
+              <tr><td>Dependencia externa</td><td>¿Qué paquete adicional necesita el proyecto?</td><td>requests</td><td>Que el programa funcione en un equipo y falle en otro.</td></tr>
+              <tr><td>Registro de dependencias</td><td>¿Cómo reproducimos el entorno?</td><td>requirements.txt en este nivel introductorio</td><td>No conocer qué versiones instalar posteriormente.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout"><strong>Precisión importante:</strong> un archivo <strong>requirements.txt</strong> es una forma sencilla de registrar dependencias en Python, pero no es el único mecanismo existente ni constituye por sí solo una estrategia completa de empaquetado. En este curso lo usaremos inicialmente por su claridad didáctica.</div>
+      </div>
+    </section>
+
+    <section id="predice" aria-labelledby="predice-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">PREDICE</div><div><h2 id="predice-title">Dos proyectos, una misma computadora</h2><p class="lead">Imagina que el Proyecto A necesita una versión de una biblioteca y el Proyecto B necesita otra. Ambos estudiantes instalan paquetes globalmente sin aislar los proyectos.</p></div></div>
+        <div class="activity">
+          <h3>¿Qué problema es más probable?</h3>
+          <div class="prediction">
+            <label><input type="radio" name="envPrediction" value="a"> Ninguno: todos los proyectos siempre utilizan exactamente las mismas versiones.</label>
+            <label><input type="radio" name="envPrediction" value="b"> Puede aparecer un conflicto: actualizar el paquete para un proyecto podría afectar al otro.</label>
+            <label><input type="radio" name="envPrediction" value="c"> El problema se resuelve cambiando la dirección IP de uno de los proyectos.</label>
+          </div>
+          <div class="action-row"><button class="btn" id="checkPrediction" type="button">Comprobar predicción</button><button class="btn light" id="resetPrediction" type="button">Reintentar</button></div>
+          <div class="feedback" id="predictionFeedback" role="status" aria-live="polite">Predice antes de revisar la explicación.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="experimenta" aria-labelledby="experimenta-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">EXPERIMENTA · OBSERVA · EXPLICA</div><div><h2 id="experimenta-title">Construye conceptualmente un entorno reproducible</h2><p class="lead">Ordena las etapas y luego observa cómo se traduce esa secuencia en acciones concretas. Las instrucciones muestran Python de forma general; el comando de activación cambia según el sistema operativo.</p></div></div>
+        <div class="activity">
+          <h3>Laboratorio 1 · Ordena el flujo de preparación</h3>
+          <p class="activity-instruction">Asigna una posición del 1 al 5 a cada acción. Cada posición debe utilizarse una sola vez.</p>
+          <div class="workspace">
+            <div class="control-panel">
+              <div class="sequence-grid" id="envSequence">
+                <label for="seqRuntime">Verificar intérprete y versión.</label><select id="seqRuntime" aria-label="Posición de verificar intérprete"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+                <label for="seqFolder">Crear o identificar la carpeta del proyecto.</label><select id="seqFolder" aria-label="Posición de crear carpeta"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+                <label for="seqVenv">Crear y activar un entorno virtual.</label><select id="seqVenv" aria-label="Posición de crear entorno virtual"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+                <label for="seqInstall">Instalar únicamente las dependencias externas necesarias.</label><select id="seqInstall" aria-label="Posición de instalar dependencias"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+                <label for="seqRecord">Registrar y verificar las dependencias.</label><select id="seqRecord" aria-label="Posición de registrar dependencias"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+              </div>
+              <div class="action-row" style="margin-top:1rem"><button class="btn" id="checkSequence" type="button">Comprobar secuencia</button><button class="btn light" id="resetSequence" type="button">Restablecer</button></div>
+              <div class="feedback" id="sequenceFeedback" role="status" aria-live="polite">Relaciona cada paso con lo que necesita existir antes de ejecutarlo.</div>
+            </div>
+            <div class="project-stage">
+              <h3>Vista del proyecto</h3>
+              <div class="project-tree" id="projectTree" aria-live="polite">
+                <div class="tree-row"><div class="icon">1</div><span><strong>Runtime</strong><small>Python verificado</small></span></div>
+                <div class="tree-row"><div class="icon">2</div><span><strong>Carpeta del proyecto</strong><small>trabajo-redes/</small></span></div>
+                <div class="tree-row"><div class="icon">3</div><span><strong>Entorno aislado</strong><small>.venv/</small></span></div>
+                <div class="tree-row"><div class="icon">4</div><span><strong>Dependencias externas</strong><small>solo las necesarias</small></span></div>
+                <div class="tree-row"><div class="icon">5</div><span><strong>Registro reproducible</strong><small>requirements.txt</small></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity">
+          <h3>Laboratorio 2 · Observa cómo se materializa la secuencia</h3>
+          <p class="activity-instruction">Selecciona un sistema operativo y avanza paso a paso. El objetivo es comprender qué hace cada acción, no memorizarla sin contexto.</p>
+          <div class="workspace">
+            <div class="control-panel">
+              <label for="osSelect">Sistema operativo</label>
+              <select id="osSelect"><option value="windows">Windows</option><option value="unix">Linux / macOS</option></select>
+              <div class="action-row" style="margin-top:1rem"><button class="btn" id="nextCommand" type="button">Mostrar siguiente acción</button><button class="btn light" id="resetCommands" type="button">Reiniciar</button></div>
+              <div class="callout"><strong>Nota:</strong> en algunos equipos Windows el lanzador puede ser <strong>py</strong>; en Linux/macOS es frecuente utilizar <strong>python3</strong>. Sigue la configuración oficial de tu laboratorio.</div>
+            </div>
+            <div>
+              <div class="terminal" id="terminalOutput" role="status" aria-live="polite">
+                <div class="muted-line">El recorrido mostrará una acción y su propósito.</div>
+              </div>
+              <div class="feedback" id="commandFeedback">Comienza verificando qué intérprete ejecutarás. No instales dependencias antes de saber en qué entorno estás trabajando.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity">
+          <h3>Laboratorio 3 · ¿Biblioteca estándar o dependencia externa?</h3>
+          <p class="activity-instruction">Clasifica cada módulo o paquete. Esta distinción evita instalar cosas que Python ya incluye.</p>
+          <div class="package-grid">
+            <div class="package-card"><strong>socket</strong><span>Comunicación de red de bajo nivel en Python.</span><select id="pkgSocket" aria-label="Clasificación de socket"><option value="">Selecciona...</option><option value="stdlib">Biblioteca estándar</option><option value="external">Dependencia externa</option></select></div>
+            <div class="package-card"><strong>json</strong><span>Codificación y decodificación de JSON.</span><select id="pkgJson" aria-label="Clasificación de json"><option value="">Selecciona...</option><option value="stdlib">Biblioteca estándar</option><option value="external">Dependencia externa</option></select></div>
+            <div class="package-card"><strong>ipaddress</strong><span>Trabajo con direcciones y redes IP.</span><select id="pkgIp" aria-label="Clasificación de ipaddress"><option value="">Selecciona...</option><option value="stdlib">Biblioteca estándar</option><option value="external">Dependencia externa</option></select></div>
+            <div class="package-card"><strong>requests</strong><span>Cliente HTTP de terceros ampliamente utilizado.</span><select id="pkgRequests" aria-label="Clasificación de requests"><option value="">Selecciona...</option><option value="stdlib">Biblioteca estándar</option><option value="external">Dependencia externa</option></select></div>
+          </div>
+          <div class="action-row" style="margin-top:1rem"><button class="btn" id="checkPackages" type="button">Comprobar clasificación</button><button class="btn light" id="resetPackages" type="button">Reintentar</button></div>
+          <div class="feedback" id="packagesFeedback" role="status" aria-live="polite">Clasifica los cuatro elementos.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="ejercicio-resuelto" aria-labelledby="resolved-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">EJERCICIO RESUELTO</div><div><h2 id="resolved-title">Preparar un proyecto de monitoreo sin mezclar dependencias</h2><p class="lead">El problema no es solo “instalar un paquete”. Debemos poder explicar qué pertenece a Python, qué pertenece al proyecto y cómo otro estudiante reconstruirá el entorno.</p></div></div>
+        <article class="exercise-box">
+          <div class="exercise-head"><span>Situación</span><strong>Un equipo desarrollará una herramienta que consulta direcciones IP, procesa JSON y después consumirá un servicio HTTP.</strong></div>
+          <div class="exercise-body">
+            <p>El proyecto utilizará <strong>ipaddress</strong> y <strong>json</strong>, además del paquete externo <strong>requests</strong>. Dos estudiantes trabajarán en computadores diferentes.</p>
+            <div class="steps" id="solutionSteps">
+              <div class="step"><strong>Paso 1 · Identificar qué ya incluye Python</strong><div class="solution"><strong>ipaddress</strong> y <strong>json</strong> forman parte de la biblioteca estándar. No se agregan como paquetes externos del proyecto.</div></div>
+              <div class="step"><strong>Paso 2 · Aislar el proyecto</strong><div class="solution">Se crea un entorno virtual dentro o asociado a la carpeta del proyecto. Así, los paquetes instalados para esta herramienta no interfieren con otros trabajos.</div></div>
+              <div class="step"><strong>Paso 3 · Instalar solo lo externo</strong><div class="solution"><strong>requests</strong> sí es una dependencia de terceros. Debe instalarse dentro del entorno virtual activo, no asumirse como disponible globalmente.</div></div>
+              <div class="step"><strong>Paso 4 · Registrar el estado necesario</strong><div class="solution">Se registra la dependencia en un archivo de requisitos apropiado para este nivel del curso. Así el segundo estudiante conoce qué paquete debe instalar.</div></div>
+              <div class="step"><strong>Paso 5 · Verificar reproducibilidad</strong><div class="solution">En otro entorno limpio se comprueba que, tras instalar las dependencias registradas, el proyecto puede ejecutarse. Esa prueba es más valiosa que asumir que el archivo de requisitos es correcto.</div></div>
+            </div>
+            <div class="action-row" style="margin-top:1rem"><button class="btn" id="revealStep" type="button">Revelar siguiente paso</button><button class="btn light" id="resetSolution" type="button">Resolver otra vez</button></div>
+            <div class="feedback" id="solutionFeedback" role="status" aria-live="polite">Antes de revelar cada paso, intenta decidir qué elementos deben instalarse realmente.</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="practica" aria-labelledby="practice-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">EJERCICIOS PROPUESTOS</div><div><h2 id="practice-title">Toma decisiones sobre entornos reales</h2><p class="lead">No buscamos repetir comandos, sino diagnosticar qué decisión de preparación evita cada problema.</p></div></div>
+        <div class="practice-grid">
+          <article class="practice-card"><h3>Ejercicio 1 · Funciona solo en mi PC</h3><p>El programa de un estudiante usa un paquete externo, pero no existe ningún registro de dependencias.</p><label for="practiceOne">Mejor acción inicial</label><select id="practiceOne"><option value="">Selecciona...</option><option value="record">Identificar y registrar las dependencias necesarias</option><option value="ip">Cambiar la IP del computador</option><option value="global">Instalar muchos paquetes globalmente</option></select><button class="btn" id="checkOne" type="button" style="margin-top:.8rem">Comprobar</button><div class="mini-feedback" id="feedbackOne" role="status" aria-live="polite">Piensa qué información necesita otra persona para reconstruir el entorno.</div></article>
+          <article class="practice-card"><h3>Ejercicio 2 · Dos proyectos incompatibles</h3><p>Proyecto A exige una versión de un paquete y Proyecto B otra versión distinta.</p><label for="practiceTwo">Decisión más coherente</label><select id="practiceTwo"><option value="">Selecciona...</option><option value="venv">Crear un entorno virtual para cada proyecto</option><option value="same">Forzar ambos a compartir todo globalmente</option><option value="port">Asignar un puerto diferente a cada proyecto</option></select><button class="btn" id="checkTwo" type="button" style="margin-top:.8rem">Comprobar</button><div class="mini-feedback" id="feedbackTwo" role="status" aria-live="polite">El conflicto es de software instalado, no de direccionamiento de red.</div></article>
+          <article class="practice-card"><h3>Ejercicio 3 · Módulo socket</h3><p>Un estudiante intenta instalar <strong>socket</strong> como si fuera una dependencia externa para comenzar el Tema 1.2.</p><label for="practiceThree">Diagnóstico correcto</label><select id="practiceThree"><option value="">Selecciona...</option><option value="stdlib">socket ya pertenece a la biblioteca estándar de Python</option><option value="external">socket siempre debe descargarse con pip</option><option value="network">solo se instala cuando existe conexión a Internet</option></select><button class="btn" id="checkThree" type="button" style="margin-top:.8rem">Comprobar</button><div class="mini-feedback" id="feedbackThree" role="status" aria-live="polite">Distingue módulo incluido de paquete externo.</div></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="caso" aria-labelledby="case-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">CASO PROFESIONAL</div><div><h2 id="case-title">Una herramienta del NOC pasa del portátil al servidor</h2><p class="lead">El prototipo funciona en el equipo del desarrollador. Ahora debe ejecutarse en un servidor de operaciones sin copiar manualmente “todo lo que tenga instalado” el portátil.</p></div></div>
+        <div class="case-grid">
+          <div class="case-panel">
+            <h3>Situación</h3>
+            <ul><li>El proyecto utiliza módulos de la biblioteca estándar.</li><li>También utiliza dos paquetes externos.</li><li>En el portátil existen decenas de paquetes globales no relacionados.</li><li>El servidor debe instalar únicamente lo necesario.</li></ul>
+            <label for="caseIsolation"><strong>¿Cómo aislarías el despliegue?</strong></label>
+            <select id="caseIsolation"><option value="">Selecciona...</option><option value="venv">Crear un entorno propio para la aplicación</option><option value="global">Reproducir todos los paquetes globales del portátil</option><option value="none">No separar el proyecto</option></select>
+            <label for="caseDeps"><strong>¿Qué instalarías en ese entorno?</strong></label>
+            <select id="caseDeps"><option value="">Selecciona...</option><option value="required">Solo las dependencias externas requeridas y registradas</option><option value="all">Todos los paquetes encontrados en el computador del desarrollador</option><option value="stdlib">Volver a instalar por pip todos los módulos de la biblioteca estándar</option></select>
+            <div class="action-row"><button class="btn" id="checkCase" type="button">Analizar decisión</button><button class="btn light" id="resetCase" type="button">Reintentar</button></div>
+          </div>
+          <div class="case-panel">
+            <h3>Criterios profesionales</h3>
+            <p>Una preparación reproducible mejora:</p>
+            <ul><li><strong>Trazabilidad:</strong> sabemos qué necesita el proyecto.</li><li><strong>Aislamiento:</strong> reducimos interferencias con otras aplicaciones.</li><li><strong>Despliegue:</strong> el servidor recibe lo necesario y no una copia accidental del portátil.</li><li><strong>Diagnóstico:</strong> es más fácil separar errores de instalación de errores de red o de código.</li></ul>
+            <div class="feedback" id="caseFeedback" role="status" aria-live="polite">Selecciona una estrategia para el servidor y justifícala con estos criterios.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="comprueba" aria-labelledby="quiz-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">COMPROBACIÓN INTEGRADORA</div><div><h2 id="quiz-title">Comprueba si puedes preparar el proyecto antes de programar la red</h2><p class="lead">Responde las cinco preguntas. Puedes reintentar después de revisar la retroalimentación.</p></div></div>
+        <form class="quiz" id="quizForm">
+          <div class="question"><fieldset><legend>1. ¿Cuál es el propósito principal de un entorno virtual?</legend><label><input type="radio" name="q1" value="a"> Cambiar automáticamente la IP del computador.</label><label><input type="radio" name="q1" value="b"> Aislar las dependencias del proyecto respecto de otros proyectos.</label><label><input type="radio" name="q1" value="c"> Reemplazar el intérprete de Python por un router.</label></fieldset></div>
+          <div class="question"><fieldset><legend>2. ¿Cuál de estos elementos pertenece a la biblioteca estándar de Python?</legend><label><input type="radio" name="q2" value="a"> requests</label><label><input type="radio" name="q2" value="b"> socket</label><label><input type="radio" name="q2" value="c"> Cualquier paquete descargado de Internet</label></fieldset></div>
+          <div class="question"><fieldset><legend>3. ¿Qué problema ayuda a resolver un registro de dependencias?</legend><label><input type="radio" name="q3" value="a"> Saber qué paquetes externos necesita instalar otro entorno.</label><label><input type="radio" name="q3" value="b"> Elegir la máscara de subred del servidor.</label><label><input type="radio" name="q3" value="c"> Garantizar por sí solo que no exista ningún error de software.</label></fieldset></div>
+          <div class="question"><fieldset><legend>4. Un proyecto usa json y requests. ¿Qué afirmación es correcta?</legend><label><input type="radio" name="q4" value="a"> Ambos deben instalarse siempre como paquetes externos.</label><label><input type="radio" name="q4" value="b"> Ninguno está relacionado con Python.</label><label><input type="radio" name="q4" value="c"> json es estándar; requests es una dependencia externa.</label></fieldset></div>
+          <div class="question"><fieldset><legend>5. ¿Qué práctica facilita detectar si un fallo proviene del entorno?</legend><label><input type="radio" name="q5" value="a"> Utilizar un entorno controlado y reproducible.</label><label><input type="radio" name="q5" value="b"> Instalar paquetes al azar hasta que el error desaparezca.</label><label><input type="radio" name="q5" value="c"> Cambiar puertos sin revisar dependencias.</label></fieldset></div>
+          <div class="action-row"><button class="btn" type="submit">Comprobar respuestas</button><button class="btn light" id="resetQuiz" type="button">Reintentar cuestionario</button></div>
+          <div class="feedback" id="quizFeedback" role="status" aria-live="polite">Completa las cinco preguntas antes de comprobar.</div>
+        </form>
+      </div>
+    </section>
+
+    <section id="reflexion" aria-labelledby="reflection-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">REFLEXIÓN FINAL</div><div><h2 id="reflection-title">¿Qué significa que un proyecto sea reproducible?</h2><p class="lead">Escribe una explicación breve pensando en un compañero que debe ejecutar tu aplicación de red en otro computador.</p></div></div>
+        <label for="reflectionText"><strong>En 80–150 palabras, explica qué información y qué decisiones dejarías preparadas para que otra persona pueda reconstruir el entorno del proyecto.</strong></label>
+        <textarea id="reflectionText" maxlength="1200" placeholder="Incluye versión del runtime, aislamiento, dependencias externas y una forma de verificar el entorno..."></textarea>
+        <div class="action-row" style="margin-top:.8rem"><button class="btn" id="saveReflection" type="button">Guardar en este navegador</button><button class="btn light" id="clearReflection" type="button">Limpiar</button></div>
+        <div class="feedback" id="reflectionFeedback" role="status" aria-live="polite">El texto se guarda únicamente en el almacenamiento local de este navegador y no se transmite.</div>
+      </div>
+    </section>
+
+    <section id="referencias" aria-labelledby="references-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">REFERENCIAS Y ALCANCE</div><div><h2 id="references-title">Qué hemos preparado y qué viene después</h2><p class="lead">Este subtema se limita a la preparación conceptual y operativa básica del entorno. No desarrolla todavía sockets ni APIs.</p></div></div>
+        <div class="reference-list">
+          <div class="reference-item"><cite>Python Documentation · venv</cite><span>Referencia oficial para creación de entornos virtuales.</span></div>
+          <div class="reference-item"><cite>Python Documentation · The Python Standard Library</cite><span>Referencia para distinguir módulos incluidos con Python.</span></div>
+          <div class="reference-item"><cite>Python Packaging User Guide</cite><span>Referencia para instalación y gestión básica de paquetes y dependencias.</span></div>
+        </div>
+        <div class="callout"><strong>Delimitación:</strong> los comandos mostrados son una guía introductoria y pueden variar según la instalación del laboratorio. En el Tema 1.2 utilizaremos este entorno para comenzar la programación de sockets, sin volver a convertir la preparación del entorno en el centro de la clase.</div>
+        <div class="bottom-nav"><a class="btn light" href="tema-1-1-3-tcp-udp-aplicados-desarrollo.html">← 1.1.3 TCP y UDP</a><a class="btn" href="tema-1-1-fundamentos-programacion-aplicada-redes.html">Volver al Tema 1.1</a></div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="footer-inner"><span>Programación de Redes · Subtema 1.1.4</span><span>Progreso y reflexión: almacenamiento local del navegador.</span></div></footer>
+
+  <script>
+    (function(){
+      "use strict";
+      const progressBar=document.getElementById("progressBar");
+      function updateProgress(){const doc=document.documentElement;const max=doc.scrollHeight-doc.clientHeight;const value=max>0?(doc.scrollTop/max)*100:0;progressBar.style.width=Math.min(100,Math.max(0,value))+"%";}
+      document.addEventListener("scroll",updateProgress,{passive:true});window.addEventListener("resize",updateProgress);updateProgress();
+
+      function setFeedback(el,type,text){el.classList.remove("success","warn","error");if(type){el.classList.add(type);}el.textContent=text;}
+
+      const predictionFeedback=document.getElementById("predictionFeedback");
+      document.getElementById("checkPrediction").addEventListener("click",function(){const chosen=document.querySelector('input[name="envPrediction"]:checked');if(!chosen){setFeedback(predictionFeedback,"warn","Selecciona una predicción antes de comprobar.");return;}if(chosen.value==="b"){setFeedback(predictionFeedback,"success","Correcto. Cuando varios proyectos comparten paquetes globales, una actualización puede satisfacer a uno y romper la compatibilidad del otro. El aislamiento reduce ese acoplamiento.");}else if(chosen.value==="a"){setFeedback(predictionFeedback,"error","Revisa la idea de versión. Dos proyectos pueden requerir versiones diferentes del mismo paquete; compartir una instalación global puede crear conflictos.");}else{setFeedback(predictionFeedback,"error","La dirección IP no resuelve un conflicto de versiones de software. El problema pertenece al entorno de ejecución, no al direccionamiento de red.");}});
+      document.getElementById("resetPrediction").addEventListener("click",function(){document.querySelectorAll('input[name="envPrediction"]').forEach(function(r){r.checked=false;});setFeedback(predictionFeedback,"","Predice antes de revisar la explicación.");});
+
+      const seqIds=["seqRuntime","seqFolder","seqVenv","seqInstall","seqRecord"];
+      const sequenceFeedback=document.getElementById("sequenceFeedback");
+      document.getElementById("checkSequence").addEventListener("click",function(){const values=seqIds.map(function(id){return document.getElementById(id).value;});if(values.some(function(v){return !v;})){setFeedback(sequenceFeedback,"warn","Asigna una posición a las cinco acciones antes de comprobar.");return;}if(new Set(values).size!==5){setFeedback(sequenceFeedback,"error","Hay posiciones repetidas. Cada paso debe ocupar un lugar distinto del 1 al 5.");return;}const expected=["1","2","3","4","5"];const ok=values.every(function(v,i){return v===expected[i];});if(ok){setFeedback(sequenceFeedback,"success","Secuencia coherente: verificar runtime → preparar carpeta → crear/activar entorno → instalar lo externo → registrar y verificar dependencias. Esta secuencia ayuda a saber exactamente dónde y por qué se instala cada paquete.");}else{setFeedback(sequenceFeedback,"error","La secuencia todavía tiene una dependencia lógica incorrecta. Debes conocer el runtime y el proyecto antes de aislarlo; solo después instalas lo externo y finalmente registras/verificas el estado necesario.");}});
+      document.getElementById("resetSequence").addEventListener("click",function(){seqIds.forEach(function(id){document.getElementById(id).value="";});setFeedback(sequenceFeedback,"","Relaciona cada paso con lo que necesita existir antes de ejecutarlo.");});
+
+      const terminalOutput=document.getElementById("terminalOutput");const commandFeedback=document.getElementById("commandFeedback");let commandIndex=0;
+      const commandSets={
+        windows:[
+          {cmd:"python --version",why:"Verificar qué intérprete responde en este equipo. En algunos laboratorios Windows puede utilizarse py en lugar de python."},
+          {cmd:"python -m venv .venv",why:"Crear un entorno virtual asociado al proyecto."},
+          {cmd:".venv\\Scripts\\Activate.ps1",why:"Activar el entorno en PowerShell. Otros terminales de Windows usan una sintaxis de activación diferente."},
+          {cmd:"python -m pip install requests",why:"Instalar una dependencia externa dentro del entorno activo. socket, json e ipaddress no requieren esta instalación."},
+          {cmd:"python -m pip freeze > requirements.txt",why:"Registrar las versiones instaladas para este ejercicio introductorio. Después conviene revisar que el archivo no incluya dependencias accidentales."}
+        ],
+        unix:[
+          {cmd:"python3 --version",why:"Verificar qué intérprete utilizarás en el equipo."},
+          {cmd:"python3 -m venv .venv",why:"Crear un entorno virtual asociado al proyecto."},
+          {cmd:"source .venv/bin/activate",why:"Activar el entorno en una terminal compatible con esta sintaxis."},
+          {cmd:"python -m pip install requests",why:"Instalar una dependencia externa dentro del entorno activo. socket, json e ipaddress no requieren esta instalación."},
+          {cmd:"python -m pip freeze > requirements.txt",why:"Registrar las versiones instaladas para este ejercicio introductorio. Después conviene revisar que el archivo represente realmente al proyecto."}
+        ]
+      };
+      function resetCommands(){commandIndex=0;terminalOutput.innerHTML='<div class="muted-line">El recorrido mostrará una acción y su propósito.</div>';setFeedback(commandFeedback,"","Comienza verificando qué intérprete ejecutarás. No instales dependencias antes de saber en qué entorno estás trabajando.");document.getElementById("nextCommand").disabled=false;}
+      document.getElementById("osSelect").addEventListener("change",resetCommands);
+      document.getElementById("nextCommand").addEventListener("click",function(){const os=document.getElementById("osSelect").value;const list=commandSets[os];if(commandIndex<list.length){const item=list[commandIndex];const line=document.createElement("div");line.className="terminal-line";line.textContent="$ "+item.cmd;terminalOutput.appendChild(line);const why=document.createElement("div");why.className="muted-line";why.textContent="↳ "+item.why;terminalOutput.appendChild(why);commandIndex+=1;setFeedback(commandFeedback,commandIndex===list.length?"success":"",item.why);if(commandIndex===list.length){document.getElementById("nextCommand").disabled=true;}}});
+      document.getElementById("resetCommands").addEventListener("click",resetCommands);resetCommands();
+
+      const packageAnswers={pkgSocket:"stdlib",pkgJson:"stdlib",pkgIp:"stdlib",pkgRequests:"external"};const packagesFeedback=document.getElementById("packagesFeedback");
+      document.getElementById("checkPackages").addEventListener("click",function(){const ids=Object.keys(packageAnswers);let answered=0,correct=0;ids.forEach(function(id){const value=document.getElementById(id).value;if(value){answered+=1;if(value===packageAnswers[id]){correct+=1;}}});if(answered<ids.length){setFeedback(packagesFeedback,"warn","Clasifica los cuatro elementos antes de comprobar.");return;}if(correct===ids.length){setFeedback(packagesFeedback,"success","4/4. socket, json e ipaddress pertenecen a la biblioteca estándar; requests es un paquete externo y sí debe instalarse cuando el proyecto lo necesita.");}else{setFeedback(packagesFeedback,"error","Obtuviste "+correct+"/4. Recuerda: que un módulo se utilice con import no significa que sea externo. Revisa cuáles distribuye Python como parte de su biblioteca estándar.");}});
+      document.getElementById("resetPackages").addEventListener("click",function(){Object.keys(packageAnswers).forEach(function(id){document.getElementById(id).value="";});setFeedback(packagesFeedback,"","Clasifica los cuatro elementos.");});
+
+      const solutionSteps=Array.from(document.querySelectorAll("#solutionSteps .step"));const revealStep=document.getElementById("revealStep");const solutionFeedback=document.getElementById("solutionFeedback");let revealed=0;
+      revealStep.addEventListener("click",function(){if(revealed<solutionSteps.length){solutionSteps[revealed].classList.add("revealed");revealed+=1;if(revealed<solutionSteps.length){setFeedback(solutionFeedback,"","Paso "+revealed+" revelado. Antes de continuar, anticipa qué decisión sigue.");}else{setFeedback(solutionFeedback,"success","Solución completa. La idea central es instalar únicamente lo externo dentro de un entorno aislado y comprobar que ese entorno puede reconstruirse.");revealStep.disabled=true;}}});
+      document.getElementById("resetSolution").addEventListener("click",function(){solutionSteps.forEach(function(s){s.classList.remove("revealed");});revealed=0;revealStep.disabled=false;setFeedback(solutionFeedback,"","Antes de revelar cada paso, intenta decidir qué elementos deben instalarse realmente.");});
+
+      function checkPractice(selectId,feedbackId,correct,successText,retryText){const value=document.getElementById(selectId).value;const fb=document.getElementById(feedbackId);fb.classList.remove("success","warn");if(!value){fb.classList.add("warn");fb.textContent="Selecciona una respuesta antes de comprobar.";return;}if(value===correct){fb.classList.add("success");fb.textContent=successText;}else{fb.classList.add("warn");fb.textContent=retryText;}}
+      document.getElementById("checkOne").addEventListener("click",function(){checkPractice("practiceOne","feedbackOne","record","Correcto. Antes de pedir a otra persona que ejecute el proyecto, debes identificar y registrar las dependencias externas necesarias.","Cambiar parámetros de red no informa qué paquetes necesita el programa. Piensa en reproducibilidad del software.");});
+      document.getElementById("checkTwo").addEventListener("click",function(){checkPractice("practiceTwo","feedbackTwo","venv","Correcto. Un entorno por proyecto permite mantener versiones distintas sin forzar a ambos a compartir una única instalación global.","El conflicto no es de puertos ni direcciones. Es una incompatibilidad entre dependencias de software.");});
+      document.getElementById("checkThree").addEventListener("click",function(){checkPractice("practiceThree","feedbackThree","stdlib","Correcto. socket forma parte de la biblioteca estándar de Python y será la base de los primeros ejercicios del Tema 1.2.","Revisa la clasificación realizada en el laboratorio: socket viene con Python; no se instala como paquete de terceros.");});
+
+      const caseFeedback=document.getElementById("caseFeedback");
+      document.getElementById("checkCase").addEventListener("click",function(){const isolation=document.getElementById("caseIsolation").value;const deps=document.getElementById("caseDeps").value;if(!isolation||!deps){setFeedback(caseFeedback,"warn","Selecciona las dos decisiones antes de analizar el caso.");return;}if(isolation==="venv"&&deps==="required"){setFeedback(caseFeedback,"success","Diseño coherente: el servidor utiliza un entorno propio y recibe solo las dependencias externas realmente requeridas y registradas. Esto mejora aislamiento, trazabilidad y diagnóstico.");}else{setFeedback(caseFeedback,"error","Revisa el objetivo: trasladar la aplicación, no clonar accidentalmente el estado completo del portátil. Aísla el proyecto e instala solo lo que éste necesita.");}});
+      document.getElementById("resetCase").addEventListener("click",function(){document.getElementById("caseIsolation").value="";document.getElementById("caseDeps").value="";setFeedback(caseFeedback,"","Selecciona una estrategia para el servidor y justifícala con estos criterios.");});
+
+      const quizForm=document.getElementById("quizForm");const quizFeedback=document.getElementById("quizFeedback");const quizAnswers={q1:"b",q2:"b",q3:"a",q4:"c",q5:"a"};const quizExplanations={q1:"Q1: el entorno virtual aísla dependencias entre proyectos.",q2:"Q2: socket forma parte de la biblioteca estándar.",q3:"Q3: registrar dependencias permite saber qué instalar en otro entorno.",q4:"Q4: json es estándar; requests es externo.",q5:"Q5: un entorno controlado ayuda a separar problemas de instalación de otros fallos."};
+      quizForm.addEventListener("submit",function(event){event.preventDefault();let answered=0,correct=0;const misses=[];Object.keys(quizAnswers).forEach(function(name){const selected=quizForm.querySelector('input[name="'+name+'"]:checked');if(selected){answered+=1;if(selected.value===quizAnswers[name]){correct+=1;}else{misses.push(quizExplanations[name]);}}});if(answered<5){setFeedback(quizFeedback,"warn","Has respondido "+answered+" de 5 preguntas. Completa todas antes de comprobar.");return;}if(correct===5){setFeedback(quizFeedback,"success","5/5. Puedes distinguir runtime, aislamiento, biblioteca estándar y dependencias externas, y relacionarlos con un proyecto reproducible.");}else{quizFeedback.classList.remove("success","warn","error");quizFeedback.classList.add("error");quizFeedback.innerHTML="Obtuviste <strong>"+correct+"/5</strong>. Revisa: "+misses.join(" ")+" Después vuelve a intentarlo.";}});
+      document.getElementById("resetQuiz").addEventListener("click",function(){quizForm.reset();setFeedback(quizFeedback,"","Completa las cinco preguntas antes de comprobar.");});
+
+      const reflectionText=document.getElementById("reflectionText");const reflectionFeedback=document.getElementById("reflectionFeedback");const storageKey="programacion-redes-1-1-4-reflexion";
+      try{const saved=localStorage.getItem(storageKey);if(saved){reflectionText.value=saved;setFeedback(reflectionFeedback,"success","Se recuperó la reflexión guardada previamente en este navegador.");}}catch(error){setFeedback(reflectionFeedback,"warn","El navegador no permitió acceder al almacenamiento local. Puedes realizar la reflexión sin guardarla.");}
+      document.getElementById("saveReflection").addEventListener("click",function(){const value=reflectionText.value.trim();if(value.length<80){setFeedback(reflectionFeedback,"warn","Amplía la reflexión. Incluye runtime, aislamiento, dependencias externas y cómo comprobarías que el entorno puede reconstruirse.");return;}try{localStorage.setItem(storageKey,value);setFeedback(reflectionFeedback,"success","Reflexión guardada únicamente en este navegador.");}catch(error){setFeedback(reflectionFeedback,"warn","No fue posible guardar localmente. El texto permanece visible mientras esta página siga abierta.");}});
+      document.getElementById("clearReflection").addEventListener("click",function(){reflectionText.value="";try{localStorage.removeItem(storageKey);}catch(error){}setFeedback(reflectionFeedback,"","Reflexión limpiada en esta página.");reflectionText.focus();});
+    })();
+  </script>
+</body>
+</html>

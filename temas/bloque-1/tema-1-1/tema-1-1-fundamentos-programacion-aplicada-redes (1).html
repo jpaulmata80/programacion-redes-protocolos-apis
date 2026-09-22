@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Tema 1.1: visión general de los fundamentos de programación aplicada a redes para Telecomunicaciones.">
+  <meta name="theme-color" content="#10212a">
+  <title>Tema 1.1 | Fundamentos de programación aplicada a redes</title>
+  <style>
+    :root{
+      --ink:#18212a;
+      --muted:#586775;
+      --line:#cbd5dc;
+      --soft:#f3f6f8;
+      --paper:#ffffff;
+      --cyan:#007c91;
+      --cyan-dark:#005b6a;
+      --cyan-light:#6ed2e2;
+      --green:#16734a;
+      --green-soft:#e8f5ee;
+      --amber:#8a5600;
+      --amber-soft:#fff3d8;
+      --focus:#005fcc;
+      --navy:#10212a;
+      --navy-deep:#07141a;
+      --max:1180px;
+      --radius:8px;
+      --shadow:0 16px 38px rgba(24,33,42,.08);
+    }
+
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      min-width:280px;
+      color:var(--ink);
+      background:var(--paper);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      line-height:1.55;
+      overflow-x:hidden;
+    }
+    img,svg,canvas,video{display:block;max-width:100%}
+    button,input,select,textarea{font:inherit;max-width:100%}
+    button,input[type="checkbox"]{cursor:pointer}
+    a{color:var(--cyan-dark)}
+    a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+
+    .skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}
+    .skip-link:focus{top:1rem}
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:30;
+      background:rgba(255,255,255,.97);
+      border-bottom:1px solid var(--line);
+      backdrop-filter:blur(8px);
+    }
+    .header-inner{
+      width:min(100%,var(--max));
+      min-height:66px;
+      margin:0 auto;
+      padding:.55rem 1.25rem;
+      display:flex;
+      gap:1rem;
+      align-items:center;
+      min-width:0;
+    }
+    .brand{min-width:190px}
+    .brand strong{display:block;font-size:.95rem}
+    .brand span{display:block;color:var(--muted);font-size:.78rem}
+    .nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}
+    nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+    nav a{color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;border-bottom:2px solid transparent;font-size:.84rem}
+    nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+    .home-link{
+      flex:0 0 auto;
+      text-decoration:none;
+      border:1px solid var(--line);
+      border-radius:5px;
+      padding:.48rem .72rem;
+      color:var(--ink);
+      font-weight:750;
+      white-space:nowrap;
+      background:#fff;
+    }
+    .home-link:hover{border-color:var(--cyan);color:var(--cyan-dark)}
+
+    main{overflow:hidden}
+    section{scroll-margin-top:84px;border-bottom:1px solid var(--line)}
+    .band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+
+    .hero{
+      min-height:calc(100svh - 66px);
+      display:grid;
+      align-items:center;
+      background:var(--navy);
+      color:#fff;
+    }
+    .hero-grid{
+      width:min(100%,var(--max));
+      margin:0 auto;
+      padding:3.4rem 1.25rem;
+      display:grid;
+      grid-template-columns:minmax(0,.95fr) minmax(0,1.25fr);
+      gap:3rem;
+      align-items:center;
+    }
+    .hero-grid>*{min-width:0}
+    .eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+    h1{
+      font-size:clamp(2rem,5vw,4.6rem);
+      line-height:1.02;
+      margin:.65rem 0 1.15rem;
+      max-width:18ch;
+      overflow-wrap:normal;
+      word-break:normal;
+      hyphens:none;
+    }
+    h2{
+      font-size:clamp(1.75rem,3.3vw,2.8rem);
+      line-height:1.12;
+      margin:0 0 .8rem;
+      overflow-wrap:normal;
+      word-break:normal;
+      hyphens:none;
+    }
+    h3{font-size:1.22rem;margin:0 0 .55rem}
+    p{max-width:72ch}
+    .hero p{color:#d7e5ea;font-size:1.08rem}
+    .hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}
+    .hero-actions{margin-top:1.45rem}
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid var(--cyan-dark);
+      background:var(--cyan);
+      color:#fff;
+      text-decoration:none;
+      padding:.72rem 1rem;
+      border-radius:5px;
+      font-weight:750;
+    }
+    .btn:hover{background:var(--cyan-dark)}
+    .btn.secondary{background:transparent;color:inherit;border-color:currentColor}
+    .btn.secondary:hover{background:rgba(255,255,255,.1)}
+    .btn.light{background:#fff;color:var(--ink);border-color:var(--line)}
+    .btn.light:hover{background:var(--soft);color:var(--cyan-dark)}
+
+    .hero-map{
+      min-width:0;
+      background:var(--navy-deep);
+      border:1px solid #3b5965;
+      border-radius:8px;
+      padding:1.35rem;
+    }
+    .map-line{display:grid;grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr) 48px minmax(0,1fr);gap:.55rem;align-items:center}
+    .map-node{min-width:0;text-align:center;border:1px solid #48616b;border-radius:7px;padding:1rem .7rem;background:#102a35}
+    .map-node strong{display:block;color:#fff;margin-bottom:.25rem}
+    .map-node span{display:block;color:#bfd1d7;font-size:.83rem}
+    .map-arrow{text-align:center;color:var(--cyan-light);font-size:1.8rem;font-weight:900}
+    .hero-caption{margin-top:1rem;color:#b8cbd2;font-size:.82rem}
+
+    .section-head{display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem}
+    .section-head>*{min-width:0}
+    .section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}
+    .lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+
+    .outcomes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+    .outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}
+    .outcome:last-child{border-right:0}
+    .outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+
+    .why-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:2.4rem;align-items:start}
+    .why-grid>*{min-width:0}
+    .concept-list{margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
+    .concept-list li{padding:1rem 0;border-bottom:1px solid var(--line)}
+    .concept-list strong{display:block;margin-bottom:.2rem;color:var(--ink)}
+
+    .scenario-board{
+      background:var(--soft);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:1.35rem;
+      min-width:0;
+    }
+    .scenario-chain{display:grid;grid-template-columns:minmax(0,1fr) 44px minmax(0,1fr) 44px minmax(0,1fr);gap:.5rem;align-items:center;margin-top:1rem}
+    .scenario-box{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1rem;text-align:center;min-width:0;box-shadow:var(--shadow)}
+    .scenario-box strong{display:block;color:var(--cyan-dark);margin-bottom:.25rem}
+    .scenario-box span{display:block;color:var(--muted);font-size:.85rem}
+    .scenario-arrow{text-align:center;color:var(--cyan-dark);font-size:1.45rem;font-weight:900}
+
+    .journey{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+    .journey-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.25rem;background:#fff;box-shadow:var(--shadow);display:flex;flex-direction:column}
+    .journey-card .num{font-weight:850;color:var(--cyan-dark);font-size:.82rem;text-transform:uppercase;letter-spacing:.05em}
+    .journey-card h3{margin:.35rem 0 .55rem}
+    .journey-card p{color:var(--muted);font-size:.94rem;margin:0 0 1rem}
+    .journey-card .question{margin-top:auto;padding-top:.9rem;border-top:1px solid var(--line);font-weight:700;font-size:.9rem}
+
+    .activity{margin-top:2rem;padding:1.35rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--soft);min-width:0}
+    .activity h3{margin-top:0}
+    .activity-instruction{color:var(--muted);margin-top:0}
+    .prediction{display:grid;gap:.65rem;margin:1rem 0}
+    .prediction label{display:block;padding:.78rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+    .prediction input{margin-right:.5rem}
+    .feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}
+    .feedback.success{background:var(--green-soft);border-color:var(--green)}
+    .feedback.warn{background:var(--amber-soft);border-color:var(--amber)}
+
+    .subtopics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+    .subtopic-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.3rem;background:#fff;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.8rem}
+    .subtopic-top{display:flex;gap:1rem;align-items:flex-start;min-width:0}
+    .badge{flex:0 0 auto;display:grid;place-items:center;min-width:64px;height:42px;border-radius:6px;background:#d9eef2;color:var(--cyan-dark);font-weight:850}
+    .subtopic-card h3{margin:.1rem 0 .25rem}
+    .subtopic-card p{margin:0;color:var(--muted)}
+    .subtopic-card .goal{padding:.8rem;background:var(--soft);border-radius:5px;font-size:.91rem}
+    .subtopic-card .btn{align-self:flex-start;margin-top:auto}
+
+    .scope-note{margin-top:1.4rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}
+
+    .reflection-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:2rem;align-items:start}
+    .reflection-grid>*{min-width:0}
+    textarea{width:100%;min-height:150px;resize:vertical;border:1px solid var(--line);border-radius:6px;padding:.8rem;background:#fff}
+    .storage-note{font-size:.83rem;color:var(--muted)}
+
+    .references{font-size:.94rem;color:var(--muted)}
+    .references ul{padding-left:1.2rem}
+
+    footer{background:var(--navy);color:#c9d8dd}
+    footer .band{padding-top:2rem;padding-bottom:2rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+
+    @media(max-width:900px){
+      .header-inner{flex-wrap:wrap}
+      .nav-scroll{order:3;flex-basis:100%}
+      .hero-grid,.why-grid,.reflection-grid{grid-template-columns:1fr}
+      .outcomes,.journey{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .outcome:nth-child(2){border-right:0}
+      .outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}
+    }
+
+    @media(max-width:680px){
+      .band{padding:3.2rem 1rem}
+      .hero-grid{padding:2.7rem 1rem}
+      .section-head{grid-template-columns:1fr;gap:.45rem}
+      .outcomes,.journey,.subtopics{grid-template-columns:1fr}
+      .outcome{border-right:0;border-bottom:1px solid var(--line)}
+      .outcome:last-child{border-bottom:0}
+      .map-line,.scenario-chain{grid-template-columns:1fr}
+      .map-arrow,.scenario-arrow{transform:rotate(90deg)}
+      .home-link{width:100%;text-align:center}
+    }
+
+    @media(max-width:480px){
+      h1{font-size:clamp(2rem,10vw,2.8rem);max-width:none}
+      .header-inner{padding:.55rem 1rem}
+      .brand{min-width:0;flex:1}
+      .subtopic-top{flex-direction:column}
+      .badge{min-width:0;width:max-content;padding:0 .7rem}
+    }
+
+    @media(prefers-reduced-motion:reduce){
+      html{scroll-behavior:auto}
+      *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#inicio">Ir al contenido</a>
+
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <strong>Programación de Redes</strong>
+        <span>Bloque 1 · Tema 1.1</span>
+      </div>
+      <div class="nav-scroll">
+        <nav aria-label="Secciones del tema">
+          <a href="#inicio" aria-current="location">Inicio</a>
+          <a href="#proposito">Propósito</a>
+          <a href="#recorrido">Recorrido</a>
+          <a href="#telecom">Telecomunicaciones</a>
+          <a href="#subtemas">Subtemas</a>
+          <a href="#reflexion">Reflexión</a>
+        </nav>
+      </div>
+      <a class="home-link" href="index.html" aria-label="Volver a la pantalla principal del curso">← Curso</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="inicio">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">Bloque 1 · Tema 1.1 · Visión general</div>
+          <h1>Fundamentos de programación aplicada a redes</h1>
+          <p>Antes de programar sockets o consumir APIs, necesitamos comprender qué elementos permiten que dos aplicaciones se encuentren, intercambien información y trabajen de forma coordinada a través de una red.</p>
+          <div class="hero-actions">
+            <a class="btn" href="#proposito">Comenzar el tema</a>
+            <a class="btn secondary" href="#subtemas">Ver subtemas</a>
+          </div>
+        </div>
+
+        <div class="hero-map" role="img" aria-label="Esquema conceptual: una aplicación cliente se comunica a través de la red con un servicio remoto">
+          <div class="map-line">
+            <div class="map-node"><strong>Aplicación</strong><span>Necesita información o ejecutar una acción</span></div>
+            <div class="map-arrow" aria-hidden="true">→</div>
+            <div class="map-node"><strong>Red</strong><span>Transporta la comunicación hasta el destino</span></div>
+            <div class="map-arrow" aria-hidden="true">→</div>
+            <div class="map-node"><strong>Servicio</strong><span>Recibe, procesa y responde</span></div>
+          </div>
+          <p class="hero-caption">Este tema presenta el mapa general. Cada elemento se desarrollará después en un subtema independiente.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="proposito" aria-labelledby="proposito-title">
+      <div class="band">
+        <div class="section-head">
+          <div class="section-code">ORIENTACIÓN</div>
+          <div>
+            <h2 id="proposito-title">¿Qué vamos a comprender antes de programar?</h2>
+            <p class="lead">La programación de redes no empieza con una instrucción de código. Empieza entendiendo quién se comunica, dónde está el destino, cómo viajan los datos y en qué entorno se ejecutará nuestra aplicación.</p>
+          </div>
+        </div>
+
+        <div class="outcomes" aria-label="Resultados del recorrido general">
+          <div class="outcome"><b>Relacionar</b>Aplicaciones de software con servicios que operan sobre una red.</div>
+          <div class="outcome"><b>Ubicar</b>Los elementos que permiten identificar un destino de comunicación.</div>
+          <div class="outcome"><b>Distinguir</b>Por qué una aplicación puede necesitar comportamientos de transporte diferentes.</div>
+          <div class="outcome"><b>Reconocer</b>La necesidad de preparar un entorno de desarrollo controlado.</div>
+        </div>
+
+        <div class="scope-note"><strong>Cómo trabajar este tema:</strong> úsalo como mapa de entrada. No necesitas memorizar todavía los detalles. El objetivo es comprender cómo se conectan los conceptos que después estudiaremos con profundidad en 1.1.1, 1.1.2, 1.1.3 y 1.1.4.</div>
+      </div>
+    </section>
+
+    <section id="recorrido" aria-labelledby="recorrido-title">
+      <div class="band">
+        <div class="section-head">
+          <div class="section-code">MAPA</div>
+          <div>
+            <h2 id="recorrido-title">De un programa aislado a una aplicación conectada</h2>
+            <p class="lead">Una aplicación de red debe resolver cuatro preguntas fundamentales. Estas preguntas organizan todo el Tema 1.1.</p>
+          </div>
+        </div>
+
+        <div class="journey">
+          <article class="journey-card">
+            <div class="num">1.1.1</div>
+            <h3>¿Quién se comunica?</h3>
+            <p>Identificaremos los roles de cliente y servidor, quién inicia una solicitud y quién ofrece un servicio.</p>
+            <div class="question">Concepto guía: arquitectura cliente-servidor.</div>
+          </article>
+          <article class="journey-card">
+            <div class="num">1.1.2</div>
+            <h3>¿Dónde está el servicio?</h3>
+            <p>Relacionaremos dirección IP, puerto y protocolo con la forma en que una aplicación localiza un punto de comunicación.</p>
+            <div class="question">Concepto guía: IP + puerto + protocolo.</div>
+          </article>
+          <article class="journey-card">
+            <div class="num">1.1.3</div>
+            <h3>¿Cómo viajarán los datos?</h3>
+            <p>Compararemos TCP y UDP desde las necesidades reales de una aplicación y no desde definiciones aisladas.</p>
+            <div class="question">Concepto guía: requisitos del transporte.</div>
+          </article>
+          <article class="journey-card">
+            <div class="num">1.1.4</div>
+            <h3>¿Dónde desarrollaremos?</h3>
+            <p>Comprenderemos por qué conviene controlar versión, entorno y dependencias antes de empezar a programar.</p>
+            <div class="question">Concepto guía: entorno reproducible.</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="telecom" aria-labelledby="telecom-title">
+      <div class="band">
+        <div class="section-head">
+          <div class="section-code">APLICACIÓN</div>
+          <div>
+            <h2 id="telecom-title">¿Dónde aparece esto en Telecomunicaciones?</h2>
+            <p class="lead">En el campo profesional, muchas tareas dependen de software que consulta, supervisa, configura o integra equipos distribuidos en una red.</p>
+          </div>
+        </div>
+
+        <div class="why-grid">
+          <div>
+            <ul class="concept-list">
+              <li><strong>Monitoreo de infraestructura</strong>Un panel consulta el estado de routers, switches, enlaces, sensores o servicios remotos.</li>
+              <li><strong>Automatización y operación</strong>Una aplicación puede enviar órdenes, recopilar métricas o ejecutar acciones sobre dispositivos de red.</li>
+              <li><strong>IoT y telemetría</strong>Equipos distribuidos reportan valores hacia plataformas que almacenan, procesan o visualizan información.</li>
+              <li><strong>APIs y plataformas</strong>Servicios de software intercambian información mediante interfaces y protocolos definidos.</li>
+            </ul>
+          </div>
+
+          <div class="scenario-board">
+            <h3>Caso profesional de entrada</h3>
+            <p>Un centro de operaciones necesita consultar el estado de un equipo instalado en un sitio remoto. Todavía no vamos a programarlo; primero observaremos qué preguntas aparecen.</p>
+            <div class="scenario-chain" role="img" aria-label="Centro de operaciones conectado por una red a un sitio remoto">
+              <div class="scenario-box"><strong>Centro NOC</strong><span>Aplicación del operador</span></div>
+              <div class="scenario-arrow" aria-hidden="true">→</div>
+              <div class="scenario-box"><strong>Red IP</strong><span>Ruta hacia el sitio</span></div>
+              <div class="scenario-arrow" aria-hidden="true">→</div>
+              <div class="scenario-box"><strong>Sitio remoto</strong><span>Servicio del equipo</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity" aria-labelledby="prediccion-title">
+          <h3 id="prediccion-title">Predice · ¿Qué necesitará conocer la aplicación?</h3>
+          <p class="activity-instruction">Selecciona los elementos que consideras necesarios para que el software del NOC pueda comunicarse con el servicio remoto. Puedes elegir más de uno.</p>
+          <div class="prediction" id="overviewPrediction">
+            <label><input type="checkbox" value="role"> Qué proceso actuará como cliente y qué proceso ofrecerá el servicio.</label>
+            <label><input type="checkbox" value="address"> Cómo identificar el destino mediante información de red y del servicio.</label>
+            <label><input type="checkbox" value="transport"> Qué comportamiento de transporte necesita la aplicación.</label>
+            <label><input type="checkbox" value="environment"> En qué entorno se ejecutará y qué dependencias requerirá el programa.</label>
+            <label><input type="checkbox" value="screen"> El tamaño físico de la pantalla del operador como requisito de comunicación.</label>
+          </div>
+          <div class="action-row">
+            <button class="btn" id="checkOverview" type="button">Comprobar</button>
+            <button class="btn light" id="resetOverview" type="button">Reintentar</button>
+          </div>
+          <div class="feedback" id="overviewFeedback" role="status" aria-live="polite">Haz tu predicción antes de continuar. No buscamos todavía detalles técnicos, sino reconocer las categorías de información necesarias.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="subtemas" aria-labelledby="subtemas-title">
+      <div class="band">
+        <div class="section-head">
+          <div class="section-code">RECORRIDO</div>
+          <div>
+            <h2 id="subtemas-title">Continúa con los subtemas del 1.1</h2>
+            <p class="lead">Cada subtema desarrolla con mayor profundidad uno de los elementos introducidos en esta visión general e incorporará ejercicios e interacciones cuando el contenido lo justifique.</p>
+          </div>
+        </div>
+
+        <div class="subtopics">
+          <article class="subtopic-card">
+            <div class="subtopic-top">
+              <div class="badge">1.1.1</div>
+              <div>
+                <h3>Arquitectura cliente-servidor</h3>
+                <p>Roles, solicitudes, respuestas, servicios y comportamiento de múltiples clientes.</p>
+              </div>
+            </div>
+            <div class="goal"><strong>Pregunta central:</strong> ¿quién inicia la comunicación y quién ofrece el servicio?</div>
+            <a class="btn" href="tema-1-1-1-arquitectura-cliente-servidor.html">Ir al subtema 1.1.1</a>
+          </article>
+
+          <article class="subtopic-card">
+            <div class="subtopic-top">
+              <div class="badge">1.1.2</div>
+              <div>
+                <h3>Direccionamiento IP, puertos y protocolos</h3>
+                <p>Cómo una aplicación identifica el host, el servicio y el protocolo de transporte que necesita alcanzar.</p>
+              </div>
+            </div>
+            <div class="goal"><strong>Pregunta central:</strong> ¿cómo encuentra una aplicación al proceso remoto correcto?</div>
+            <a class="btn" href="tema-1-1-2-direccionamiento-ip-puertos-protocolos.html">Ir al subtema 1.1.2</a>
+          </article>
+
+          <article class="subtopic-card">
+            <div class="subtopic-top">
+              <div class="badge">1.1.3</div>
+              <div>
+                <h3>TCP y UDP aplicados al desarrollo</h3>
+                <p>Diferencias relevantes para el software: conexión, entrega, orden, pérdida y oportunidad temporal.</p>
+              </div>
+            </div>
+            <div class="goal"><strong>Pregunta central:</strong> ¿qué comportamiento de transporte necesita mi aplicación?</div>
+            <a class="btn" href="tema-1-1-3-tcp-udp-aplicados-desarrollo.html">Ir al subtema 1.1.3</a>
+          </article>
+
+          <article class="subtopic-card">
+            <div class="subtopic-top">
+              <div class="badge">1.1.4</div>
+              <div>
+                <h3>Entorno de programación y dependencias</h3>
+                <p>Runtime, aislamiento del proyecto, paquetes necesarios y reproducibilidad del entorno.</p>
+              </div>
+            </div>
+            <div class="goal"><strong>Pregunta central:</strong> ¿cómo preparo un entorno confiable para desarrollar y repetir el proyecto?</div>
+            <a class="btn" href="tema-1-1-4-entorno-programacion-dependencias.html">Ir al subtema 1.1.4</a>
+          </article>
+        </div>
+
+        <div class="scope-note"><strong>Nota de navegación:</strong> los enlaces anteriores ya usan los nombres previstos para los archivos de cada subtema. Se activarán completamente a medida que construyamos 1.1.1–1.1.4.</div>
+      </div>
+    </section>
+
+    <section id="reflexion" aria-labelledby="reflexion-title">
+      <div class="band">
+        <div class="section-head">
+          <div class="section-code">REFLEXIÓN</div>
+          <div>
+            <h2 id="reflexion-title">Antes de entrar al primer subtema</h2>
+            <p class="lead">Formula una idea inicial. Después podrás compararla con lo que aprendas en los subtemas.</p>
+          </div>
+        </div>
+
+        <div class="reflection-grid">
+          <div>
+            <h3>Pregunta de cierre</h3>
+            <p>Si una aplicación instalada en tu computador necesita consultar información de un equipo remoto, ¿qué crees que debe ocurrir desde que presionas “consultar” hasta que ves una respuesta?</p>
+            <p class="storage-note">La reflexión se guarda únicamente en este navegador mediante almacenamiento local. No se transmite información.</p>
+          </div>
+          <div>
+            <label for="reflectionText"><strong>Escribe tu explicación inicial</strong></label>
+            <textarea id="reflectionText" placeholder="Describe con tus palabras qué elementos crees que intervienen..."></textarea>
+            <div class="action-row" style="margin-top:.8rem">
+              <button class="btn" id="saveReflection" type="button">Guardar reflexión</button>
+              <a class="btn light" href="tema-1-1-1-arquitectura-cliente-servidor.html">Continuar a 1.1.1</a>
+            </div>
+            <div class="feedback" id="reflectionFeedback" role="status" aria-live="polite">Aún no se ha guardado una reflexión.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="referencias" aria-labelledby="referencias-title">
+      <div class="band">
+        <div class="section-head">
+          <div class="section-code">ALCANCE</div>
+          <div>
+            <h2 id="referencias-title">Referencias y delimitación</h2>
+            <p class="lead">Este recurso introduce la estructura conceptual del Tema 1.1. Los detalles técnicos, ejercicios resueltos y actividades profundas se desarrollan en los subtemas.</p>
+          </div>
+        </div>
+
+        <div class="references">
+          <ul>
+            <li>Kurose, J. F. y Ross, K. W. <em>Redes de computadoras: un enfoque descendente</em>. Conceptos de aplicaciones de red y transporte.</li>
+            <li>Tanenbaum, A. S. y Wetherall, D. J. <em>Redes de computadoras</em>. Arquitecturas, protocolos y servicios de red.</li>
+          </ul>
+          <p><strong>No se aborda todavía:</strong> programación de sockets, sintaxis de APIs de red ni implementación de clientes o servidores. Esos contenidos aparecerán en los temas correspondientes.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="band">
+      <span>Programación de Redes: Protocolos y APIs · Aula interactiva</span>
+      <span>Tema 1.1 · Fundamentos de programación aplicada a redes</span>
+    </div>
+  </footer>
+
+  <script>
+    (function(){
+      "use strict";
+
+      const checkOverview = document.getElementById("checkOverview");
+      const resetOverview = document.getElementById("resetOverview");
+      const overviewFeedback = document.getElementById("overviewFeedback");
+      const overviewPrediction = document.getElementById("overviewPrediction");
+
+      function selectedValues(){
+        return Array.from(overviewPrediction.querySelectorAll('input[type="checkbox"]:checked')).map(function(input){return input.value;});
+      }
+
+      checkOverview.addEventListener("click", function(){
+        const selected = selectedValues();
+        const required = ["role","address","transport","environment"];
+        const hasAll = required.every(function(value){return selected.includes(value);});
+        const hasDistractor = selected.includes("screen");
+
+        overviewFeedback.classList.remove("success","warn");
+
+        if(selected.length === 0){
+          overviewFeedback.classList.add("warn");
+          overviewFeedback.textContent = "Selecciona al menos una opción. Piensa en qué información necesita el software para comunicarse, no en características físicas de la interfaz del operador.";
+          return;
+        }
+
+        if(hasAll && !hasDistractor){
+          overviewFeedback.classList.add("success");
+          overviewFeedback.textContent = "Buena lectura del problema. Has identificado las cuatro categorías que organizan este tema: roles de comunicación, localización del servicio, comportamiento del transporte y entorno de ejecución. Cada una se profundizará en un subtema.";
+          return;
+        }
+
+        overviewFeedback.classList.add("warn");
+        if(hasDistractor){
+          overviewFeedback.textContent = "Revisa tu selección. El tamaño físico de la pantalla puede afectar la interfaz de usuario, pero no determina cómo la aplicación encuentra ni comunica con un servicio remoto. Busca las cuatro categorías técnicas que organizan el Tema 1.1.";
+        } else {
+          overviewFeedback.textContent = "Vas por buen camino, pero falta al menos una categoría. Pregúntate: ¿quién se comunica?, ¿cómo se identifica el destino?, ¿cómo deben viajar los datos? y ¿en qué entorno se ejecutará el programa?";
+        }
+      });
+
+      resetOverview.addEventListener("click", function(){
+        overviewPrediction.querySelectorAll('input[type="checkbox"]').forEach(function(input){input.checked=false;});
+        overviewFeedback.classList.remove("success","warn");
+        overviewFeedback.textContent = "Haz tu predicción antes de continuar. No buscamos todavía detalles técnicos, sino reconocer las categorías de información necesarias.";
+      });
+
+      const reflectionText = document.getElementById("reflectionText");
+      const saveReflection = document.getElementById("saveReflection");
+      const reflectionFeedback = document.getElementById("reflectionFeedback");
+      const storageKey = "programacion-redes-tema-1-1-reflexion";
+
+      try{
+        const saved = localStorage.getItem(storageKey);
+        if(saved){
+          reflectionText.value = saved;
+          reflectionFeedback.classList.add("success");
+          reflectionFeedback.textContent = "Se recuperó la reflexión guardada previamente en este navegador.";
+        }
+      }catch(error){
+        reflectionFeedback.classList.add("warn");
+        reflectionFeedback.textContent = "El navegador no permitió acceder al almacenamiento local. Puedes trabajar la reflexión sin guardarla.";
+      }
+
+      saveReflection.addEventListener("click", function(){
+        const value = reflectionText.value.trim();
+        reflectionFeedback.classList.remove("success","warn");
+        if(value.length < 20){
+          reflectionFeedback.classList.add("warn");
+          reflectionFeedback.textContent = "Amplía un poco tu explicación antes de guardarla. Intenta mencionar al menos quién solicita, dónde está el destino o cómo regresaría una respuesta.";
+          return;
+        }
+        try{
+          localStorage.setItem(storageKey,value);
+          reflectionFeedback.classList.add("success");
+          reflectionFeedback.textContent = "Reflexión guardada únicamente en este navegador.";
+        }catch(error){
+          reflectionFeedback.classList.add("warn");
+          reflectionFeedback.textContent = "No fue posible guardar localmente. El contenido permanece visible mientras mantengas abierta la página.";
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

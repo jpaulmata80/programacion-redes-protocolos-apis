@@ -1,0 +1,1040 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Subtema 1.1.1: arquitectura cliente-servidor aplicada a programación de redes y telecomunicaciones.">
+  <meta name="theme-color" content="#10212a">
+  <title>1.1.1 | Arquitectura cliente-servidor</title>
+  <style>
+    :root{
+      --ink:#18212a;
+      --muted:#586775;
+      --line:#cbd5dc;
+      --soft:#f3f6f8;
+      --paper:#ffffff;
+      --cyan:#007c91;
+      --cyan-dark:#005b6a;
+      --cyan-light:#6ed2e2;
+      --green:#16734a;
+      --green-soft:#e8f5ee;
+      --amber:#8a5600;
+      --amber-soft:#fff3d8;
+      --red:#9b2c2c;
+      --red-soft:#fff0f0;
+      --focus:#005fcc;
+      --navy:#10212a;
+      --navy-deep:#07141a;
+      --max:1180px;
+      --radius:8px;
+      --shadow:0 16px 38px rgba(24,33,42,.08);
+    }
+
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      min-width:280px;
+      color:var(--ink);
+      background:var(--paper);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      line-height:1.55;
+      overflow-x:hidden;
+    }
+    img,svg,canvas,video{display:block;max-width:100%}
+    button,input,select,textarea{font:inherit;max-width:100%}
+    button,input[type="radio"],input[type="checkbox"],select{cursor:pointer}
+    a{color:var(--cyan-dark)}
+    a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+
+    .skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}
+    .skip-link:focus{top:1rem}
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:30;
+      background:rgba(255,255,255,.97);
+      border-bottom:1px solid var(--line);
+      backdrop-filter:blur(8px);
+    }
+    .header-inner{
+      width:min(100%,var(--max));
+      min-height:66px;
+      margin:0 auto;
+      padding:.55rem 1.25rem;
+      display:flex;
+      gap:.75rem;
+      align-items:center;
+      min-width:0;
+    }
+    .brand{min-width:190px}
+    .brand strong{display:block;font-size:.95rem}
+    .brand span{display:block;color:var(--muted);font-size:.78rem}
+    .nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}
+    nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+    nav a{color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;border-bottom:2px solid transparent;font-size:.84rem}
+    nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+    .top-link{
+      flex:0 0 auto;
+      text-decoration:none;
+      border:1px solid var(--line);
+      border-radius:5px;
+      padding:.48rem .72rem;
+      color:var(--ink);
+      font-weight:750;
+      white-space:nowrap;
+      background:#fff;
+    }
+    .top-link:hover{border-color:var(--cyan);color:var(--cyan-dark)}
+
+    main{overflow:hidden}
+    section{scroll-margin-top:84px;border-bottom:1px solid var(--line)}
+    .band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+
+    .hero{
+      min-height:calc(100svh - 66px);
+      display:grid;
+      align-items:center;
+      background:var(--navy);
+      color:#fff;
+    }
+    .hero-grid{
+      width:min(100%,var(--max));
+      margin:0 auto;
+      padding:3.4rem 1.25rem;
+      display:grid;
+      grid-template-columns:minmax(0,.95fr) minmax(0,1.25fr);
+      gap:3rem;
+      align-items:center;
+    }
+    .hero-grid>*{min-width:0}
+    .eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+    h1{
+      font-size:clamp(2rem,5vw,4.45rem);
+      line-height:1.02;
+      margin:.65rem 0 1.15rem;
+      max-width:17ch;
+      overflow-wrap:normal;
+      word-break:normal;
+      hyphens:none;
+    }
+    h2{
+      font-size:clamp(1.75rem,3.3vw,2.8rem);
+      line-height:1.12;
+      margin:0 0 .8rem;
+      overflow-wrap:normal;
+      word-break:normal;
+      hyphens:none;
+    }
+    h3{font-size:1.22rem;margin:0 0 .55rem}
+    h4{font-size:1rem;margin:.2rem 0 .35rem}
+    p{max-width:72ch}
+    .hero p{color:#d7e5ea;font-size:1.08rem}
+    .hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}
+    .hero-actions{margin-top:1.45rem}
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid var(--cyan-dark);
+      background:var(--cyan);
+      color:#fff;
+      text-decoration:none;
+      padding:.72rem 1rem;
+      border-radius:5px;
+      font-weight:750;
+    }
+    .btn:hover{background:var(--cyan-dark)}
+    .btn.secondary{background:transparent;color:inherit;border-color:currentColor}
+    .btn.secondary:hover{background:rgba(255,255,255,.1)}
+    .btn.light{background:#fff;color:var(--ink);border-color:var(--line)}
+    .btn.light:hover{background:var(--soft);color:var(--cyan-dark)}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
+
+    .hero-board{
+      min-width:0;
+      background:var(--navy-deep);
+      border:1px solid #3b5965;
+      border-radius:8px;
+      padding:1.35rem;
+    }
+    .hero-flow{display:grid;grid-template-columns:minmax(0,1fr) 58px minmax(0,1fr);gap:.65rem;align-items:center}
+    .hero-node{min-width:0;border:1px solid #48616b;border-radius:7px;padding:1rem;background:#102a35;text-align:center}
+    .hero-node strong{display:block;color:#fff;margin-bottom:.25rem}
+    .hero-node span{display:block;color:#bfd1d7;font-size:.83rem}
+    .hero-arrows{display:grid;gap:.25rem;text-align:center;color:var(--cyan-light);font-weight:900}
+    .hero-arrows span:first-child{font-size:1.35rem}
+    .hero-arrows span:last-child{font-size:1.35rem}
+    .hero-caption{margin-top:1rem;color:#b8cbd2;font-size:.82rem}
+
+    .section-head{display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem}
+    .section-head>*{min-width:0}
+    .section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}
+    .lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+
+    .outcomes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+    .outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}
+    .outcome:last-child{border-right:0}
+    .outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+
+    .callout{margin-top:1.35rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}
+    .callout strong{color:var(--ink)}
+
+    .concept-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+    .concept-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.25rem;background:#fff;box-shadow:var(--shadow)}
+    .concept-card .tag{display:inline-block;margin-bottom:.7rem;padding:.25rem .48rem;background:#d9eef2;color:var(--cyan-dark);border-radius:4px;font-size:.78rem;font-weight:850;text-transform:uppercase;letter-spacing:.05em}
+    .concept-card p{margin:.3rem 0;color:var(--muted)}
+    .concept-card ul{padding-left:1.1rem;margin:.7rem 0 0}
+
+    .compare{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1rem;margin-top:1.4rem}
+    .compare>*{min-width:0}
+    .compare-card{border:1px solid var(--line);border-radius:var(--radius);padding:1.15rem;background:var(--soft)}
+    .compare-card strong{display:block;color:var(--cyan-dark);margin-bottom:.4rem}
+
+    .activity{margin-top:2rem;padding:1.35rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--soft);min-width:0}
+    .activity h3{margin-top:0}
+    .activity-instruction{color:var(--muted);margin-top:0}
+    .feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}
+    .feedback.success{background:var(--green-soft);border-color:var(--green)}
+    .feedback.warn{background:var(--amber-soft);border-color:var(--amber)}
+    .feedback.error{background:var(--red-soft);border-color:var(--red)}
+
+    .sim-grid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:1.2rem;align-items:start}
+    .sim-grid>*{min-width:0}
+    .control-panel{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1rem}
+    .control-panel label{display:block;font-weight:750;margin:.85rem 0 .3rem}
+    .control-panel select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+    .network-stage{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1rem;min-width:0}
+    .network-row{display:grid;grid-template-columns:minmax(0,1fr) 90px minmax(0,1fr);gap:.7rem;align-items:center}
+    .endpoint{min-width:0;border:1px solid var(--line);border-radius:6px;padding:1rem;text-align:center;background:var(--soft)}
+    .endpoint.active{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,124,145,.1)}
+    .endpoint strong{display:block;margin-bottom:.25rem}
+    .endpoint span{font-size:.84rem;color:var(--muted)}
+    .message-lane{min-width:0;display:grid;gap:.35rem}
+    .packet{opacity:.3;text-align:center;padding:.42rem .35rem;border-radius:4px;background:#d9eef2;color:var(--cyan-dark);font-size:.8rem;font-weight:800;transition:opacity .2s ease,transform .2s ease}
+    .packet.response{background:#e7efe7;color:var(--green)}
+    .packet.active{opacity:1;transform:scale(1.03)}
+    .event-log{margin-top:1rem;border-top:1px solid var(--line);padding-top:.8rem}
+    .event-log ol{margin:.4rem 0 0;padding-left:1.3rem}
+    .event-log li{margin:.3rem 0;color:var(--muted)}
+    .event-log li.current{color:var(--ink);font-weight:750}
+
+    .prediction{display:grid;gap:.65rem;margin:1rem 0}
+    .prediction label{display:block;padding:.78rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+    .prediction input{margin-right:.5rem}
+
+    .exercise-box{border:1px solid var(--line);border-radius:var(--radius);background:#fff;overflow:hidden;box-shadow:var(--shadow)}
+    .exercise-head{padding:1rem 1.15rem;background:var(--navy);color:#fff}
+    .exercise-head span{display:block;color:var(--cyan-light);font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.25rem}
+    .exercise-body{padding:1.2rem}
+    .exercise-body p{margin-top:0}
+    .steps{display:grid;gap:.8rem;margin:1rem 0}
+    .step{border-left:4px solid var(--line);padding:.8rem 1rem;background:var(--soft)}
+    .step.revealed{border-color:var(--cyan)}
+    .step .solution{display:none;margin-top:.4rem;color:var(--muted)}
+    .step.revealed .solution{display:block}
+
+    .practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+    .practice-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.15rem;background:#fff;box-shadow:var(--shadow);display:flex;flex-direction:column}
+    .practice-card p{color:var(--muted);font-size:.94rem}
+    .practice-card label{font-weight:700;font-size:.9rem;margin:.45rem 0 .25rem}
+    .practice-card select{width:100%;padding:.58rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+    .mini-feedback{margin-top:.7rem;padding:.7rem;border-left:3px solid var(--line);background:var(--soft);font-size:.88rem;min-height:4.2rem}
+    .mini-feedback.success{border-color:var(--green);background:var(--green-soft)}
+    .mini-feedback.warn{border-color:var(--amber);background:var(--amber-soft)}
+
+    .professional-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:1.5rem;align-items:start}
+    .professional-grid>*{min-width:0}
+    .noc-board{border:1px solid var(--line);background:var(--soft);border-radius:var(--radius);padding:1.2rem}
+    .noc-chain{display:grid;grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr);gap:.55rem;align-items:center;margin-top:1rem}
+    .noc-node{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1rem;text-align:center;min-width:0}
+    .noc-node strong{display:block;color:var(--cyan-dark)}
+    .noc-arrow{text-align:center;color:var(--cyan-dark);font-size:1.5rem;font-weight:900}
+    .decision-list{display:grid;gap:.6rem;margin:1rem 0}
+    .decision-list label{display:block;padding:.72rem;border:1px solid var(--line);background:#fff;border-radius:5px}
+
+    .quiz{display:grid;gap:1rem}
+    .question{border:1px solid var(--line);border-radius:6px;padding:1rem;background:#fff}
+    .question legend{font-weight:800;padding:0 .25rem}
+    .question label{display:block;padding:.35rem 0}
+    .question input{margin-right:.45rem}
+
+    .reflection-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:2rem;align-items:start}
+    .reflection-grid>*{min-width:0}
+    textarea{width:100%;min-height:150px;resize:vertical;border:1px solid var(--line);border-radius:6px;padding:.8rem;background:#fff}
+    .storage-note{font-size:.83rem;color:var(--muted)}
+
+    .references{font-size:.94rem;color:var(--muted)}
+    .references ul{padding-left:1.2rem}
+
+    .bottom-nav{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--line)}
+
+    footer{background:var(--navy);color:#c9d8dd}
+    footer .band{padding-top:2rem;padding-bottom:2rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+
+    @media(max-width:900px){
+      .header-inner{flex-wrap:wrap}
+      .nav-scroll{order:3;flex-basis:100%}
+      .hero-grid,.sim-grid,.professional-grid,.reflection-grid{grid-template-columns:1fr}
+      .outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .outcome:nth-child(2){border-right:0}
+      .outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}
+      .practice-grid{grid-template-columns:1fr}
+    }
+
+    @media(max-width:680px){
+      .band{padding:3.2rem 1rem}
+      .hero-grid{padding:2.7rem 1rem}
+      .section-head{grid-template-columns:1fr;gap:.45rem}
+      .outcomes,.concept-grid,.compare{grid-template-columns:1fr}
+      .outcome{border-right:0;border-bottom:1px solid var(--line)}
+      .outcome:last-child{border-bottom:0}
+      .hero-flow,.network-row,.noc-chain{grid-template-columns:1fr}
+      .hero-arrows,.noc-arrow{transform:rotate(90deg)}
+      .message-lane{grid-template-columns:1fr 1fr}
+      .top-link{flex:1 1 auto;text-align:center}
+    }
+
+    @media(max-width:480px){
+      h1{font-size:clamp(2rem,10vw,2.8rem);max-width:none}
+      .header-inner{padding:.55rem 1rem}
+      .brand{min-width:0;flex:1 1 100%}
+      .bottom-nav .btn{width:100%}
+    }
+
+    @media(prefers-reduced-motion:reduce){
+      html{scroll-behavior:auto}
+      *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#inicio">Ir al contenido</a>
+
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <strong>Programación de Redes</strong>
+        <span>Bloque 1 · Tema 1.1 · Subtema 1.1.1</span>
+      </div>
+      <div class="nav-scroll">
+        <nav aria-label="Secciones del subtema">
+          <a href="#inicio" aria-current="location">Inicio</a>
+          <a href="#conceptos">Conceptos</a>
+          <a href="#explora">Explora</a>
+          <a href="#ejercicio-resuelto">Resuelto</a>
+          <a href="#practica">Practica</a>
+          <a href="#caso">Caso profesional</a>
+          <a href="#comprueba">Comprueba</a>
+          <a href="#reflexion">Reflexión</a>
+        </nav>
+      </div>
+      <a class="top-link" href="tema-1-1-fundamentos-programacion-aplicada-redes.html" aria-label="Volver al Tema 1.1">← Tema 1.1</a>
+      <a class="top-link" href="index.html" aria-label="Volver a la pantalla principal del curso">Curso</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="inicio">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">Bloque 1 · Tema 1.1 · Subtema 1.1.1</div>
+          <h1>Arquitectura cliente-servidor</h1>
+          <p>Comprenderemos cómo dos procesos asumen roles diferentes para intercambiar información: uno solicita un servicio y otro lo ofrece. Esta idea aparece detrás de aplicaciones web, monitoreo de red, plataformas de gestión, IoT y numerosos sistemas distribuidos.</p>
+          <div class="hero-actions">
+            <a class="btn" href="#conceptos">Comenzar</a>
+            <a class="btn secondary" href="#explora">Ir a la simulación</a>
+          </div>
+        </div>
+
+        <div class="hero-board" role="img" aria-label="Esquema cliente-servidor con solicitud del cliente y respuesta del servidor">
+          <div class="hero-flow">
+            <div class="hero-node"><strong>Cliente</strong><span>Inicia una solicitud para obtener información o ejecutar una acción</span></div>
+            <div class="hero-arrows" aria-hidden="true"><span>→</span><span>←</span></div>
+            <div class="hero-node"><strong>Servidor</strong><span>Escucha solicitudes, procesa y devuelve una respuesta</span></div>
+          </div>
+          <p class="hero-caption">Cliente y servidor son roles de software dentro de una interacción. No describen necesariamente tipos de computadoras diferentes.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="orientacion" aria-labelledby="orientacion-title">
+      <div class="band">
+        <div class="section-head">
+          <div class="section-code">CÓMO TRABAJAR</div>
+          <div>
+            <h2 id="orientacion-title">Observa el comportamiento antes de memorizar términos</h2>
+            <p class="lead">Durante el recorrido primero predecirás qué ocurre, luego experimentarás con una comunicación simulada y finalmente explicarás los roles con tus propias palabras.</p>
+          </div>
+        </div>
+
+        <div class="outcomes" aria-label="Resultados del recorrido">
+          <div class="outcome"><b>Identificar</b>Qué proceso actúa como cliente y cuál como servidor en una interacción.</div>
+          <div class="outcome"><b>Explicar</b>La secuencia básica solicitud → procesamiento → respuesta.</div>
+          <div class="outcome"><b>Interpretar</b>Qué cambia cuando varios clientes requieren el mismo servicio.</div>
+          <div class="outcome"><b>Aplicar</b>El modelo a escenarios reales de Telecomunicaciones.</div>
+        </div>
+
+        <div class="callout"><strong>Idea clave:</strong> el rol depende de la interacción. Un mismo equipo o programa puede actuar como servidor en una comunicación y como cliente en otra.</div>
+      </div>
+    </section>
+
+    <section id="conceptos" aria-labelledby="conceptos-title">
+      <div class="band">
+        <div class="section-head">
+          <div class="section-code">CONCEPTOS</div>
+          <div>
+            <h2 id="conceptos-title">¿Qué define una arquitectura cliente-servidor?</h2>
+            <p class="lead">Más que dos máquinas, hablamos de dos roles coordinados alrededor de un servicio.</p>
+          </div>
+        </div>
+
+        <div class="concept-grid">
+          <article class="concept-card">
+            <span class="tag">Cliente</span>
+            <h3>Solicita un servicio</h3>
+            <p>El cliente inicia una interacción porque necesita un recurso, un dato o una operación proporcionada por otro proceso.</p>
+            <ul>
+              <li>Inicia la solicitud.</li>
+              <li>Espera o recibe una respuesta.</li>
+              <li>Interpreta el resultado para continuar su tarea.</li>
+            </ul>
+          </article>
+
+          <article class="concept-card">
+            <span class="tag">Servidor</span>
+            <h3>Ofrece un servicio</h3>
+            <p>El servidor mantiene disponible una funcionalidad y atiende solicitudes provenientes de uno o varios clientes.</p>
+            <ul>
+              <li>Permanece disponible para recibir solicitudes.</li>
+              <li>Procesa la petición según reglas del servicio.</li>
+              <li>Devuelve una respuesta o un estado de error.</li>
+            </ul>
+          </article>
+
+          <article class="concept-card">
+            <span class="tag">Solicitud</span>
+            <h3>Expresa una necesidad</h3>
+            <p>Una solicitud comunica qué operación quiere realizar el cliente. En este subtema nos interesa su función conceptual, no todavía su formato ni el protocolo usado.</p>
+          </article>
+
+          <article class="concept-card">
+            <span class="tag">Respuesta</span>
+            <h3>Comunica el resultado</h3>
+            <p>La respuesta indica el resultado de la solicitud: puede contener datos, una confirmación, un estado o información de error.</p>
+          </article>
+        </div>
+
+        <div class="compare">
+          <div class="compare-card"><strong>Servicio ≠ computadora</strong>Un servicio es una capacidad de software. Puede ejecutarse en un servidor físico, una máquina virtual, un contenedor, un equipo de red o incluso en el mismo computador del cliente.</div>
+          <div class="compare-card"><strong>Rol ≠ identidad permanente</strong>Un programa que responde solicitudes puede posteriormente solicitar datos a otro servicio y asumir, en esa segunda interacción, el rol de cliente.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="explora" aria-labelledby="explora-title">
+      <div class="band">
+        <div class="section-head">
+          <div class="section-code">EXPLORA</div>
+          <div>
+            <h2 id="explora-title">Experimenta con una solicitud y observa cada paso</h2>
+            <p class="lead">Elige un escenario y recorre el intercambio paso a paso. La visualización simplifica la red para concentrarnos únicamente en los roles.</p>
+          </div>
+        </div>
+
+        <div class="activity">
+          <h3>Simulador conceptual cliente-servidor</h3>
+          <p class="activity-instruction">Selecciona el escenario, inicia la comunicación y usa “Siguiente paso”. Observa quién actúa primero y quién genera la respuesta.</p>
+
+          <div class="sim-grid">
+            <div class="control-panel">
+              <label for="scenarioSelect">Escenario</label>
+              <select id="scenarioSelect">
+                <option value="noc">NOC consulta el estado de un equipo remoto</option>
+                <option value="web">Navegador solicita una página web</option>
+                <option value="iot">Panel consulta el último valor de un sensor</option>
+              </select>
+
+              <label for="clientCount">Número conceptual de clientes</label>
+              <select id="clientCount">
+                <option value="1">1 cliente</option>
+                <option value="3">3 clientes</option>
+                <option value="5">5 clientes</option>
+              </select>
+
+              <div class="action-row" style="margin-top:1rem">
+                <button class="btn" id="startSim" type="button">Iniciar</button>
+                <button class="btn light" id="nextSim" type="button" disabled>Siguiente paso</button>
+                <button class="btn light" id="resetSim" type="button">Reiniciar</button>
+              </div>
+
+              <div class="feedback" id="simFeedback" role="status" aria-live="polite">Selecciona un escenario e inicia la simulación.</div>
+            </div>
+
+            <div class="network-stage">
+              <div class="network-row">
+                <div class="endpoint" id="clientNode"><strong id="clientLabel">Cliente</strong><span id="clientDesc">Aplicación que necesita un servicio</span></div>
+                <div class="message-lane" aria-hidden="true">
+                  <div class="packet" id="requestPacket">Solicitud →</div>
+                  <div class="packet response" id="responsePacket">← Respuesta</div>
+                </div>
+                <div class="endpoint" id="serverNode"><strong id="serverLabel">Servidor</strong><span id="serverDesc">Proceso que ofrece el servicio</span></div>
+              </div>
+              <div class="event-log" aria-live="polite">
+                <strong>Secuencia observada</strong>
+                <ol id="eventList">
+                  <li>La simulación aún no ha comenzado.</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity" aria-labelledby="prediccion-title">
+          <h3 id="prediccion-title">Predice · ¿Qué ocurre si el servidor no está disponible?</h3>
+          <p class="activity-instruction">Marca la explicación que mejor describe el modelo conceptual.</p>
+          <div class="prediction" id="serverDownOptions">
+            <label><input type="radio" name="serverDown" value="a"> El cliente se convierte automáticamente en servidor y responde su propia solicitud.</label>
+            <label><input type="radio" name="serverDown" value="b"> La solicitud no puede ser atendida por ese servicio; el cliente deberá recibir o manejar una condición de fallo.</label>
+            <label><input type="radio" name="serverDown" value="c"> La red inventa una respuesta para que la aplicación continúe.</label>
+          </div>
+          <div class="action-row">
+            <button class="btn" id="checkPrediction" type="button">Comprobar predicción</button>
+            <button class="btn light" id="resetPrediction" type="button">Reintentar</button>
+          </div>
+          <div class="feedback" id="predictionFeedback" role="status" aria-live="polite">Haz primero tu predicción.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="ejercicio-resuelto" aria-labelledby="resuelto-title">
+      <div class="band">
+        <div class="section-head">
+          <div class="section-code">EJERCICIO RESUELTO</div>
+          <div>
+            <h2 id="resuelto-title">Identificar roles en un sistema de monitoreo</h2>
+            <p class="lead">No basta con memorizar “cliente pide y servidor responde”. Debemos identificar los roles dentro de un escenario concreto.</p>
+          </div>
+        </div>
+
+        <article class="exercise-box">
+          <div class="exercise-head"><span>Situación</span><strong>Un operador usa un panel del NOC para consultar la temperatura interna de un gabinete remoto.</strong></div>
+          <div class="exercise-body">
+            <p>El panel envía una solicitud a un servicio que se ejecuta en el sitio remoto. El servicio lee el último valor disponible y devuelve “31 °C”.</p>
+            <div class="steps" id="solutionSteps">
+              <div class="step" data-step="1"><strong>Paso 1 · Identificar quién inicia</strong><div class="solution">El panel del NOC inicia la consulta. Por tanto, en esta interacción actúa como <strong>cliente</strong>.</div></div>
+              <div class="step" data-step="2"><strong>Paso 2 · Identificar quién ofrece la función</strong><div class="solution">El proceso remoto que recibe la consulta y obtiene el dato ofrece el servicio. En esta interacción actúa como <strong>servidor</strong>.</div></div>
+              <div class="step" data-step="3"><strong>Paso 3 · Identificar solicitud y respuesta</strong><div class="solution">La solicitud expresa “consultar temperatura”; la respuesta contiene el resultado “31 °C”.</div></div>
+              <div class="step" data-step="4"><strong>Paso 4 · Formular la conclusión</strong><div class="solution">La arquitectura permite separar al consumidor del servicio de quien lo ofrece. El cliente no necesita realizar localmente la lectura física del sensor; solicita ese resultado al servicio remoto.</div></div>
+            </div>
+            <div class="action-row">
+              <button class="btn" id="revealStep" type="button">Revelar siguiente paso</button>
+              <button class="btn light" id="resetSolution" type="button">Ocultar solución</button>
+            </div>
+            <div class="feedback" id="solutionFeedback" role="status" aria-live="polite">Intenta resolver mentalmente el caso antes de revelar el primer paso.</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="practica" aria-labelledby="practica-title">
+      <div class="band">
+        <div class="section-head">
+          <div class="section-code">PRACTICA</div>
+          <div>
+            <h2 id="practica-title">Ahora identifica los roles por tu cuenta</h2>
+            <p class="lead">Resuelve los tres escenarios. Recibirás retroalimentación específica en cada uno.</p>
+          </div>
+        </div>
+
+        <div class="practice-grid">
+          <article class="practice-card" data-practice="web">
+            <h3>Ejercicio 1 · Navegador</h3>
+            <p>Un usuario escribe una dirección y el navegador solicita contenido a un servicio web.</p>
+            <label for="webClient">¿Quién es el cliente?</label>
+            <select id="webClient"><option value="">Selecciona...</option><option value="browser">Navegador</option><option value="service">Servicio web</option></select>
+            <label for="webServer">¿Quién es el servidor?</label>
+            <select id="webServer"><option value="">Selecciona...</option><option value="browser">Navegador</option><option value="service">Servicio web</option></select>
+            <button class="btn" type="button" data-check="web" style="margin-top:.8rem">Comprobar</button>
+            <div class="mini-feedback" id="webFeedback" role="status" aria-live="polite">Identifica primero quién inicia la solicitud y quién ofrece el contenido.</div>
+          </article>
+
+          <article class="practice-card" data-practice="config">
+            <h3>Ejercicio 2 · Configuración remota</h3>
+            <p>Una herramienta de administración solicita a un equipo de red aplicar un cambio de configuración.</p>
+            <label for="configClient">¿Quién es el cliente?</label>
+            <select id="configClient"><option value="">Selecciona...</option><option value="tool">Herramienta de administración</option><option value="device">Servicio del equipo</option></select>
+            <label for="configServer">¿Quién es el servidor?</label>
+            <select id="configServer"><option value="">Selecciona...</option><option value="tool">Herramienta de administración</option><option value="device">Servicio del equipo</option></select>
+            <button class="btn" type="button" data-check="config" style="margin-top:.8rem">Comprobar</button>
+            <div class="mini-feedback" id="configFeedback" role="status" aria-live="polite">Piensa quién solicita la operación y quién expone la capacidad de ejecutarla.</div>
+          </article>
+
+          <article class="practice-card" data-practice="chain">
+            <h3>Ejercicio 3 · Un servidor también puede ser cliente</h3>
+            <p>El servidor A recibe una consulta del usuario y, para responderla, solicita información al servidor B.</p>
+            <label for="chainRole">Respecto de B, ¿qué rol asume A?</label>
+            <select id="chainRole"><option value="">Selecciona...</option><option value="client">Cliente</option><option value="server">Servidor</option><option value="none">Ninguno</option></select>
+            <button class="btn" type="button" data-check="chain" style="margin-top:.8rem">Comprobar</button>
+            <div class="mini-feedback" id="chainFeedback" role="status" aria-live="polite">Recuerda: el rol depende de la interacción que estás analizando.</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="caso" aria-labelledby="caso-title">
+      <div class="band">
+        <div class="section-head">
+          <div class="section-code">CASO PROFESIONAL</div>
+          <div>
+            <h2 id="caso-title">Monitoreo de un sitio remoto desde un NOC</h2>
+            <p class="lead">Analiza una situación típica de operación: varios operadores consultan el mismo servicio de supervisión instalado en un sitio remoto.</p>
+          </div>
+        </div>
+
+        <div class="professional-grid">
+          <div class="noc-board">
+            <h3>Escenario</h3>
+            <p>Tres operadores usan sus aplicaciones para consultar el estado de un enlace. Todas las consultas llegan al mismo servicio de monitoreo.</p>
+            <div class="noc-chain" role="img" aria-label="Varios clientes del NOC consultan un servicio de monitoreo remoto">
+              <div class="noc-node"><strong>3 clientes</strong><span>Aplicaciones de los operadores</span></div>
+              <div class="noc-arrow" aria-hidden="true">→</div>
+              <div class="noc-node"><strong>1 servicio</strong><span>Proceso servidor de monitoreo</span></div>
+            </div>
+            <div class="callout"><strong>Observa:</strong> “un servidor” no significa “un solo cliente”. Un mismo servicio puede diseñarse para atender múltiples clientes.</div>
+          </div>
+
+          <div class="activity" style="margin-top:0">
+            <h3>Decide y justifica</h3>
+            <p class="activity-instruction">Selecciona la afirmación más precisa.</p>
+            <div class="decision-list" id="caseOptions">
+              <label><input type="radio" name="caseDecision" value="a"> Solo el primer operador puede ser cliente; los demás deben esperar a convertirse en servidores.</label>
+              <label><input type="radio" name="caseDecision" value="b"> Los tres operadores pueden actuar como clientes del mismo servicio; la forma exacta de atenderlos depende del diseño del servidor.</label>
+              <label><input type="radio" name="caseDecision" value="c"> El servicio deja de ser servidor en cuanto recibe más de una solicitud.</label>
+            </div>
+            <div class="action-row">
+              <button class="btn" id="checkCase" type="button">Comprobar decisión</button>
+              <button class="btn light" id="resetCase" type="button">Reintentar</button>
+            </div>
+            <div class="feedback" id="caseFeedback" role="status" aria-live="polite">Elige una opción y justifica mentalmente tu decisión antes de comprobar.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="comprueba" aria-labelledby="comprueba-title">
+      <div class="band">
+        <div class="section-head">
+          <div class="section-code">COMPRUEBA</div>
+          <div>
+            <h2 id="comprueba-title">Comprobación integradora</h2>
+            <p class="lead">Responde las cuatro preguntas y revisa la explicación de cada error antes de reintentar.</p>
+          </div>
+        </div>
+
+        <form class="quiz" id="quizForm">
+          <fieldset class="question">
+            <legend>1. En una interacción cliente-servidor, ¿qué caracteriza normalmente al cliente?</legend>
+            <label><input type="radio" name="q1" value="a"> Inicia una solicitud para usar un servicio.</label>
+            <label><input type="radio" name="q1" value="b"> Debe ser una computadora físicamente pequeña.</label>
+            <label><input type="radio" name="q1" value="c"> Siempre permanece esperando conexiones de otros procesos.</label>
+          </fieldset>
+
+          <fieldset class="question">
+            <legend>2. ¿Cuál es la descripción más precisa de un servidor?</legend>
+            <label><input type="radio" name="q2" value="a"> Una computadora de alto rendimiento, independientemente del software que ejecute.</label>
+            <label><input type="radio" name="q2" value="b"> Un proceso o servicio que ofrece una funcionalidad y atiende solicitudes.</label>
+            <label><input type="radio" name="q2" value="c"> Cualquier dispositivo conectado a Internet.</label>
+          </fieldset>
+
+          <fieldset class="question">
+            <legend>3. Un servidor A consulta a un servidor B para completar una respuesta. Respecto de B, A actúa como:</legend>
+            <label><input type="radio" name="q3" value="a"> Cliente.</label>
+            <label><input type="radio" name="q3" value="b"> Servidor exclusivamente.</label>
+            <label><input type="radio" name="q3" value="c"> Ninguno, porque ya era servidor de otro cliente.</label>
+          </fieldset>
+
+          <fieldset class="question">
+            <legend>4. ¿Qué secuencia representa mejor el intercambio conceptual?</legend>
+            <label><input type="radio" name="q4" value="a"> Cliente procesa → servidor solicita → red decide.</label>
+            <label><input type="radio" name="q4" value="b"> Solicitud del cliente → procesamiento del servidor → respuesta al cliente.</label>
+            <label><input type="radio" name="q4" value="c"> Respuesta → solicitud → procesamiento.</label>
+          </fieldset>
+
+          <div class="action-row">
+            <button class="btn" type="submit">Comprobar respuestas</button>
+            <button class="btn light" id="resetQuiz" type="button">Reintentar</button>
+          </div>
+          <div class="feedback" id="quizFeedback" role="status" aria-live="polite">Completa las cuatro preguntas antes de comprobar.</div>
+        </form>
+      </div>
+    </section>
+
+    <section id="reflexion" aria-labelledby="reflexion-title">
+      <div class="band">
+        <div class="section-head">
+          <div class="section-code">REFLEXIÓN</div>
+          <div>
+            <h2 id="reflexion-title">Explica el modelo con tus propias palabras</h2>
+            <p class="lead">La comprensión se vuelve útil cuando puedes trasladarla a un sistema que no has visto antes.</p>
+          </div>
+        </div>
+
+        <div class="reflection-grid">
+          <div>
+            <h3>Pregunta final</h3>
+            <p>Piensa en una aplicación real de Telecomunicaciones que conozcas. ¿Quién podría actuar como cliente, qué servicio necesitaría y qué proceso actuaría como servidor?</p>
+            <p class="storage-note">La reflexión se guarda únicamente en este navegador mediante almacenamiento local. No se transmite información.</p>
+          </div>
+          <div>
+            <label for="reflectionText"><strong>Escribe tu explicación</strong></label>
+            <textarea id="reflectionText" placeholder="Ejemplo: una aplicación de supervisión actúa como cliente cuando solicita..."> </textarea>
+            <div class="action-row" style="margin-top:.8rem">
+              <button class="btn" id="saveReflection" type="button">Guardar reflexión</button>
+              <button class="btn light" id="clearReflection" type="button">Limpiar</button>
+            </div>
+            <div class="feedback" id="reflectionFeedback" role="status" aria-live="polite">Aún no se ha guardado una reflexión.</div>
+          </div>
+        </div>
+
+        <div class="bottom-nav" aria-label="Navegación entre contenidos">
+          <a class="btn light" href="tema-1-1-fundamentos-programacion-aplicada-redes.html">← Volver al Tema 1.1</a>
+          <a class="btn" href="tema-1-1-2-direccionamiento-ip-puertos-protocolos.html">Siguiente: 1.1.2 →</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="referencias" aria-labelledby="referencias-title">
+      <div class="band">
+        <div class="section-head">
+          <div class="section-code">REFERENCIAS</div>
+          <div>
+            <h2 id="referencias-title">Referencias y delimitación del subtema</h2>
+            <p class="lead">Este recurso desarrolla el modelo cliente-servidor desde la perspectiva de programación de redes.</p>
+          </div>
+        </div>
+        <div class="references">
+          <ul>
+            <li>Kurose, J. F. y Ross, K. W. <em>Redes de computadoras: un enfoque descendente</em>. Arquitecturas de aplicaciones de red.</li>
+            <li>Tanenbaum, A. S. y Wetherall, D. J. <em>Redes de computadoras</em>. Aplicaciones distribuidas y servicios de red.</li>
+          </ul>
+          <p><strong>Delimitación:</strong> todavía no se programan sockets, no se estudian puertos concretos ni se comparan TCP y UDP. Esos elementos se desarrollarán en los subtemas siguientes.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="band">
+      <span>Programación de Redes: Protocolos y APIs · Aula interactiva</span>
+      <span>Subtema 1.1.1 · Arquitectura cliente-servidor</span>
+    </div>
+  </footer>
+
+  <script>
+    (function(){
+      "use strict";
+
+      const scenarios = {
+        noc:{client:"Aplicación del NOC",clientDesc:"Inicia la consulta de estado",server:"Servicio remoto",serverDesc:"Obtiene el estado y responde",request:"Solicita estado del equipo",response:"Devuelve el estado solicitado"},
+        web:{client:"Navegador",clientDesc:"Solicita un recurso",server:"Servicio web",serverDesc:"Procesa la petición del recurso",request:"Solicita contenido",response:"Devuelve el contenido o un estado"},
+        iot:{client:"Panel de monitoreo",clientDesc:"Solicita el último valor",server:"Servicio de telemetría",serverDesc:"Consulta el dato disponible",request:"Solicita lectura reciente",response:"Devuelve el valor disponible"}
+      };
+
+      const scenarioSelect = document.getElementById("scenarioSelect");
+      const clientCount = document.getElementById("clientCount");
+      const startSim = document.getElementById("startSim");
+      const nextSim = document.getElementById("nextSim");
+      const resetSim = document.getElementById("resetSim");
+      const simFeedback = document.getElementById("simFeedback");
+      const clientNode = document.getElementById("clientNode");
+      const serverNode = document.getElementById("serverNode");
+      const clientLabel = document.getElementById("clientLabel");
+      const clientDesc = document.getElementById("clientDesc");
+      const serverLabel = document.getElementById("serverLabel");
+      const serverDesc = document.getElementById("serverDesc");
+      const requestPacket = document.getElementById("requestPacket");
+      const responsePacket = document.getElementById("responsePacket");
+      const eventList = document.getElementById("eventList");
+      let simStep = -1;
+
+      function loadScenario(){
+        const s = scenarios[scenarioSelect.value];
+        const count = Number(clientCount.value);
+        clientLabel.textContent = count === 1 ? s.client : count + " clientes";
+        clientDesc.textContent = count === 1 ? s.clientDesc : "Varias aplicaciones solicitan el mismo servicio";
+        serverLabel.textContent = s.server;
+        serverDesc.textContent = s.serverDesc;
+        requestPacket.textContent = "Solicitud →";
+        responsePacket.textContent = "← Respuesta";
+      }
+
+      function clearSimVisuals(){
+        clientNode.classList.remove("active");
+        serverNode.classList.remove("active");
+        requestPacket.classList.remove("active");
+        responsePacket.classList.remove("active");
+        simFeedback.classList.remove("success","warn","error");
+      }
+
+      function renderSim(){
+        clearSimVisuals();
+        const s = scenarios[scenarioSelect.value];
+        const count = Number(clientCount.value);
+        const events = [
+          "El cliente detecta que necesita usar un servicio.",
+          "El cliente inicia una solicitud: " + s.request + ".",
+          "El servidor recibe y procesa la solicitud.",
+          "El servidor genera una respuesta: " + s.response + ".",
+          "El cliente recibe e interpreta la respuesta."
+        ];
+        eventList.innerHTML = "";
+        events.forEach(function(text,index){
+          const li = document.createElement("li");
+          li.textContent = text;
+          if(index === simStep){li.classList.add("current");}
+          if(index <= simStep){eventList.appendChild(li);}
+        });
+
+        if(simStep === 0){
+          clientNode.classList.add("active");
+          simFeedback.textContent = "Paso 1: la necesidad aparece en el cliente. El servidor todavía no ha generado ninguna respuesta.";
+        }else if(simStep === 1){
+          clientNode.classList.add("active");
+          requestPacket.classList.add("active");
+          simFeedback.textContent = "Paso 2: el cliente inicia la solicitud. Esta acción es la pista principal para identificar su rol.";
+        }else if(simStep === 2){
+          serverNode.classList.add("active");
+          simFeedback.textContent = "Paso 3: el servidor recibe la solicitud y ejecuta la lógica del servicio.";
+        }else if(simStep === 3){
+          serverNode.classList.add("active");
+          responsePacket.classList.add("active");
+          simFeedback.textContent = "Paso 4: el servidor produce una respuesta. La respuesta puede contener datos, confirmación o información de error.";
+        }else if(simStep === 4){
+          clientNode.classList.add("active");
+          responsePacket.classList.add("active");
+          simFeedback.classList.add("success");
+          simFeedback.textContent = "Paso 5: el cliente recibe la respuesta. Con " + count + (count === 1 ? " cliente, la lógica conceptual es la misma." : " clientes, todos pueden solicitar el mismo servicio; la estrategia concreta de atención corresponde al diseño del servidor.");
+          nextSim.disabled = true;
+        }
+      }
+
+      startSim.addEventListener("click",function(){
+        loadScenario();
+        simStep = 0;
+        nextSim.disabled = false;
+        renderSim();
+      });
+
+      nextSim.addEventListener("click",function(){
+        if(simStep < 4){simStep += 1;renderSim();}
+      });
+
+      resetSim.addEventListener("click",function(){
+        simStep = -1;
+        nextSim.disabled = true;
+        clearSimVisuals();
+        loadScenario();
+        eventList.innerHTML = "<li>La simulación aún no ha comenzado.</li>";
+        simFeedback.textContent = "Selecciona un escenario e inicia la simulación.";
+      });
+
+      scenarioSelect.addEventListener("change",function(){resetSim.click();});
+      clientCount.addEventListener("change",function(){resetSim.click();});
+      loadScenario();
+
+      const checkPrediction = document.getElementById("checkPrediction");
+      const resetPrediction = document.getElementById("resetPrediction");
+      const predictionFeedback = document.getElementById("predictionFeedback");
+      checkPrediction.addEventListener("click",function(){
+        const selected = document.querySelector('input[name="serverDown"]:checked');
+        predictionFeedback.classList.remove("success","warn","error");
+        if(!selected){
+          predictionFeedback.classList.add("warn");
+          predictionFeedback.textContent = "Selecciona una opción. Piensa qué componente ofrece realmente el servicio que el cliente necesita.";
+          return;
+        }
+        if(selected.value === "b"){
+          predictionFeedback.classList.add("success");
+          predictionFeedback.textContent = "Correcto. Si el proceso servidor no está disponible, ese servicio no puede atender la solicitud. La aplicación cliente debe manejar esa condición según su diseño; más adelante veremos mecanismos concretos.";
+        }else{
+          predictionFeedback.classList.add("error");
+          predictionFeedback.textContent = "Revisa el modelo. Ni el cliente se convierte automáticamente en servidor ni la red inventa la respuesta. El servicio debe estar disponible para procesar la solicitud.";
+        }
+      });
+      resetPrediction.addEventListener("click",function(){
+        document.querySelectorAll('input[name="serverDown"]').forEach(function(input){input.checked=false;});
+        predictionFeedback.classList.remove("success","warn","error");
+        predictionFeedback.textContent = "Haz primero tu predicción.";
+      });
+
+      const solutionSteps = Array.from(document.querySelectorAll("#solutionSteps .step"));
+      const revealStep = document.getElementById("revealStep");
+      const resetSolution = document.getElementById("resetSolution");
+      const solutionFeedback = document.getElementById("solutionFeedback");
+      let revealed = 0;
+      revealStep.addEventListener("click",function(){
+        if(revealed < solutionSteps.length){
+          solutionSteps[revealed].classList.add("revealed");
+          revealed += 1;
+          solutionFeedback.classList.remove("success","warn");
+          solutionFeedback.textContent = revealed < solutionSteps.length ? "Paso " + revealed + " revelado. Antes de continuar, intenta anticipar el siguiente." : "Solución completa. El criterio principal fue identificar quién inicia la solicitud y quién ofrece la función requerida.";
+          if(revealed === solutionSteps.length){solutionFeedback.classList.add("success");revealStep.disabled=true;}
+        }
+      });
+      resetSolution.addEventListener("click",function(){
+        solutionSteps.forEach(function(step){step.classList.remove("revealed");});
+        revealed = 0;
+        revealStep.disabled = false;
+        solutionFeedback.classList.remove("success","warn");
+        solutionFeedback.textContent = "Intenta resolver mentalmente el caso antes de revelar el primer paso.";
+      });
+
+      const practiceAnswers = {
+        web:{clientId:"webClient",serverId:"webServer",client:"browser",server:"service",feedback:"webFeedback",ok:"Correcto. El navegador inicia la solicitud y el servicio web ofrece el recurso solicitado."},
+        config:{clientId:"configClient",serverId:"configServer",client:"tool",server:"device",feedback:"configFeedback",ok:"Correcto. La herramienta solicita la operación y el servicio del equipo remoto expone la capacidad de ejecutarla."}
+      };
+
+      document.querySelectorAll("[data-check]").forEach(function(button){
+        button.addEventListener("click",function(){
+          const key = button.getAttribute("data-check");
+          if(key === "chain"){
+            const select = document.getElementById("chainRole");
+            const fb = document.getElementById("chainFeedback");
+            fb.classList.remove("success","warn");
+            if(!select.value){fb.classList.add("warn");fb.textContent="Selecciona un rol antes de comprobar.";return;}
+            if(select.value === "client"){
+              fb.classList.add("success");
+              fb.textContent = "Correcto. Frente a B, A inicia una solicitud; por eso actúa como cliente en esa interacción, aunque sea servidor frente al usuario original.";
+            }else{
+              fb.classList.add("warn");
+              fb.textContent = "Revisa la interacción específica A → B. El proceso que inicia esa nueva solicitud asume el rol de cliente respecto del servicio consultado.";
+            }
+            return;
+          }
+
+          const cfg = practiceAnswers[key];
+          const client = document.getElementById(cfg.clientId).value;
+          const server = document.getElementById(cfg.serverId).value;
+          const fb = document.getElementById(cfg.feedback);
+          fb.classList.remove("success","warn");
+          if(!client || !server){fb.classList.add("warn");fb.textContent="Completa ambos roles antes de comprobar.";return;}
+          if(client === cfg.client && server === cfg.server){fb.classList.add("success");fb.textContent=cfg.ok;}
+          else if(client === server){fb.classList.add("warn");fb.textContent="Has asignado el mismo elemento a ambos roles. En este escenario, identifica por separado quién inicia la solicitud y quién ofrece el servicio.";}
+          else{fb.classList.add("warn");fb.textContent="Los roles están invertidos. Usa esta regla: cliente = inicia la solicitud; servidor = ofrece y procesa el servicio solicitado.";}
+        });
+      });
+
+      const checkCase = document.getElementById("checkCase");
+      const resetCase = document.getElementById("resetCase");
+      const caseFeedback = document.getElementById("caseFeedback");
+      checkCase.addEventListener("click",function(){
+        const selected = document.querySelector('input[name="caseDecision"]:checked');
+        caseFeedback.classList.remove("success","warn","error");
+        if(!selected){caseFeedback.classList.add("warn");caseFeedback.textContent="Selecciona una opción antes de comprobar.";return;}
+        if(selected.value === "b"){
+          caseFeedback.classList.add("success");
+          caseFeedback.textContent = "Correcto. Varios procesos cliente pueden solicitar el mismo servicio. Cómo se atienden simultáneamente, en cola o con otras estrategias es una decisión de implementación que estudiaremos más adelante.";
+        }else{
+          caseFeedback.classList.add("error");
+          caseFeedback.textContent = "Revisa el concepto. La existencia de varios clientes no cambia el rol del servicio. Todos pueden actuar como clientes del mismo servidor; la capacidad de atención depende de su diseño.";
+        }
+      });
+      resetCase.addEventListener("click",function(){
+        document.querySelectorAll('input[name="caseDecision"]').forEach(function(input){input.checked=false;});
+        caseFeedback.classList.remove("success","warn","error");
+        caseFeedback.textContent = "Elige una opción y justifica mentalmente tu decisión antes de comprobar.";
+      });
+
+      const quizForm = document.getElementById("quizForm");
+      const quizFeedback = document.getElementById("quizFeedback");
+      const resetQuiz = document.getElementById("resetQuiz");
+      const quizAnswers = {q1:"a",q2:"b",q3:"a",q4:"b"};
+      const quizExplanations = {
+        q1:"Q1: el cliente se reconoce porque inicia la solicitud para consumir un servicio.",
+        q2:"Q2: servidor describe un rol de software que ofrece una funcionalidad; no depende por sí solo del tipo de hardware.",
+        q3:"Q3: respecto de B, A inicia una nueva solicitud y por eso actúa como cliente.",
+        q4:"Q4: la secuencia conceptual es solicitud del cliente, procesamiento en el servidor y respuesta al cliente."
+      };
+
+      quizForm.addEventListener("submit",function(event){
+        event.preventDefault();
+        let answered = 0;
+        let correct = 0;
+        const misses = [];
+        Object.keys(quizAnswers).forEach(function(name){
+          const selected = quizForm.querySelector('input[name="'+name+'"]:checked');
+          if(selected){
+            answered += 1;
+            if(selected.value === quizAnswers[name]){correct += 1;}else{misses.push(quizExplanations[name]);}
+          }
+        });
+        quizFeedback.classList.remove("success","warn","error");
+        if(answered < 4){
+          quizFeedback.classList.add("warn");
+          quizFeedback.textContent = "Has respondido " + answered + " de 4 preguntas. Completa todas antes de comprobar.";
+          return;
+        }
+        if(correct === 4){
+          quizFeedback.classList.add("success");
+          quizFeedback.textContent = "4/4. Has distinguido correctamente roles, servicio y secuencia de interacción. Puedes continuar al siguiente subtema.";
+        }else{
+          quizFeedback.classList.add("error");
+          quizFeedback.innerHTML = "Obtuviste <strong>" + correct + "/4</strong>. Revisa: " + misses.join(" ") + " Reintenta después de contrastar estas ideas con la simulación.";
+        }
+      });
+
+      resetQuiz.addEventListener("click",function(){
+        quizForm.reset();
+        quizFeedback.classList.remove("success","warn","error");
+        quizFeedback.textContent = "Completa las cuatro preguntas antes de comprobar.";
+      });
+
+      const reflectionText = document.getElementById("reflectionText");
+      const saveReflection = document.getElementById("saveReflection");
+      const clearReflection = document.getElementById("clearReflection");
+      const reflectionFeedback = document.getElementById("reflectionFeedback");
+      const storageKey = "programacion-redes-1-1-1-reflexion";
+
+      try{
+        const saved = localStorage.getItem(storageKey);
+        if(saved){
+          reflectionText.value = saved;
+          reflectionFeedback.classList.add("success");
+          reflectionFeedback.textContent = "Se recuperó la reflexión guardada previamente en este navegador.";
+        }
+      }catch(error){
+        reflectionFeedback.classList.add("warn");
+        reflectionFeedback.textContent = "El navegador no permitió acceder al almacenamiento local. Puedes trabajar la reflexión sin guardarla.";
+      }
+
+      saveReflection.addEventListener("click",function(){
+        const value = reflectionText.value.trim();
+        reflectionFeedback.classList.remove("success","warn");
+        if(value.length < 30){
+          reflectionFeedback.classList.add("warn");
+          reflectionFeedback.textContent = "Amplía tu explicación. Intenta identificar cliente, necesidad, servicio y servidor en un mismo ejemplo.";
+          return;
+        }
+        try{
+          localStorage.setItem(storageKey,value);
+          reflectionFeedback.classList.add("success");
+          reflectionFeedback.textContent = "Reflexión guardada únicamente en este navegador.";
+        }catch(error){
+          reflectionFeedback.classList.add("warn");
+          reflectionFeedback.textContent = "No fue posible guardar en el almacenamiento local. El contenido permanece visible mientras esta página siga abierta.";
+        }
+      });
+
+      clearReflection.addEventListener("click",function(){
+        reflectionText.value = "";
+        reflectionFeedback.classList.remove("success","warn");
+        try{localStorage.removeItem(storageKey);}catch(error){}
+        reflectionFeedback.textContent = "Reflexión limpiada en esta página.";
+        reflectionText.focus();
+      });
+    })();
+  </script>
+</body>
+</html>

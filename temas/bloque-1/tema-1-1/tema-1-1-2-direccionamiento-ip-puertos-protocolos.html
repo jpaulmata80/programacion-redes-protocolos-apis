@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Subtema 1.1.2: direccionamiento IP, puertos y protocolos desde la perspectiva de programación de redes.">
+  <meta name="theme-color" content="#10212a">
+  <title>1.1.2 | Direccionamiento IP, puertos y protocolos</title>
+  <style>
+    :root{
+      --ink:#18212a;--muted:#586775;--line:#cbd5dc;--soft:#f3f6f8;--paper:#ffffff;
+      --cyan:#007c91;--cyan-dark:#005b6a;--cyan-light:#6ed2e2;--green:#16734a;--green-soft:#e8f5ee;
+      --amber:#8a5600;--amber-soft:#fff3d8;--red:#9b2c2c;--red-soft:#fff0f0;--focus:#005fcc;
+      --navy:#10212a;--navy-deep:#07141a;--max:1180px;--radius:8px;--shadow:0 16px 38px rgba(24,33,42,.08)
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;min-width:280px;color:var(--ink);background:var(--paper);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55;overflow-x:hidden}
+    img,svg,canvas,video{display:block;max-width:100%}
+    button,input,select,textarea{font:inherit;max-width:100%}
+    button,input[type="radio"],input[type="checkbox"],select{cursor:pointer}
+    a{color:var(--cyan-dark)}
+    a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+    .skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}.skip-link:focus{top:1rem}
+    header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+    .header-inner{width:min(100%,var(--max));min-height:66px;margin:0 auto;padding:.55rem 1.25rem;display:flex;gap:.75rem;align-items:center;min-width:0}
+    .brand{min-width:190px}.brand strong{display:block;font-size:.95rem}.brand span{display:block;color:var(--muted);font-size:.78rem}
+    .nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+    nav a{color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;border-bottom:2px solid transparent;font-size:.84rem}
+    nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+    .top-link{flex:0 0 auto;text-decoration:none;border:1px solid var(--line);border-radius:5px;padding:.48rem .72rem;color:var(--ink);font-weight:750;white-space:nowrap;background:#fff}
+    .top-link:hover{border-color:var(--cyan);color:var(--cyan-dark)}
+    main{overflow:hidden}section{scroll-margin-top:84px;border-bottom:1px solid var(--line)}.band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+    .hero{min-height:calc(100svh - 66px);display:grid;align-items:center;background:var(--navy);color:#fff}
+    .hero-grid{width:min(100%,var(--max));margin:0 auto;padding:3.4rem 1.25rem;display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.25fr);gap:3rem;align-items:center}.hero-grid>*{min-width:0}
+    .eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+    h1{font-size:clamp(2rem,5vw,4.35rem);line-height:1.02;margin:.65rem 0 1.15rem;max-width:18ch;overflow-wrap:normal;word-break:normal;hyphens:none}
+    h2{font-size:clamp(1.75rem,3.3vw,2.8rem);line-height:1.12;margin:0 0 .8rem;overflow-wrap:normal;word-break:normal;hyphens:none}
+    h3{font-size:1.22rem;margin:0 0 .55rem}h4{font-size:1rem;margin:.2rem 0 .35rem}p{max-width:72ch}.hero p{color:#d7e5ea;font-size:1.08rem}
+    .hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}.hero-actions{margin-top:1.45rem}
+    .btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cyan-dark);background:var(--cyan);color:#fff;text-decoration:none;padding:.72rem 1rem;border-radius:5px;font-weight:750}
+    .btn:hover{background:var(--cyan-dark)}.btn.secondary{background:transparent;color:inherit;border-color:currentColor}.btn.secondary:hover{background:rgba(255,255,255,.1)}
+    .btn.light{background:#fff;color:var(--ink);border-color:var(--line)}.btn.light:hover{background:var(--soft);color:var(--cyan-dark)}.btn:disabled{opacity:.55;cursor:not-allowed}
+    .hero-board{min-width:0;background:var(--navy-deep);border:1px solid #3b5965;border-radius:8px;padding:1.35rem}
+    .endpoint-hero{display:grid;grid-template-columns:minmax(0,1fr) 56px minmax(0,1fr);gap:.65rem;align-items:center}.endpoint-hero>*{min-width:0}
+    .host-box{border:1px solid #48616b;border-radius:7px;padding:1rem;background:#102a35}.host-box strong{display:block;color:#fff}.host-box span{display:block;color:#bfd1d7;font-size:.83rem;margin-top:.15rem}
+    .port-list{display:grid;gap:.45rem;margin-top:.8rem}.port-pill{display:flex;justify-content:space-between;gap:.7rem;padding:.48rem .6rem;border:1px solid #45616c;border-radius:5px;color:#d7e5ea;font-size:.82rem}.port-pill b{color:var(--cyan-light)}
+    .hero-arrow{text-align:center;color:var(--cyan-light);font-size:1.6rem;font-weight:900}.hero-caption{margin-top:1rem;color:#b8cbd2;font-size:.82rem}
+    .section-head{display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem}.section-head>*{min-width:0}.section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}.lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+    .outcomes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}.outcome:last-child{border-right:0}.outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+    .callout{margin-top:1.35rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}.callout strong{color:var(--ink)}
+    .concept-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.concept-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.25rem;background:#fff;box-shadow:var(--shadow)}
+    .concept-card .tag{display:inline-block;margin-bottom:.7rem;padding:.25rem .48rem;background:#d9eef2;color:var(--cyan-dark);border-radius:4px;font-size:.78rem;font-weight:850;text-transform:uppercase;letter-spacing:.05em}.concept-card p{margin:.3rem 0;color:var(--muted)}.concept-card ul{padding-left:1.1rem;margin:.7rem 0 0}
+    .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px;margin-top:1.2rem}table{width:100%;border-collapse:collapse;min-width:640px;background:#fff}th,td{text-align:left;padding:.78rem .85rem;border-bottom:1px solid var(--line);vertical-align:top}th{background:var(--soft);font-size:.9rem}tr:last-child td{border-bottom:0}
+    .activity{margin-top:2rem;padding:1.35rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--soft);min-width:0}.activity h3{margin-top:0}.activity-instruction{color:var(--muted);margin-top:0}
+    .feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}.feedback.success{background:var(--green-soft);border-color:var(--green)}.feedback.warn{background:var(--amber-soft);border-color:var(--amber)}.feedback.error{background:var(--red-soft);border-color:var(--red)}
+    .builder-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:1.2rem;align-items:start}.builder-grid>*{min-width:0}
+    .control-panel{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1rem}.control-panel label{display:block;font-weight:750;margin:.85rem 0 .3rem}.control-panel input,.control-panel select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+    .endpoint-preview{border:1px solid var(--line);border-radius:6px;background:#fff;padding:1.1rem;min-width:0}.endpoint-code{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:.55rem;align-items:center;padding:1rem;border:1px solid var(--line);background:var(--navy);color:#fff;border-radius:6px;overflow:hidden}.endpoint-code>*{min-width:0}.endpoint-code .ip{overflow-wrap:anywhere}.endpoint-code .port,.endpoint-code .proto{padding:.25rem .45rem;border-radius:4px;background:#173744;color:var(--cyan-light);font-weight:800;white-space:nowrap}.meaning-list{display:grid;gap:.55rem;margin-top:1rem}.meaning-row{display:grid;grid-template-columns:110px minmax(0,1fr);gap:.7rem;border-bottom:1px solid var(--line);padding:.5rem 0}.meaning-row:last-child{border-bottom:0}.meaning-row b{color:var(--cyan-dark)}
+    .service-lab{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:1.2rem;align-items:start}.service-lab>*{min-width:0}.service-host{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1rem}.service-doors{display:grid;gap:.65rem;margin-top:1rem}.service-door{border:1px solid var(--line);border-radius:6px;padding:.8rem;background:var(--soft)}.service-door.active{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,124,145,.1)}.service-door strong{display:block;color:var(--cyan-dark)}.packet-line{display:grid;gap:.55rem}.packet-chip{padding:.8rem;border:1px solid var(--line);border-radius:6px;background:#fff;font-weight:800}.packet-chip.active{border-color:var(--cyan);background:#e8f7fa}.packet-chip.missed{border-color:var(--red);background:var(--red-soft)}
+    .prediction{display:grid;gap:.65rem;margin:1rem 0}.prediction label{display:block;padding:.78rem;border:1px solid var(--line);border-radius:5px;background:#fff}.prediction input{margin-right:.5rem}
+    .exercise-box{border:1px solid var(--line);border-radius:var(--radius);background:#fff;overflow:hidden;box-shadow:var(--shadow)}.exercise-head{padding:1rem 1.15rem;background:var(--navy);color:#fff}.exercise-head span{display:block;color:var(--cyan-light);font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.25rem}.exercise-body{padding:1.2rem}.exercise-body p{margin-top:0}
+    .steps{display:grid;gap:.8rem;margin:1rem 0}.step{border-left:4px solid var(--line);padding:.8rem 1rem;background:var(--soft)}.step.revealed{border-color:var(--cyan)}.step .solution{display:none;margin-top:.4rem;color:var(--muted)}.step.revealed .solution{display:block}
+    .tuple-box{margin-top:1rem;padding:.85rem 1rem;border:1px dashed var(--cyan);border-radius:6px;background:#f4fbfc;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}
+    .practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.practice-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.15rem;background:#fff;box-shadow:var(--shadow);display:flex;flex-direction:column}.practice-card p{color:var(--muted);font-size:.94rem}.practice-card label{font-weight:700;font-size:.9rem;margin:.45rem 0 .25rem}.practice-card select,.practice-card input{width:100%;padding:.58rem;border:1px solid var(--line);border-radius:5px;background:#fff}.mini-feedback{margin-top:.7rem;padding:.7rem;border-left:3px solid var(--line);background:var(--soft);font-size:.88rem;min-height:4.2rem}.mini-feedback.success{border-color:var(--green);background:var(--green-soft)}.mini-feedback.warn{border-color:var(--amber);background:var(--amber-soft)}
+    .professional-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:1.5rem;align-items:start}.professional-grid>*{min-width:0}.noc-board{border:1px solid var(--line);background:var(--soft);border-radius:var(--radius);padding:1.2rem}.service-map{display:grid;gap:.7rem;margin-top:1rem}.service-map-row{display:grid;grid-template-columns:minmax(0,1fr) 90px 110px;gap:.55rem;align-items:center;background:#fff;border:1px solid var(--line);border-radius:6px;padding:.75rem}.service-map-row>*{min-width:0}.badge{display:inline-flex;align-items:center;justify-content:center;padding:.25rem .45rem;border-radius:4px;background:#d9eef2;color:var(--cyan-dark);font-weight:800;font-size:.8rem;white-space:nowrap}
+    .decision-list{display:grid;gap:.6rem;margin:1rem 0}.decision-list label{display:block;padding:.72rem;border:1px solid var(--line);background:#fff;border-radius:5px}
+    .quiz{display:grid;gap:1rem}.question{border:1px solid var(--line);border-radius:6px;padding:1rem;background:#fff}.question legend{font-weight:800;padding:0 .25rem}.question label{display:block;padding:.35rem 0}.question input{margin-right:.45rem}
+    .reflection-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:2rem;align-items:start}.reflection-grid>*{min-width:0}textarea{width:100%;min-height:150px;resize:vertical;border:1px solid var(--line);border-radius:6px;padding:.8rem;background:#fff}.storage-note{font-size:.83rem;color:var(--muted)}
+    .references{font-size:.94rem;color:var(--muted)}.references ul{padding-left:1.2rem}.bottom-nav{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--line)}
+    footer{background:var(--navy);color:#c9d8dd}footer .band{padding-top:2rem;padding-bottom:2rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+    @media(max-width:900px){.header-inner{flex-wrap:wrap}.nav-scroll{order:3;flex-basis:100%}.hero-grid,.builder-grid,.service-lab,.professional-grid,.reflection-grid{grid-template-columns:1fr}.outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}.outcome:nth-child(2){border-right:0}.outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}.practice-grid{grid-template-columns:1fr}}
+    @media(max-width:680px){.band{padding:3.2rem 1rem}.hero-grid{padding:2.7rem 1rem}.section-head{grid-template-columns:1fr;gap:.45rem}.outcomes,.concept-grid{grid-template-columns:1fr}.outcome{border-right:0;border-bottom:1px solid var(--line)}.outcome:last-child{border-bottom:0}.endpoint-hero{grid-template-columns:1fr}.hero-arrow{transform:rotate(90deg)}.endpoint-code{grid-template-columns:1fr}.meaning-row{grid-template-columns:1fr;gap:.1rem}.service-map-row{grid-template-columns:1fr}.top-link{flex:1 1 auto;text-align:center}}
+    @media(max-width:480px){h1{font-size:clamp(2rem,10vw,2.8rem);max-width:none}.header-inner{padding:.55rem 1rem}.brand{min-width:0;flex:1 1 100%}.bottom-nav .btn{width:100%}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#inicio">Ir al contenido</a>
+  <header>
+    <div class="header-inner">
+      <div class="brand"><strong>Programación de Redes</strong><span>Bloque 1 · Tema 1.1 · Subtema 1.1.2</span></div>
+      <div class="nav-scroll">
+        <nav aria-label="Secciones del subtema">
+          <a href="#inicio" aria-current="location">Inicio</a><a href="#conceptos">Conceptos</a><a href="#explora">Explora</a><a href="#ejercicio-resuelto">Resuelto</a><a href="#practica">Practica</a><a href="#caso">Caso profesional</a><a href="#comprueba">Comprueba</a><a href="#reflexion">Reflexión</a>
+        </nav>
+      </div>
+      <a class="top-link" href="tema-1-1-fundamentos-programacion-aplicada-redes.html" aria-label="Volver al Tema 1.1">← Tema 1.1</a>
+      <a class="top-link" href="index.html" aria-label="Volver a la pantalla principal del curso">Curso</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="inicio">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">Bloque 1 · Tema 1.1 · Subtema 1.1.2</div>
+          <h1>Direccionamiento IP, puertos y protocolos</h1>
+          <p>Una aplicación de red no puede comunicarse solo con “otro computador”. Necesita identificar el destino y el servicio concreto al que desea llegar. Desde la programación, esa decisión se construye combinando dirección IP, puerto y protocolo de transporte.</p>
+          <div class="hero-actions"><a class="btn" href="#conceptos">Comenzar</a><a class="btn secondary" href="#explora">Construir un destino</a></div>
+        </div>
+        <div class="hero-board" role="img" aria-label="Dos hosts conectados, donde el destino ofrece varios servicios diferenciados por puertos">
+          <div class="endpoint-hero">
+            <div class="host-box"><strong>Aplicación cliente</strong><span>Necesita contactar un servicio remoto</span></div>
+            <div class="hero-arrow" aria-hidden="true">→</div>
+            <div class="host-box"><strong>198.51.100.25</strong><span>Un mismo host puede exponer varios servicios</span><div class="port-list"><div class="port-pill"><span>Administración web</span><b>443/TCP</b></div><div class="port-pill"><span>Monitoreo</span><b>161/UDP</b></div><div class="port-pill"><span>Telemetría propia</span><b>5500/TCP</b></div></div></div>
+          </div>
+          <p class="hero-caption">La IP aproxima el destino de red; el puerto diferencia el servicio dentro del host; el protocolo de transporte completa el contexto del extremo.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="orientacion" aria-labelledby="orientacion-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">CÓMO TRABAJAR</div><div><h2 id="orientacion-title">Piensa como una aplicación que debe encontrar un servicio</h2><p class="lead">Primero distinguirás qué identifica cada dato. Después construirás extremos de comunicación y comprobarás qué ocurre cuando una aplicación acierta o se equivoca en el puerto o el protocolo.</p></div></div>
+        <div class="outcomes" aria-label="Resultados del recorrido">
+          <div class="outcome"><b>Distinguir</b>La función de una dirección IP, un puerto y un protocolo de transporte.</div>
+          <div class="outcome"><b>Interpretar</b>Notaciones como 198.51.100.25:443/TCP sin confundir host y servicio.</div>
+          <div class="outcome"><b>Construir</b>Un extremo remoto coherente a partir de requisitos de una aplicación.</div>
+          <div class="outcome"><b>Aplicar</b>El concepto a servicios de monitoreo y administración en Telecomunicaciones.</div>
+        </div>
+        <div class="callout"><strong>Idea clave:</strong> dos aplicaciones pueden estar en el mismo host y, aun así, necesitar puertos diferentes. Además, un número de puerto se interpreta dentro de un protocolo de transporte: 53/TCP y 53/UDP no son el mismo extremo.</div>
+      </div>
+    </section>
+
+    <section id="conceptos" aria-labelledby="conceptos-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">CONCEPTOS</div><div><h2 id="conceptos-title">Tres piezas para localizar el destino lógico de una aplicación</h2><p class="lead">En este subtema trabajaremos con IPv4 para mantener visible la idea principal. IPv6 aparecerá cuando el programa oficial lo requiera.</p></div></div>
+        <div class="concept-grid">
+          <article class="concept-card"><span class="tag">Dirección IP</span><h3>Ubica el destino en la red</h3><p>Desde la perspectiva de una aplicación, la dirección IP permite indicar a qué host o interfaz de red desea enviar tráfico. No identifica por sí sola qué programa debe recibirlo.</p><ul><li>Ejemplo didáctico: <strong>198.51.100.25</strong>.</li><li>En IPv4 cada octeto válido está entre 0 y 255.</li><li>La misma IP puede alojar muchos servicios.</li></ul></article>
+          <article class="concept-card"><span class="tag">Puerto</span><h3>Diferencia servicios dentro del host</h3><p>El puerto es un número de 16 bits que permite al sistema operativo asociar tráfico con un servicio o extremo de transporte.</p><ul><li>Rango: <strong>0–65535</strong>.</li><li>Los puertos conocidos facilitan convenciones, pero una aplicación puede usar otros cuando su diseño lo permite.</li><li>El puerto remoto indica qué servicio intenta alcanzar el cliente.</li></ul></article>
+          <article class="concept-card"><span class="tag">Protocolo</span><h3>Define el contexto de transporte</h3><p>Para direccionar correctamente el extremo no basta con conocer IP y puerto: también debe saberse qué protocolo de transporte espera el servicio.</p><ul><li>En este curso trabajaremos principalmente con <strong>TCP</strong> y <strong>UDP</strong>.</li><li>Sus diferencias de comportamiento se estudian en 1.1.3.</li><li>Aquí nos interesa que forman parte de la identificación del extremo.</li></ul></article>
+          <article class="concept-card"><span class="tag">Extremo</span><h3>IP + puerto + transporte</h3><p>En programación es útil pensar en un extremo remoto como la combinación que indica <em>dónde</em> y <em>a qué servicio</em> queremos llegar.</p><ul><li><strong>198.51.100.25:5500/TCP</strong></li><li>IP: host remoto.</li><li>5500: servicio lógico dentro del host.</li><li>TCP: contexto de transporte.</li></ul></article>
+        </div>
+
+        <div class="table-wrap" role="region" aria-label="Rangos de puertos" tabindex="0">
+          <table>
+            <thead><tr><th>Rango</th><th>Nombre habitual</th><th>Interpretación práctica</th></tr></thead>
+            <tbody>
+              <tr><td>0–1023</td><td>Puertos del sistema / bien conocidos</td><td>Incluyen numerosos servicios estandarizados. Su uso suele estar más controlado por el sistema operativo.</td></tr>
+              <tr><td>1024–49151</td><td>Puertos de usuario / registrados</td><td>Pueden asociarse a aplicaciones y servicios registrados o propios.</td></tr>
+              <tr><td>49152–65535</td><td>Dinámicos / privados</td><td>Frecuentemente se utilizan como puertos temporales de origen elegidos por el sistema operativo.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout"><strong>No memorices listas completas de puertos.</strong> Lo importante es aprender a leer documentación, identificar el puerto esperado por un servicio y configurar tu aplicación de forma coherente.</div>
+      </div>
+    </section>
+
+    <section id="explora" aria-labelledby="explora-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">EXPLORA</div><div><h2 id="explora-title">Construye e interpreta un extremo remoto</h2><p class="lead">Modifica IP, puerto y transporte. El objetivo no es memorizar sintaxis, sino explicar qué representa cada componente.</p></div></div>
+
+        <div class="activity">
+          <h3>Constructor de destino</h3>
+          <p class="activity-instruction">Escribe una IPv4 válida, selecciona un puerto y el transporte. Después pulsa “Interpretar”.</p>
+          <div class="builder-grid">
+            <div class="control-panel">
+              <label for="ipInput">Dirección IPv4 remota</label><input id="ipInput" value="198.51.100.25" inputmode="decimal" autocomplete="off" aria-describedby="ipHint"><small id="ipHint">Usamos direcciones reservadas para documentación en los ejemplos.</small>
+              <label for="portInput">Puerto remoto</label><input id="portInput" type="number" min="0" max="65535" value="5500">
+              <label for="protocolSelect">Protocolo de transporte</label><select id="protocolSelect"><option value="TCP">TCP</option><option value="UDP">UDP</option></select>
+              <div class="action-row" style="margin-top:1rem"><button class="btn" id="interpretEndpoint" type="button">Interpretar</button><button class="btn light" id="resetEndpoint" type="button">Restablecer</button></div>
+            </div>
+            <div class="endpoint-preview">
+              <h3>Extremo construido</h3>
+              <div class="endpoint-code" aria-live="polite"><span class="ip" id="previewIp">198.51.100.25</span><span class="port" id="previewPort">:5500</span><span class="proto" id="previewProto">TCP</span></div>
+              <div class="meaning-list"><div class="meaning-row"><b>IP</b><span id="ipMeaning">Indica el host o interfaz remota hacia la que se dirige la comunicación.</span></div><div class="meaning-row"><b>Puerto</b><span id="portMeaning">5500 distingue el servicio concreto dentro del host.</span></div><div class="meaning-row"><b>Transporte</b><span id="protoMeaning">TCP define el contexto de transporte esperado por ese servicio.</span></div></div>
+              <div class="feedback" id="endpointFeedback" role="status" aria-live="polite">Modifica los valores y comprueba si forman un extremo válido.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity" aria-labelledby="prediction-title">
+          <h3 id="prediction-title">Predice · Mismo host, puerto diferente</h3>
+          <p class="activity-instruction">Un equipo tiene la IP 198.51.100.25. En 443/TCP ofrece administración web y en 5500/TCP ofrece telemetría. ¿Qué cambia cuando el cliente usa 5500 en lugar de 443?</p>
+          <div class="prediction">
+            <label><input type="radio" name="portPrediction" value="a"> Cambia el host de destino, porque cada puerto representa otra dirección IP.</label>
+            <label><input type="radio" name="portPrediction" value="b"> Se mantiene el host, pero el sistema intenta entregar el tráfico a otro servicio o extremo de transporte.</label>
+            <label><input type="radio" name="portPrediction" value="c"> No cambia nada: todos los puertos de un host representan exactamente el mismo servicio.</label>
+          </div>
+          <div class="action-row"><button class="btn" id="checkPrediction" type="button">Comprobar predicción</button><button class="btn light" id="resetPrediction" type="button">Reintentar</button></div>
+          <div class="feedback" id="predictionFeedback" role="status" aria-live="polite">Haz tu predicción antes de continuar.</div>
+        </div>
+
+        <div class="activity">
+          <h3>Experimenta · ¿A qué servicio llega el intento?</h3>
+          <p class="activity-instruction">El host remoto es siempre 198.51.100.25. Selecciona puerto y protocolo, envía el intento y observa qué servicio coincide en este modelo didáctico.</p>
+          <div class="service-lab">
+            <div class="control-panel">
+              <label for="labPort">Puerto</label><select id="labPort"><option value="443">443</option><option value="161">161</option><option value="5500">5500</option><option value="9999">9999</option></select>
+              <label for="labProtocol">Transporte</label><select id="labProtocol"><option value="TCP">TCP</option><option value="UDP">UDP</option></select>
+              <button class="btn" id="sendAttempt" type="button" style="margin-top:1rem">Enviar intento</button>
+              <div class="packet-line" style="margin-top:1rem"><div class="packet-chip" id="attemptChip">198.51.100.25:443/TCP</div></div>
+            </div>
+            <div class="service-host">
+              <strong>Host 198.51.100.25</strong><span style="display:block;color:var(--muted);font-size:.9rem">Servicios disponibles en la simulación</span>
+              <div class="service-doors">
+                <div class="service-door" id="doorWeb" data-key="443/TCP"><strong>443/TCP</strong><span>Administración web</span></div>
+                <div class="service-door" id="doorSnmp" data-key="161/UDP"><strong>161/UDP</strong><span>Monitoreo</span></div>
+                <div class="service-door" id="doorTelemetry" data-key="5500/TCP"><strong>5500/TCP</strong><span>Telemetría propia</span></div>
+              </div>
+              <div class="feedback" id="labFeedback" role="status" aria-live="polite">Selecciona un puerto y un protocolo para observar la coincidencia.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="ejercicio-resuelto" aria-labelledby="resolved-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">EJERCICIO RESUELTO</div><div><h2 id="resolved-title">Del requisito de la aplicación al extremo de comunicación</h2><p class="lead">Resolveremos un caso completo incluyendo el extremo local y el remoto, sin entrar todavía en programación de sockets.</p></div></div>
+        <article class="exercise-box">
+          <div class="exercise-head"><span>Situación</span><strong>Una aplicación del NOC debe consultar un servicio de telemetría remoto.</strong></div>
+          <div class="exercise-body">
+            <p>Datos proporcionados: cliente 192.0.2.10, puerto local temporal 53214, servidor 198.51.100.25, servicio de telemetría en 5500/TCP.</p>
+            <div class="steps" id="solutionSteps">
+              <div class="step"><strong>Paso 1 · Identificar el host remoto</strong><div class="solution">La dirección IP remota es <strong>198.51.100.25</strong>. Esta parte permite dirigir el tráfico hacia el host que ofrece el servicio.</div></div>
+              <div class="step"><strong>Paso 2 · Identificar el servicio remoto</strong><div class="solution">El servicio escucha conceptualmente en el puerto <strong>5500</strong>. Esa es la parte que diferencia la telemetría de otros servicios del mismo host.</div></div>
+              <div class="step"><strong>Paso 3 · Incorporar el transporte</strong><div class="solution">La documentación indica <strong>TCP</strong>. Por tanto, el extremo remoto se interpreta como <strong>198.51.100.25:5500/TCP</strong>.</div></div>
+              <div class="step"><strong>Paso 4 · Reconocer ambos extremos</strong><div class="solution">El sistema operativo del cliente utiliza el extremo local 192.0.2.10:53214/TCP. La comunicación queda identificada por IP y puerto de origen, IP y puerto de destino y protocolo.</div></div>
+              <div class="step"><strong>Paso 5 · Formular la 5-tupla</strong><div class="solution">Una forma habitual de describirla es: <strong>(TCP, 192.0.2.10, 53214, 198.51.100.25, 5500)</strong>. El orden exacto al escribirla puede variar según la documentación, pero deben estar presentes protocolo, origen y destino.</div></div>
+            </div>
+            <div class="tuple-box" aria-label="Cinco elementos que identifican el flujo">Protocolo + IP origen + puerto origen + IP destino + puerto destino</div>
+            <div class="action-row" style="margin-top:1rem"><button class="btn" id="revealStep" type="button">Revelar siguiente paso</button><button class="btn light" id="resetSolution" type="button">Ocultar solución</button></div>
+            <div class="feedback" id="solutionFeedback" role="status" aria-live="polite">Intenta construir primero el extremo remoto por tu cuenta.</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="practica" aria-labelledby="practice-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">PRACTICA</div><div><h2 id="practice-title">Interpreta y construye extremos</h2><p class="lead">Los ejercicios cambian de contexto para evitar que el aprendizaje dependa de memorizar un único ejemplo.</p></div></div>
+        <div class="practice-grid">
+          <article class="practice-card"><h3>Ejercicio 1 · ¿Qué representa cada parte?</h3><p>Observa: <strong>203.0.113.8:443/TCP</strong>.</p><label for="partIp">¿Qué identifica 203.0.113.8?</label><select id="partIp"><option value="">Selecciona...</option><option value="host">Host o interfaz remota</option><option value="service">Servicio dentro del host</option><option value="transport">Transporte</option></select><label for="partPort">¿Qué identifica 443?</label><select id="partPort"><option value="">Selecciona...</option><option value="host">Host o interfaz remota</option><option value="service">Servicio dentro del host</option><option value="transport">Transporte</option></select><button class="btn" id="checkParts" type="button" style="margin-top:.8rem">Comprobar</button><div class="mini-feedback" id="partsFeedback" role="status" aria-live="polite">Separa primero “dónde está el host” de “qué servicio buscas”.</div></article>
+          <article class="practice-card"><h3>Ejercicio 2 · Construye el destino</h3><p>El servicio de monitoreo está en <strong>203.0.113.50</strong>, puerto <strong>161</strong> y utiliza <strong>UDP</strong>.</p><label for="destIp">IP</label><input id="destIp" autocomplete="off" placeholder="Ej. 203.0.113.50"><label for="destPort">Puerto</label><input id="destPort" type="number" min="0" max="65535" placeholder="Puerto"><label for="destProtocol">Transporte</label><select id="destProtocol"><option value="">Selecciona...</option><option>TCP</option><option>UDP</option></select><button class="btn" id="checkDestination" type="button" style="margin-top:.8rem">Comprobar</button><div class="mini-feedback" id="destinationFeedback" role="status" aria-live="polite">Construye los tres componentes del extremo.</div></article>
+          <article class="practice-card"><h3>Ejercicio 3 · ¿Mismo extremo?</h3><p>Compara <strong>192.0.2.40:53/TCP</strong> con <strong>192.0.2.40:53/UDP</strong>.</p><label for="sameEndpoint">¿Representan el mismo extremo de transporte?</label><select id="sameEndpoint"><option value="">Selecciona...</option><option value="yes">Sí</option><option value="no">No</option></select><button class="btn" id="checkSame" type="button" style="margin-top:.8rem">Comprobar</button><div class="mini-feedback" id="sameFeedback" role="status" aria-live="polite">Fíjate en que IP y puerto coinciden, pero todavía falta comparar otra pieza.</div></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="caso" aria-labelledby="case-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">CASO PROFESIONAL</div><div><h2 id="case-title">Un mismo equipo de telecomunicaciones, varios servicios</h2><p class="lead">En operación real no basta con conocer “la IP del router”. Una herramienta debe saber qué servicio pretende utilizar.</p></div></div>
+        <div class="professional-grid">
+          <div class="noc-board">
+            <h3>Router de acceso · 203.0.113.20</h3>
+            <p>El equipo ofrece tres funciones en este escenario didáctico:</p>
+            <div class="service-map">
+              <div class="service-map-row"><span>Administración web</span><span class="badge">443</span><span class="badge">TCP</span></div>
+              <div class="service-map-row"><span>Monitoreo SNMP</span><span class="badge">161</span><span class="badge">UDP</span></div>
+              <div class="service-map-row"><span>NETCONF</span><span class="badge">830</span><span class="badge">TCP</span></div>
+            </div>
+            <div class="callout"><strong>Observa:</strong> la IP del equipo no cambia. Lo que cambia es el servicio que la aplicación intenta alcanzar.</div>
+          </div>
+          <div class="activity" style="margin-top:0">
+            <h3>Decide según el objetivo</h3>
+            <p class="activity-instruction">Un sistema de gestión debe consultar información mediante SNMP. ¿Cuál es el destino coherente con el escenario?</p>
+            <div class="decision-list">
+              <label><input type="radio" name="caseDecision" value="a"> 203.0.113.20:443/TCP</label>
+              <label><input type="radio" name="caseDecision" value="b"> 203.0.113.20:161/UDP</label>
+              <label><input type="radio" name="caseDecision" value="c"> 203.0.113.20:830/TCP</label>
+            </div>
+            <div class="action-row"><button class="btn" id="checkCase" type="button">Comprobar decisión</button><button class="btn light" id="resetCase" type="button">Reintentar</button></div>
+            <div class="feedback" id="caseFeedback" role="status" aria-live="polite">Relaciona el objetivo de la aplicación con el servicio publicado por el equipo.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="comprueba" aria-labelledby="quiz-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">COMPRUEBA</div><div><h2 id="quiz-title">Integra IP, puerto y protocolo</h2><p class="lead">Responde las cinco preguntas y usa la retroalimentación para localizar qué concepto necesitas revisar.</p></div></div>
+        <form class="quiz" id="quizForm">
+          <fieldset class="question"><legend>1. ¿Por qué una dirección IP no basta para identificar un servicio?</legend><label><input type="radio" name="q1" value="a"> Porque un mismo host puede ejecutar varios servicios diferenciados por puertos y transporte.</label><label><input type="radio" name="q1" value="b"> Porque cada aplicación necesita obligatoriamente una dirección IP diferente.</label><label><input type="radio" name="q1" value="c"> Porque los puertos sustituyen completamente a las direcciones IP.</label></fieldset>
+          <fieldset class="question"><legend>2. ¿Cuál es el rango válido de un puerto de transporte?</legend><label><input type="radio" name="q2" value="a"> 0 a 255</label><label><input type="radio" name="q2" value="b"> 0 a 65535</label><label><input type="radio" name="q2" value="c"> 1 a 9999</label></fieldset>
+          <fieldset class="question"><legend>3. ¿Qué parte de 198.51.100.25:5500/TCP distingue el servicio dentro del host?</legend><label><input type="radio" name="q3" value="a"> 198.51.100.25</label><label><input type="radio" name="q3" value="b"> 5500</label><label><input type="radio" name="q3" value="c"> TCP exclusivamente</label></fieldset>
+          <fieldset class="question"><legend>4. ¿Son equivalentes 192.0.2.40:53/TCP y 192.0.2.40:53/UDP?</legend><label><input type="radio" name="q4" value="a"> Sí, porque IP y puerto son iguales.</label><label><input type="radio" name="q4" value="b"> No, porque el protocolo de transporte forma parte del contexto del extremo.</label></fieldset>
+          <fieldset class="question"><legend>5. En una comunicación, ¿qué describe una 5-tupla?</legend><label><input type="radio" name="q5" value="a"> Protocolo, IP y puerto de origen, IP y puerto de destino.</label><label><input type="radio" name="q5" value="b"> Cinco direcciones IP diferentes.</label><label><input type="radio" name="q5" value="c"> Solo cinco números de puerto.</label></fieldset>
+          <div class="action-row"><button class="btn" type="submit">Comprobar respuestas</button><button class="btn light" type="button" id="resetQuiz">Reintentar</button></div>
+          <div class="feedback" id="quizFeedback" role="status" aria-live="polite">Completa las cinco preguntas antes de comprobar.</div>
+        </form>
+      </div>
+    </section>
+
+    <section id="reflexion" aria-labelledby="reflection-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">REFLEXIÓN</div><div><h2 id="reflection-title">Explica el destino como lo haría un programador</h2><p class="lead">La reflexión busca comprobar si puedes pasar de la notación a una explicación técnica comprensible.</p></div></div>
+        <div class="reflection-grid">
+          <div><h3>Pregunta</h3><p>Un compañero te dice: “Ya tengo la IP del equipo, así que mi aplicación ya sabe exactamente dónde conectarse”. Explícale por qué esa afirmación está incompleta y qué datos adicionales debe confirmar.</p><div class="callout"><strong>Pista:</strong> menciona al menos host, servicio y protocolo de transporte.</div></div>
+          <div><label for="reflectionText"><strong>Tu explicación</strong></label><textarea id="reflectionText" placeholder="Escribe una explicación técnica con tus propias palabras..."></textarea><div class="action-row" style="margin-top:.75rem"><button class="btn" id="saveReflection" type="button">Guardar en este navegador</button><button class="btn light" id="clearReflection" type="button">Limpiar</button></div><div class="feedback" id="reflectionFeedback" role="status" aria-live="polite">La reflexión aún no se ha guardado.</div><p class="storage-note">El texto se almacena únicamente mediante localStorage en este navegador. No se transmite información.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="referencias" aria-labelledby="references-title">
+      <div class="band references">
+        <div class="section-head"><div class="section-code">REFERENCIAS Y ALCANCE</div><div><h2 id="references-title">Qué hemos cubierto y qué dejamos para después</h2><p class="lead">Este subtema introduce el direccionamiento que necesita una aplicación. No desarrolla todavía el comportamiento interno de TCP y UDP ni la programación de sockets.</p></div></div>
+        <ul>
+          <li>Kurose, J. F. y Ross, K. W. <em>Redes de computadoras: un enfoque descendente</em>.</li>
+          <li>RFC 6335: procedimientos y rangos para nombres de servicios y números de puerto.</li>
+          <li>RFC 5737: bloques IPv4 reservados para documentación, utilizados en los ejemplos de esta página.</li>
+          <li>IANA Service Name and Transport Protocol Port Number Registry, como referencia para asignaciones de servicios.</li>
+        </ul>
+        <div class="callout"><strong>Delimitación:</strong> en 1.1.3 estudiaremos qué diferencias de comportamiento entre TCP y UDP influyen en el diseño de una aplicación. En 1.2 llegará la programación concreta de sockets.</div>
+        <div class="bottom-nav"><a class="btn light" href="tema-1-1-1-arquitectura-cliente-servidor.html">← 1.1.1 Arquitectura cliente-servidor</a><a class="btn" href="tema-1-1-3-tcp-udp-aplicados-desarrollo.html">1.1.3 TCP y UDP aplicados al desarrollo →</a></div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="band"><span>Programación de Redes · Bloque 1</span><span>Subtema 1.1.2 · Direccionamiento IP, puertos y protocolos</span></div></footer>
+
+  <script>
+    (function(){
+      "use strict";
+
+      function isValidIPv4(value){
+        const parts=value.trim().split(".");
+        if(parts.length!==4){return false;}
+        return parts.every(function(part){
+          if(!/^\d{1,3}$/.test(part)){return false;}
+          if(part.length>1 && part.charAt(0)==="0"){return false;}
+          const n=Number(part);
+          return n>=0 && n<=255;
+        });
+      }
+
+      const ipInput=document.getElementById("ipInput");
+      const portInput=document.getElementById("portInput");
+      const protocolSelect=document.getElementById("protocolSelect");
+      const previewIp=document.getElementById("previewIp");
+      const previewPort=document.getElementById("previewPort");
+      const previewProto=document.getElementById("previewProto");
+      const portMeaning=document.getElementById("portMeaning");
+      const protoMeaning=document.getElementById("protoMeaning");
+      const endpointFeedback=document.getElementById("endpointFeedback");
+
+      function syncPreview(){
+        previewIp.textContent=ipInput.value.trim()||"—";
+        previewPort.textContent=":"+(portInput.value||"—");
+        previewProto.textContent=protocolSelect.value;
+      }
+      [ipInput,portInput,protocolSelect].forEach(function(el){el.addEventListener("input",syncPreview);el.addEventListener("change",syncPreview);});
+
+      document.getElementById("interpretEndpoint").addEventListener("click",function(){
+        endpointFeedback.classList.remove("success","warn","error");
+        const ip=ipInput.value.trim();
+        const port=Number(portInput.value);
+        if(!isValidIPv4(ip)){
+          endpointFeedback.classList.add("error");
+          endpointFeedback.textContent="La IPv4 no es válida. Debe contener cuatro octetos decimales entre 0 y 255, separados por puntos.";
+          return;
+        }
+        if(!Number.isInteger(port)||port<0||port>65535){
+          endpointFeedback.classList.add("error");
+          endpointFeedback.textContent="El puerto debe ser un entero entre 0 y 65535.";
+          return;
+        }
+        portMeaning.textContent=port+" diferencia el servicio o extremo de transporte dentro del host remoto.";
+        protoMeaning.textContent=protocolSelect.value+" define el contexto de transporte en el que se interpreta ese puerto.";
+        endpointFeedback.classList.add("success");
+        endpointFeedback.textContent="Extremo válido: "+ip+":"+port+"/"+protocolSelect.value+". Ya puedes explicar host, servicio y transporte por separado.";
+      });
+
+      document.getElementById("resetEndpoint").addEventListener("click",function(){
+        ipInput.value="198.51.100.25";portInput.value="5500";protocolSelect.value="TCP";syncPreview();
+        portMeaning.textContent="5500 distingue el servicio concreto dentro del host.";
+        protoMeaning.textContent="TCP define el contexto de transporte esperado por ese servicio.";
+        endpointFeedback.classList.remove("success","warn","error");
+        endpointFeedback.textContent="Modifica los valores y comprueba si forman un extremo válido.";
+      });
+
+      const predictionFeedback=document.getElementById("predictionFeedback");
+      document.getElementById("checkPrediction").addEventListener("click",function(){
+        const selected=document.querySelector('input[name="portPrediction"]:checked');
+        predictionFeedback.classList.remove("success","warn","error");
+        if(!selected){predictionFeedback.classList.add("warn");predictionFeedback.textContent="Selecciona una opción. Pregúntate qué identifica la IP y qué diferencia el puerto.";return;}
+        if(selected.value==="b"){
+          predictionFeedback.classList.add("success");predictionFeedback.textContent="Correcto. La IP mantiene el mismo host; cambiar de 443 a 5500 hace que la aplicación intente alcanzar otro servicio dentro de ese host.";
+        }else{
+          predictionFeedback.classList.add("error");predictionFeedback.textContent="Revisa la separación de funciones: la IP identifica el host remoto y el puerto diferencia el servicio. Cambiar solo el puerto no cambia la IP de destino.";
+        }
+      });
+      document.getElementById("resetPrediction").addEventListener("click",function(){
+        document.querySelectorAll('input[name="portPrediction"]').forEach(function(i){i.checked=false;});predictionFeedback.classList.remove("success","warn","error");predictionFeedback.textContent="Haz tu predicción antes de continuar.";
+      });
+
+      const labPort=document.getElementById("labPort");
+      const labProtocol=document.getElementById("labProtocol");
+      const attemptChip=document.getElementById("attemptChip");
+      const labFeedback=document.getElementById("labFeedback");
+      const doors=Array.from(document.querySelectorAll(".service-door"));
+      function syncAttempt(){attemptChip.textContent="198.51.100.25:"+labPort.value+"/"+labProtocol.value;}
+      labPort.addEventListener("change",syncAttempt);labProtocol.addEventListener("change",syncAttempt);syncAttempt();
+      document.getElementById("sendAttempt").addEventListener("click",function(){
+        doors.forEach(function(d){d.classList.remove("active");});attemptChip.classList.remove("active","missed");labFeedback.classList.remove("success","warn","error");
+        const key=labPort.value+"/"+labProtocol.value;
+        const match=doors.find(function(d){return d.getAttribute("data-key")===key;});
+        if(match){match.classList.add("active");attemptChip.classList.add("active");labFeedback.classList.add("success");labFeedback.textContent="Coincidencia encontrada: "+key+" corresponde al servicio \""+match.querySelector("span").textContent+"\" en este modelo.";}
+        else{attemptChip.classList.add("missed");labFeedback.classList.add("error");labFeedback.textContent="No existe un servicio publicado con "+key+" en esta simulación. Alcanzar la IP correcta no garantiza haber seleccionado el servicio correcto.";}
+      });
+
+      const solutionSteps=Array.from(document.querySelectorAll("#solutionSteps .step"));
+      const revealStep=document.getElementById("revealStep");
+      const solutionFeedback=document.getElementById("solutionFeedback");
+      let revealed=0;
+      revealStep.addEventListener("click",function(){
+        if(revealed<solutionSteps.length){solutionSteps[revealed].classList.add("revealed");revealed+=1;solutionFeedback.classList.remove("success","warn");solutionFeedback.textContent=revealed<solutionSteps.length?"Paso "+revealed+" revelado. Intenta anticipar el siguiente antes de continuar.":"Solución completa. Observa que el destino remoto se construyó con IP, puerto y transporte, y que la comunicación completa añade también el extremo local.";if(revealed===solutionSteps.length){solutionFeedback.classList.add("success");revealStep.disabled=true;}}
+      });
+      document.getElementById("resetSolution").addEventListener("click",function(){solutionSteps.forEach(function(s){s.classList.remove("revealed");});revealed=0;revealStep.disabled=false;solutionFeedback.classList.remove("success","warn");solutionFeedback.textContent="Intenta construir primero el extremo remoto por tu cuenta.";});
+
+      document.getElementById("checkParts").addEventListener("click",function(){
+        const a=document.getElementById("partIp").value,b=document.getElementById("partPort").value,fb=document.getElementById("partsFeedback");fb.classList.remove("success","warn");
+        if(!a||!b){fb.classList.add("warn");fb.textContent="Completa ambas selecciones antes de comprobar.";return;}
+        if(a==="host"&&b==="service"){fb.classList.add("success");fb.textContent="Correcto. La IP localiza el host remoto y 443 diferencia el servicio dentro de ese host.";}else{fb.classList.add("warn");fb.textContent="Revisa la función de cada componente: IP → host; puerto → servicio o extremo dentro del host.";}
+      });
+
+      document.getElementById("checkDestination").addEventListener("click",function(){
+        const ip=document.getElementById("destIp").value.trim(),port=Number(document.getElementById("destPort").value),proto=document.getElementById("destProtocol").value,fb=document.getElementById("destinationFeedback");fb.classList.remove("success","warn");
+        if(!ip||!document.getElementById("destPort").value||!proto){fb.classList.add("warn");fb.textContent="Completa IP, puerto y transporte.";return;}
+        if(ip==="203.0.113.50"&&port===161&&proto==="UDP"){fb.classList.add("success");fb.textContent="Correcto: 203.0.113.50:161/UDP. Has construido el extremo a partir de los requisitos del servicio.";}else{fb.classList.add("warn");fb.textContent="Algún componente no coincide con el requisito. Vuelve a leer host = 203.0.113.50, servicio = 161, transporte = UDP.";}
+      });
+
+      document.getElementById("checkSame").addEventListener("click",function(){
+        const value=document.getElementById("sameEndpoint").value,fb=document.getElementById("sameFeedback");fb.classList.remove("success","warn");if(!value){fb.classList.add("warn");fb.textContent="Selecciona una respuesta antes de comprobar.";return;}
+        if(value==="no"){fb.classList.add("success");fb.textContent="Correcto. Aunque IP y puerto coinciden, TCP y UDP son contextos de transporte distintos.";}else{fb.classList.add("warn");fb.textContent="Falta considerar el protocolo de transporte. El número 53 no identifica por sí solo el mismo extremo en TCP y UDP.";}
+      });
+
+      const caseFeedback=document.getElementById("caseFeedback");
+      document.getElementById("checkCase").addEventListener("click",function(){
+        const selected=document.querySelector('input[name="caseDecision"]:checked');caseFeedback.classList.remove("success","warn","error");if(!selected){caseFeedback.classList.add("warn");caseFeedback.textContent="Selecciona un destino antes de comprobar.";return;}
+        if(selected.value==="b"){caseFeedback.classList.add("success");caseFeedback.textContent="Correcto. En el escenario, SNMP se publica en 203.0.113.20:161/UDP. La misma IP también ofrece otros servicios, pero con puertos y transportes diferentes.";}else{caseFeedback.classList.add("error");caseFeedback.textContent="La IP es correcta, pero el servicio no coincide con el objetivo de monitoreo SNMP. Revisa la tabla de servicios del equipo.";}
+      });
+      document.getElementById("resetCase").addEventListener("click",function(){document.querySelectorAll('input[name="caseDecision"]').forEach(function(i){i.checked=false;});caseFeedback.classList.remove("success","warn","error");caseFeedback.textContent="Relaciona el objetivo de la aplicación con el servicio publicado por el equipo.";});
+
+      const quizForm=document.getElementById("quizForm");
+      const quizFeedback=document.getElementById("quizFeedback");
+      const quizAnswers={q1:"a",q2:"b",q3:"b",q4:"b",q5:"a"};
+      const quizExplanations={q1:"Q1: una misma IP puede alojar múltiples servicios; el puerto y el transporte ayudan a diferenciarlos.",q2:"Q2: un puerto es un valor de 16 bits entre 0 y 65535.",q3:"Q3: 5500 es el puerto y diferencia el servicio dentro del host.",q4:"Q4: TCP y UDP forman contextos de transporte distintos aunque IP y puerto coincidan.",q5:"Q5: la 5-tupla combina protocolo, IP/puerto de origen e IP/puerto de destino."};
+      quizForm.addEventListener("submit",function(event){
+        event.preventDefault();let answered=0,correct=0;const misses=[];Object.keys(quizAnswers).forEach(function(name){const selected=quizForm.querySelector('input[name="'+name+'"]:checked');if(selected){answered+=1;if(selected.value===quizAnswers[name]){correct+=1;}else{misses.push(quizExplanations[name]);}}});quizFeedback.classList.remove("success","warn","error");
+        if(answered<5){quizFeedback.classList.add("warn");quizFeedback.textContent="Has respondido "+answered+" de 5 preguntas. Completa todas antes de comprobar.";return;}
+        if(correct===5){quizFeedback.classList.add("success");quizFeedback.textContent="5/5. Puedes interpretar y construir extremos de comunicación con IP, puerto y transporte. Estás listo para estudiar qué cambia entre TCP y UDP.";}else{quizFeedback.classList.add("error");quizFeedback.innerHTML="Obtuviste <strong>"+correct+"/5</strong>. Revisa: "+misses.join(" ")+" Después vuelve a intentarlo.";}
+      });
+      document.getElementById("resetQuiz").addEventListener("click",function(){quizForm.reset();quizFeedback.classList.remove("success","warn","error");quizFeedback.textContent="Completa las cinco preguntas antes de comprobar.";});
+
+      const reflectionText=document.getElementById("reflectionText");
+      const reflectionFeedback=document.getElementById("reflectionFeedback");
+      const storageKey="programacion-redes-1-1-2-reflexion";
+      try{const saved=localStorage.getItem(storageKey);if(saved){reflectionText.value=saved;reflectionFeedback.classList.add("success");reflectionFeedback.textContent="Se recuperó la reflexión guardada previamente en este navegador.";}}catch(error){reflectionFeedback.classList.add("warn");reflectionFeedback.textContent="El navegador no permitió acceder al almacenamiento local. Puedes realizar la reflexión sin guardarla.";}
+      document.getElementById("saveReflection").addEventListener("click",function(){const value=reflectionText.value.trim();reflectionFeedback.classList.remove("success","warn");if(value.length<40){reflectionFeedback.classList.add("warn");reflectionFeedback.textContent="Amplía la explicación. Incluye explícitamente IP, puerto y protocolo de transporte.";return;}try{localStorage.setItem(storageKey,value);reflectionFeedback.classList.add("success");reflectionFeedback.textContent="Reflexión guardada únicamente en este navegador.";}catch(error){reflectionFeedback.classList.add("warn");reflectionFeedback.textContent="No fue posible guardar localmente. El texto permanece visible mientras esta página siga abierta.";}});
+      document.getElementById("clearReflection").addEventListener("click",function(){reflectionText.value="";reflectionFeedback.classList.remove("success","warn");try{localStorage.removeItem(storageKey);}catch(error){}reflectionFeedback.textContent="Reflexión limpiada en esta página.";reflectionText.focus();});
+    })();
+  </script>
+</body>
+</html>

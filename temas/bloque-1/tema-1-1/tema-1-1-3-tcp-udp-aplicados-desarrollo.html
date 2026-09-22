@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Subtema 1.1.3: TCP y UDP aplicados al desarrollo de aplicaciones de red.">
+  <meta name="theme-color" content="#10212a">
+  <title>1.1.3 | TCP y UDP aplicados al desarrollo</title>
+  <style>
+    :root{
+      --ink:#18212a;--muted:#586775;--line:#cbd5dc;--soft:#f3f6f8;--paper:#ffffff;
+      --cyan:#007c91;--cyan-dark:#005b6a;--cyan-light:#6ed2e2;--green:#16734a;--green-soft:#e8f5ee;
+      --amber:#8a5600;--amber-soft:#fff3d8;--red:#9b2c2c;--red-soft:#fff0f0;--focus:#005fcc;
+      --navy:#10212a;--navy-deep:#07141a;--max:1180px;--radius:8px;--shadow:0 16px 38px rgba(24,33,42,.08)
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;min-width:280px;color:var(--ink);background:var(--paper);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55;overflow-x:hidden}
+    img,svg,canvas,video{display:block;max-width:100%}
+    button,input,select,textarea{font:inherit;max-width:100%}
+    button,input[type="radio"],input[type="checkbox"],select{cursor:pointer}
+    a{color:var(--cyan-dark)}
+    a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+    .skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}.skip-link:focus{top:1rem}
+    header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+    .progress-track{height:4px;background:#e6ecef}.progress-bar{height:100%;width:0;background:var(--cyan);transition:width .15s linear}
+    .header-inner{width:min(100%,var(--max));min-height:66px;margin:0 auto;padding:.55rem 1.25rem;display:flex;gap:.75rem;align-items:center;min-width:0}
+    .brand{min-width:190px}.brand strong{display:block;font-size:.95rem}.brand span{display:block;color:var(--muted);font-size:.78rem}
+    .nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+    nav a{color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;border-bottom:2px solid transparent;font-size:.84rem}
+    nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+    .top-link{flex:0 0 auto;text-decoration:none;border:1px solid var(--line);border-radius:5px;padding:.48rem .72rem;color:var(--ink);font-weight:750;white-space:nowrap;background:#fff}
+    .top-link:hover{border-color:var(--cyan);color:var(--cyan-dark)}
+    main{overflow:hidden}section{scroll-margin-top:90px;border-bottom:1px solid var(--line)}.band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+    .hero{min-height:calc(100svh - 70px);display:grid;align-items:center;background:var(--navy);color:#fff}
+    .hero-grid{width:min(100%,var(--max));margin:0 auto;padding:3.4rem 1.25rem;display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.25fr);gap:3rem;align-items:center}.hero-grid>*{min-width:0}
+    .eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+    h1{font-size:clamp(2rem,5vw,4.35rem);line-height:1.02;margin:.65rem 0 1.15rem;max-width:18ch;overflow-wrap:normal;word-break:normal;hyphens:none}
+    h2{font-size:clamp(1.75rem,3.3vw,2.8rem);line-height:1.12;margin:0 0 .8rem;overflow-wrap:normal;word-break:normal;hyphens:none}
+    h3{font-size:1.22rem;margin:0 0 .55rem}h4{font-size:1rem;margin:.2rem 0 .35rem}p{max-width:72ch}.hero p{color:#d7e5ea;font-size:1.08rem}
+    .hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}.hero-actions{margin-top:1.45rem}
+    .btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cyan-dark);background:var(--cyan);color:#fff;text-decoration:none;padding:.72rem 1rem;border-radius:5px;font-weight:750}
+    .btn:hover{background:var(--cyan-dark)}.btn.secondary{background:transparent;color:inherit;border-color:currentColor}.btn.secondary:hover{background:rgba(255,255,255,.1)}
+    .btn.light{background:#fff;color:var(--ink);border-color:var(--line)}.btn.light:hover{background:var(--soft);color:var(--cyan-dark)}.btn:disabled{opacity:.55;cursor:not-allowed}
+    .hero-board{min-width:0;background:var(--navy-deep);border:1px solid #3b5965;border-radius:8px;padding:1.35rem}
+    .transport-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:.85rem}.transport-card{min-width:0;border:1px solid #48616b;border-radius:7px;padding:1rem;background:#102a35}.transport-card strong{display:block;color:#fff;font-size:1.08rem}.transport-card span{display:block;color:#bfd1d7;font-size:.83rem;margin-top:.15rem}.packet-row{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.85rem}.packet{width:32px;height:32px;border:1px solid #5a7681;display:grid;place-items:center;border-radius:4px;color:#d7e5ea;font-size:.76rem;font-weight:800}.packet.ordered{border-color:var(--cyan-light);color:var(--cyan-light)}.hero-caption{margin-top:1rem;color:#b8cbd2;font-size:.82rem}
+    .section-head{display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem}.section-head>*{min-width:0}.section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}.lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+    .outcomes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}.outcome:last-child{border-right:0}.outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+    .callout{margin-top:1.35rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}.callout strong{color:var(--ink)}
+    .concept-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.concept-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.25rem;background:#fff;box-shadow:var(--shadow)}
+    .concept-card .tag{display:inline-block;margin-bottom:.7rem;padding:.25rem .48rem;background:#d9eef2;color:var(--cyan-dark);border-radius:4px;font-size:.78rem;font-weight:850;text-transform:uppercase;letter-spacing:.05em}.concept-card p{margin:.3rem 0;color:var(--muted)}.concept-card ul{padding-left:1.1rem;margin:.7rem 0 0}
+    .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px;margin-top:1.2rem}table{width:100%;border-collapse:collapse;min-width:720px;background:#fff}th,td{text-align:left;padding:.78rem .85rem;border-bottom:1px solid var(--line);vertical-align:top}th{background:var(--soft);font-size:.9rem}tr:last-child td{border-bottom:0}
+    .activity{margin-top:2rem;padding:1.35rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--soft);min-width:0}.activity h3{margin-top:0}.activity-instruction{color:var(--muted);margin-top:0}
+    .feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}.feedback.success{background:var(--green-soft);border-color:var(--green)}.feedback.warn{background:var(--amber-soft);border-color:var(--amber)}.feedback.error{background:var(--red-soft);border-color:var(--red)}
+    .prediction{display:grid;gap:.6rem;margin:.85rem 0 1rem}.prediction label,.decision-list label{display:block;padding:.75rem .8rem;background:#fff;border:1px solid var(--line);border-radius:5px}.prediction input,.decision-list input{margin-right:.45rem}
+    .lab-grid{display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:1.2rem;align-items:start}.lab-grid>*{min-width:0}
+    .control-panel{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1rem}.control-panel label{display:block;font-weight:750;margin:.85rem 0 .3rem}.control-panel input,.control-panel select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+    .network-stage{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1rem;min-width:0}.lane{display:grid;grid-template-columns:100px minmax(0,1fr) 100px;gap:.7rem;align-items:center;margin:.7rem 0}.lane>*{min-width:0}.endpoint{padding:.75rem;border:1px solid var(--line);border-radius:6px;text-align:center;background:var(--soft);font-weight:800}.wire{min-height:54px;border-top:2px solid #8ca1aa;display:flex;align-items:flex-start;gap:.35rem;padding-top:.45rem;flex-wrap:wrap}.seg{min-width:36px;padding:.35rem .42rem;text-align:center;border:1px solid var(--line);border-radius:4px;background:#fff;font-size:.77rem;font-weight:800}.seg.ok{border-color:var(--green);background:var(--green-soft)}.seg.lost{border-color:var(--red);background:var(--red-soft);text-decoration:line-through}.seg.retry{border-color:var(--amber);background:var(--amber-soft)}
+    .observe-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem;margin-top:1rem}.observe-box{border:1px solid var(--line);border-radius:6px;padding:.8rem;background:var(--soft)}.observe-box b{display:block;color:var(--cyan-dark)}
+    .overhead-grid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:1.2rem;align-items:start}.overhead-grid>*{min-width:0}.meter{margin:.8rem 0}.meter-head{display:flex;justify-content:space-between;gap:.7rem;font-size:.88rem}.meter-track{height:15px;border-radius:999px;background:#e3e9ec;overflow:hidden}.meter-fill{height:100%;background:var(--cyan);width:0}.calc-card{border:1px solid var(--line);background:#fff;border-radius:6px;padding:1rem}.calc-card dl{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.5rem .8rem;margin:0}.calc-card dt{color:var(--muted)}.calc-card dd{margin:0;font-weight:800}
+    .exercise-box{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:#fff;box-shadow:var(--shadow)}.exercise-head{padding:1rem 1.2rem;background:var(--navy);color:#fff}.exercise-head span{display:block;color:var(--cyan-light);font-size:.8rem;font-weight:800;text-transform:uppercase}.exercise-body{padding:1.2rem}.steps{display:grid;gap:.65rem;margin-top:1rem}.step{border:1px solid var(--line);border-radius:6px;padding:.8rem;background:var(--soft)}.step .solution{display:none;margin-top:.5rem;padding-top:.5rem;border-top:1px solid var(--line)}.step.revealed .solution{display:block}
+    .practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.practice-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1rem;background:#fff}.practice-card label{display:block;font-weight:750;margin-top:.7rem}.practice-card select{width:100%;padding:.6rem;border:1px solid var(--line);border-radius:5px;background:#fff}.mini-feedback{margin-top:.75rem;padding:.75rem;border-left:3px solid var(--cyan);background:var(--soft);font-size:.9rem}.mini-feedback.success{border-color:var(--green);background:var(--green-soft)}.mini-feedback.warn{border-color:var(--amber);background:var(--amber-soft)}
+    .professional-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1.2rem;align-items:start}.professional-grid>*{min-width:0}.noc-board{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:1.1rem;box-shadow:var(--shadow)}.flow-map{display:grid;gap:.7rem;margin-top:1rem}.flow-row{display:grid;grid-template-columns:minmax(0,1fr) 100px;gap:.75rem;align-items:center;padding:.75rem;border:1px solid var(--line);border-radius:6px;background:var(--soft)}.badge{display:inline-block;padding:.25rem .48rem;background:#d9eef2;color:var(--cyan-dark);border-radius:4px;font-size:.8rem;font-weight:850;text-align:center}
+    .quiz{display:grid;gap:1rem}.question{border:1px solid var(--line);border-radius:6px;padding:1rem;background:#fff}.question legend{font-weight:800;padding:0 .35rem}.question label{display:block;margin:.45rem 0}.question input{margin-right:.45rem}
+    .reflection-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:2rem;align-items:start}.reflection-grid>*{min-width:0}textarea{width:100%;min-height:150px;resize:vertical;border:1px solid var(--line);border-radius:6px;padding:.8rem;background:#fff}.storage-note{font-size:.83rem;color:var(--muted)}
+    .references{font-size:.94rem;color:var(--muted)}.references ul{padding-left:1.2rem}.bottom-nav{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--line)}
+    footer{background:var(--navy);color:#c9d8dd}footer .band{padding-top:2rem;padding-bottom:2rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+    @media(max-width:900px){.header-inner{flex-wrap:wrap}.nav-scroll{order:3;flex-basis:100%}.hero-grid,.lab-grid,.overhead-grid,.professional-grid,.reflection-grid{grid-template-columns:1fr}.outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}.outcome:nth-child(2){border-right:0}.outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}.practice-grid{grid-template-columns:1fr}.observe-grid{grid-template-columns:1fr}}
+    @media(max-width:680px){.band{padding:3.2rem 1rem}.hero-grid{padding:2.7rem 1rem}.section-head{grid-template-columns:1fr;gap:.45rem}.outcomes,.concept-grid,.transport-hero{grid-template-columns:1fr}.outcome{border-right:0;border-bottom:1px solid var(--line)}.outcome:last-child{border-bottom:0}.lane{grid-template-columns:1fr}.wire{border-top:0;border-left:2px solid #8ca1aa;padding-top:0;padding-left:.6rem;min-height:0}.flow-row{grid-template-columns:1fr}.top-link{flex:1 1 auto;text-align:center}.meter-head{align-items:flex-start}}
+    @media(max-width:480px){h1{font-size:clamp(2rem,10vw,2.8rem);max-width:none}.header-inner{padding:.55rem 1rem}.brand{min-width:0;flex:1 1 100%}.bottom-nav .btn{width:100%}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <header>
+    <div class="header-inner">
+      <div class="brand"><strong>Programación de Redes</strong><span>Bloque 1 · Tema 1.1 · Subtema 1.1.3</span></div>
+      <div class="nav-scroll">
+        <nav aria-label="Secciones del subtema">
+          <a href="#inicio" aria-current="location">Inicio</a><a href="#conceptos">Conceptos</a><a href="#predice">Predice</a><a href="#experimenta">Experimenta</a><a href="#ejercicio-resuelto">Resuelto</a><a href="#practica">Practica</a><a href="#caso">Caso profesional</a><a href="#comprueba">Comprueba</a><a href="#reflexion">Reflexión</a>
+        </nav>
+      </div>
+      <a class="top-link" href="tema-1-1-fundamentos-programacion-aplicada-redes.html" aria-label="Volver al Tema 1.1">← Tema 1.1</a>
+      <a class="top-link" href="index.html" aria-label="Volver a la pantalla principal del curso">Curso</a>
+    </div>
+    <div class="progress-track" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div>
+  </header>
+
+  <main id="contenido">
+    <section class="hero" id="inicio">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">Bloque 1 · Tema 1.1 · Subtema 1.1.3</div>
+          <h1>TCP y UDP aplicados al desarrollo</h1>
+          <p>Elegir un protocolo de transporte no consiste en repetir que uno es “seguro” y el otro “rápido”. Un programador debe relacionar los requisitos de la aplicación con la forma en que TCP y UDP entregan los datos.</p>
+          <div class="hero-actions"><a class="btn" href="#conceptos">Comenzar</a><a class="btn secondary" href="#experimenta">Experimentar con pérdidas</a></div>
+        </div>
+        <div class="hero-board" role="img" aria-label="Comparación conceptual entre TCP y UDP">
+          <div class="transport-hero">
+            <div class="transport-card"><strong>TCP</strong><span>Flujo de bytes · entrega confiable y ordenada</span><div class="packet-row"><span class="packet ordered">1</span><span class="packet ordered">2</span><span class="packet ordered">3</span><span class="packet ordered">4</span></div></div>
+            <div class="transport-card"><strong>UDP</strong><span>Datagramas · entrega sin garantías del protocolo</span><div class="packet-row"><span class="packet">1</span><span class="packet">2</span><span class="packet">3</span><span class="packet">4</span></div></div>
+          </div>
+          <p class="hero-caption">La elección adecuada depende de qué necesita conservar la aplicación: completitud, orden, latencia, límites de mensaje y capacidad de tolerar pérdidas.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="orientacion" aria-labelledby="orientacion-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">CÓMO TRABAJAR</div><div><h2 id="orientacion-title">Decide a partir de requisitos, no de etiquetas</h2><p class="lead">Primero distinguirás qué ofrece realmente cada transporte. Después predecirás comportamientos, experimentarás con pérdidas y justificarás decisiones en escenarios de Telecomunicaciones.</p></div></div>
+        <div class="outcomes" aria-label="Resultados del recorrido">
+          <div class="outcome"><b>Comparar</b>Las propiedades relevantes de TCP y UDP para una aplicación.</div>
+          <div class="outcome"><b>Predecir</b>Qué ocurre ante pérdidas o cuando el orden de los datos importa.</div>
+          <div class="outcome"><b>Justificar</b>La elección del transporte a partir de requisitos funcionales.</div>
+          <div class="outcome"><b>Aplicar</b>La decisión a monitoreo, control y tráfico sensible al tiempo.</div>
+        </div>
+        <div class="callout"><strong>Advertencia importante:</strong> UDP no significa automáticamente “más rápido” y TCP no significa “mejor”. TCP incorpora mecanismos que simplifican la entrega confiable; UDP ofrece un servicio mínimo de datagramas. El resultado final depende de la aplicación y de las condiciones de la red.</div>
+      </div>
+    </section>
+
+    <section id="conceptos" aria-labelledby="conceptos-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">CONCEPTOS</div><div><h2 id="conceptos-title">Dos servicios de transporte con compromisos diferentes</h2><p class="lead">Ambos utilizan puertos para identificar extremos, pero entregan a la aplicación abstracciones distintas.</p></div></div>
+        <div class="concept-grid">
+          <article class="concept-card"><span class="tag">TCP</span><h3>Conexión y flujo de bytes</h3><p>TCP establece una conexión lógica antes del intercambio normal de datos y presenta a la aplicación un <strong>flujo continuo de bytes</strong>.</p><ul><li>Entrega confiable mediante confirmaciones y retransmisiones.</li><li>Entrega los bytes en orden a la aplicación.</li><li>Incluye control de flujo y control de congestión.</li><li><strong>No conserva límites de mensajes</strong>: la aplicación debe definir su propio formato.</li></ul></article>
+          <article class="concept-card"><span class="tag">UDP</span><h3>Datagramas independientes</h3><p>UDP permite enviar datagramas sin establecer previamente una conexión de transporte y conserva los límites de cada datagrama entregado.</p><ul><li>No garantiza entrega, orden ni ausencia de duplicados.</li><li>No retransmite por sí mismo los datagramas perdidos.</li><li>No incorpora control de flujo o de congestión como TCP.</li><li>La aplicación puede añadir mecanismos propios si los necesita.</li></ul></article>
+          <article class="concept-card"><span class="tag">Confiabilidad</span><h3>¿Quién asume la responsabilidad?</h3><p>Con TCP, gran parte de la confiabilidad está implementada en el transporte. Con UDP, cualquier confirmación, reintento, numeración o recuperación que la aplicación necesite debe diseñarse por encima de UDP.</p><ul><li>Eso no convierte a UDP en “incorrecto”.</li><li>Simplemente desplaza responsabilidades hacia la aplicación.</li><li>Algunos protocolos modernos construyen mecanismos avanzados sobre UDP.</li></ul></article>
+          <article class="concept-card"><span class="tag">Latencia</span><h3>No confundir menor mecanismo con menor demora garantizada</h3><p>UDP tiene una cabecera mínima menor y no exige un establecimiento de conexión del propio protocolo. Pero la latencia observada depende también de la red, del diseño de la aplicación y de cualquier mecanismo adicional.</p><ul><li>TCP mínimo: cabecera de 20 bytes, sin opciones.</li><li>UDP: cabecera de 8 bytes.</li><li>La diferencia de cabecera no decide por sí sola el protocolo adecuado.</li></ul></article>
+        </div>
+
+        <div class="table-wrap" role="region" aria-label="Comparación entre TCP y UDP" tabindex="0">
+          <table>
+            <thead><tr><th>Aspecto</th><th>TCP</th><th>UDP</th><th>Pregunta que debe hacerse el programador</th></tr></thead>
+            <tbody>
+              <tr><td>Modelo</td><td>Conexión lógica y flujo de bytes</td><td>Datagramas independientes</td><td>¿Mi aplicación trabaja mejor como flujo o como mensajes discretos?</td></tr>
+              <tr><td>Entrega</td><td>Confiable y ordenada para los bytes del flujo</td><td>Sin garantía de entrega u orden</td><td>¿Puedo tolerar pérdidas o debo recuperar cada dato?</td></tr>
+              <tr><td>Retransmisión</td><td>Integrada</td><td>No integrada</td><td>Si hay pérdida, ¿quién debe decidir si todavía vale la pena recuperar?</td></tr>
+              <tr><td>Límites de mensaje</td><td>No se preservan</td><td>Se preservan por datagrama</td><td>¿Necesito definir longitud, delimitadores o framing en la aplicación?</td></tr>
+              <tr><td>Cabecera mínima</td><td>20 bytes</td><td>8 bytes</td><td>¿El tamaño de cabecera es relevante frente al tamaño y frecuencia de mis datos?</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout"><strong>Idea que debes conservar:</strong> la decisión se toma desde los requisitos de la aplicación. “Necesito que llegue todo y en orden” apunta a una necesidad distinta de “los datos envejecen rápidamente y una muestra perdida puede descartarse”.</div>
+      </div>
+    </section>
+
+    <section id="predice" aria-labelledby="predice-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">PREDICE</div><div><h2 id="predice-title">Antes de simular, anticipa qué debería ocurrir</h2><p class="lead">Una aplicación envía las unidades 1, 2, 3, 4 y 5. Durante la transmisión se pierde la unidad 3.</p></div></div>
+        <div class="activity">
+          <h3>¿Qué diferencia esperarías observar?</h3>
+          <p class="activity-instruction">Selecciona la afirmación más precisa para el modelo que estudiaremos.</p>
+          <div class="prediction">
+            <label><input type="radio" name="lossPrediction" value="a"> Con TCP, la pérdida puede provocar recuperación antes de entregar el flujo en orden; con UDP, el datagrama perdido no es recuperado por UDP.</label>
+            <label><input type="radio" name="lossPrediction" value="b"> TCP y UDP recuperan automáticamente cualquier pérdida porque ambos utilizan puertos.</label>
+            <label><input type="radio" name="lossPrediction" value="c"> UDP siempre entrega todos los datagramas antes que TCP, incluso si la red los pierde.</label>
+          </div>
+          <div class="action-row"><button class="btn" id="checkPrediction" type="button">Comprobar predicción</button><button class="btn light" id="resetPrediction" type="button">Reintentar</button></div>
+          <div class="feedback" id="predictionFeedback" role="status" aria-live="polite">Haz tu predicción antes de ejecutar la simulación.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="experimenta" aria-labelledby="experimenta-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">EXPERIMENTA · OBSERVA · EXPLICA</div><div><h2 id="experimenta-title">Provoca una pérdida y compara la entrega</h2><p class="lead">Este laboratorio es un modelo didáctico, no una simulación temporal completa de los protocolos. Su propósito es visualizar quién recupera la pérdida y qué recibe finalmente la aplicación.</p></div></div>
+
+        <div class="activity">
+          <h3>Laboratorio de pérdida controlada</h3>
+          <div class="lab-grid">
+            <div class="control-panel">
+              <label for="labTransport">Transporte</label><select id="labTransport"><option value="TCP">TCP</option><option value="UDP">UDP</option></select>
+              <label for="lostUnit">Unidad que la red descartará</label><select id="lostUnit"><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option></select>
+              <button class="btn" id="runLossLab" type="button" style="margin-top:1rem">Ejecutar experimento</button>
+              <button class="btn light" id="resetLossLab" type="button" style="margin-top:1rem">Restablecer</button>
+              <div class="callout"><strong>Modelo:</strong> enviamos cinco unidades numeradas. Para TCP representamos segmentos del flujo; para UDP, cinco datagramas independientes.</div>
+            </div>
+            <div class="network-stage">
+              <div class="lane"><div class="endpoint">Emisor</div><div class="wire" id="wireUnits" aria-live="polite"><span class="seg">1</span><span class="seg">2</span><span class="seg">3</span><span class="seg">4</span><span class="seg">5</span></div><div class="endpoint">Receptor</div></div>
+              <div class="observe-grid">
+                <div class="observe-box"><b>Red</b><span id="networkObservation">Aún no se ha ejecutado el experimento.</span></div>
+                <div class="observe-box"><b>Transporte</b><span id="transportObservation">Selecciona TCP o UDP.</span></div>
+                <div class="observe-box"><b>Aplicación</b><span id="appObservation">Observaremos qué datos quedan disponibles.</span></div>
+              </div>
+              <div class="feedback" id="lossFeedback" role="status" aria-live="polite">Ejecuta el experimento y explica por qué el resultado cambia con el transporte.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity">
+          <h3>Explora · ¿Cuánto pesa la cabecera de transporte?</h3>
+          <p class="activity-instruction">Mueve el tamaño de carga útil. Calculamos únicamente la cabecera mínima del transporte y una sola unidad de datos; no incluimos IP, Ethernet, opciones TCP ni otros encabezados.</p>
+          <div class="overhead-grid">
+            <div class="control-panel">
+              <label for="payloadRange">Carga útil: <output id="payloadOutput" for="payloadRange">100</output> bytes</label>
+              <input id="payloadRange" type="range" min="20" max="1400" step="20" value="100">
+              <div class="meter"><div class="meter-head"><span>TCP · porcentaje de cabecera</span><strong id="tcpPct">16.67%</strong></div><div class="meter-track"><div class="meter-fill" id="tcpMeter"></div></div></div>
+              <div class="meter"><div class="meter-head"><span>UDP · porcentaje de cabecera</span><strong id="udpPct">7.41%</strong></div><div class="meter-track"><div class="meter-fill" id="udpMeter"></div></div></div>
+            </div>
+            <div class="calc-card">
+              <h3>Lectura del cálculo</h3>
+              <dl><dt>Carga útil</dt><dd id="payloadValue">100 B</dd><dt>Total con TCP mínimo</dt><dd id="tcpTotal">120 B</dd><dt>Total con UDP</dt><dd id="udpTotal">108 B</dd><dt>Diferencia de cabecera</dt><dd>12 B</dd></dl>
+              <div class="feedback" id="overheadFeedback">Con cargas pequeñas, la cabecera representa una fracción mayor. Aun así, esta comparación por sí sola no determina qué protocolo debes elegir.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="ejercicio-resuelto" aria-labelledby="resolved-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">EJERCICIO RESUELTO</div><div><h2 id="resolved-title">Elegir transporte a partir del requisito dominante</h2><p class="lead">No empezamos preguntando “¿TCP o UDP?”. Primero identificamos qué perdería la aplicación si faltara un dato, llegara tarde o llegara fuera de orden.</p></div></div>
+        <article class="exercise-box">
+          <div class="exercise-head"><span>Situación</span><strong>Un sistema del NOC descarga la configuración completa de un equipo remoto antes de realizar una auditoría.</strong></div>
+          <div class="exercise-body">
+            <p>La configuración debe llegar completa y en el orden correcto. Si falta un fragmento, el archivo final no puede considerarse válido. No existe un requisito de tiempo real estricto.</p>
+            <div class="steps" id="solutionSteps">
+              <div class="step"><strong>Paso 1 · Identificar qué no puede perderse</strong><div class="solution">No se puede aceptar una configuración incompleta. La aplicación necesita recuperar los datos que se pierdan durante el transporte.</div></div>
+              <div class="step"><strong>Paso 2 · Analizar el orden</strong><div class="solution">Los bytes deben reconstruirse en el orden correcto. El receptor necesita un flujo coherente para obtener el archivo original.</div></div>
+              <div class="step"><strong>Paso 3 · Comparar responsabilidades</strong><div class="solution">TCP ya proporciona entrega confiable y ordenada del flujo de bytes. Con UDP, la aplicación tendría que implementar confirmaciones, numeración, temporizadores y retransmisiones si quisiera lograr propiedades equivalentes.</div></div>
+              <div class="step"><strong>Paso 4 · Decisión justificada</strong><div class="solution"><strong>TCP es coherente con estos requisitos.</strong> La conclusión no proviene de que TCP sea “mejor”, sino de que la integridad y el orden son requisitos dominantes del caso.</div></div>
+            </div>
+            <div class="action-row" style="margin-top:1rem"><button class="btn" id="revealStep" type="button">Revelar siguiente paso</button><button class="btn light" id="resetSolution" type="button">Resolver otra vez</button></div>
+            <div class="feedback" id="solutionFeedback" role="status" aria-live="polite">Antes de revelar, intenta justificar tú mismo qué requisito domina la decisión.</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="practica" aria-labelledby="practice-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">EJERCICIOS PROPUESTOS</div><div><h2 id="practice-title">Decide, comprueba y corrige tu razonamiento</h2><p class="lead">En cada caso importa la justificación. La respuesta correcta cambia cuando cambian los requisitos.</p></div></div>
+        <div class="practice-grid">
+          <article class="practice-card"><h3>Ejercicio 1 · Copia de respaldo</h3><p>Un servidor debe transferir un respaldo de configuración. Cada byte debe llegar y reconstruirse en orden.</p><label for="practiceOne">Transporte más coherente</label><select id="practiceOne"><option value="">Selecciona...</option><option value="TCP">TCP</option><option value="UDP">UDP</option></select><button class="btn" id="checkOne" type="button" style="margin-top:.8rem">Comprobar</button><div class="mini-feedback" id="feedbackOne" role="status" aria-live="polite">Piensa en qué ocurriría si faltara una parte del respaldo.</div></article>
+          <article class="practice-card"><h3>Ejercicio 2 · Muestras que caducan</h3><p>Un sensor envía 20 muestras por segundo. Si una muestra se pierde, la siguiente sigue siendo útil y no interesa retrasar datos nuevos para recuperar una muestra vieja.</p><label for="practiceTwo">Transporte coherente con ese requisito</label><select id="practiceTwo"><option value="">Selecciona...</option><option value="TCP">TCP</option><option value="UDP">UDP</option></select><button class="btn" id="checkTwo" type="button" style="margin-top:.8rem">Comprobar</button><div class="mini-feedback" id="feedbackTwo" role="status" aria-live="polite">Pregunta si recuperar una muestra atrasada aporta valor a la aplicación.</div></article>
+          <article class="practice-card"><h3>Ejercicio 3 · UDP con confiabilidad propia</h3><p>Una aplicación usa UDP, pero numera mensajes, espera confirmaciones y retransmite algunos datos críticos.</p><label for="practiceThree">¿Es conceptualmente posible?</label><select id="practiceThree"><option value="">Selecciona...</option><option value="yes">Sí</option><option value="no">No</option></select><button class="btn" id="checkThree" type="button" style="margin-top:.8rem">Comprobar</button><div class="mini-feedback" id="feedbackThree" role="status" aria-live="polite">Distingue lo que garantiza UDP de lo que puede implementar la aplicación.</div></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="caso" aria-labelledby="case-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">CASO PROFESIONAL</div><div><h2 id="case-title">Dos flujos de una estación remota, dos necesidades</h2><p class="lead">Un mismo sistema de Telecomunicaciones puede utilizar transportes diferentes para funciones diferentes.</p></div></div>
+        <div class="professional-grid">
+          <div class="noc-board">
+            <h3>Estación de radioenlace</h3>
+            <p>El NOC necesita realizar dos operaciones:</p>
+            <div class="flow-map"><div class="flow-row"><span><strong>A · Configuración remota</strong><br>Los comandos deben llegar completos y el sistema debe conocer si la operación se realizó.</span><span class="badge">Flujo crítico</span></div><div class="flow-row"><span><strong>B · Telemetría de alta frecuencia</strong><br>Las muestras envejecen rápidamente y la aplicación puede tolerar pérdidas aisladas.</span><span class="badge">Flujo temporal</span></div></div>
+            <div class="callout"><strong>Importante:</strong> esto es un ejercicio de diseño. En sistemas reales, la elección también depende del protocolo de aplicación existente, seguridad, interoperabilidad y requisitos operativos.</div>
+          </div>
+          <div class="activity" style="margin-top:0">
+            <h3>Asigna un transporte a cada flujo</h3>
+            <label for="caseA"><strong>Flujo A · Configuración</strong></label><select id="caseA"><option value="">Selecciona...</option><option value="TCP">TCP</option><option value="UDP">UDP</option></select>
+            <label for="caseB" style="display:block;margin-top:.8rem"><strong>Flujo B · Telemetría tolerante a pérdidas</strong></label><select id="caseB"><option value="">Selecciona...</option><option value="TCP">TCP</option><option value="UDP">UDP</option></select>
+            <div class="action-row" style="margin-top:1rem"><button class="btn" id="checkCase" type="button">Comprobar diseño</button><button class="btn light" id="resetCase" type="button">Reintentar</button></div>
+            <div class="feedback" id="caseFeedback" role="status" aria-live="polite">No busques un protocolo ganador. Relaciona cada flujo con sus requisitos.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="comprueba" aria-labelledby="quiz-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">COMPRUEBA</div><div><h2 id="quiz-title">Integra la decisión de transporte</h2><p class="lead">Responde las cinco preguntas. La retroalimentación te indicará qué razonamiento necesitas revisar.</p></div></div>
+        <form class="quiz" id="quizForm">
+          <fieldset class="question"><legend>1. ¿Qué abstracción entrega TCP a la aplicación?</legend><label><input type="radio" name="q1" value="a"> Un flujo de bytes confiable y ordenado.</label><label><input type="radio" name="q1" value="b"> Datagramas independientes con sus límites siempre preservados.</label><label><input type="radio" name="q1" value="c"> Direcciones IP sin puertos.</label></fieldset>
+          <fieldset class="question"><legend>2. Si un datagrama UDP se pierde en la red, ¿qué hace UDP por sí mismo?</legend><label><input type="radio" name="q2" value="a"> Lo retransmite hasta recibir confirmación.</label><label><input type="radio" name="q2" value="b"> No proporciona una retransmisión automática para recuperarlo.</label><label><input type="radio" name="q2" value="c"> Convierte la comunicación automáticamente en TCP.</label></fieldset>
+          <fieldset class="question"><legend>3. ¿Qué afirmación sobre los límites de mensaje es correcta?</legend><label><input type="radio" name="q3" value="a"> TCP conserva cada envío de la aplicación como un mensaje independiente.</label><label><input type="radio" name="q3" value="b"> UDP conserva los límites de los datagramas; TCP presenta un flujo de bytes.</label><label><input type="radio" name="q3" value="c"> Ninguno utiliza puertos.</label></fieldset>
+          <fieldset class="question"><legend>4. ¿Qué criterio es más sólido para elegir entre TCP y UDP?</legend><label><input type="radio" name="q4" value="a"> Elegir siempre TCP porque garantiza entrega.</label><label><input type="radio" name="q4" value="b"> Elegir siempre UDP porque su cabecera es menor.</label><label><input type="radio" name="q4" value="c"> Relacionar las propiedades del transporte con los requisitos de la aplicación.</label></fieldset>
+          <fieldset class="question"><legend>5. Una aplicación sobre UDP necesita confirmaciones y reintentos selectivos. ¿Qué interpretación es correcta?</legend><label><input type="radio" name="q5" value="a"> Es imposible: UDP prohíbe mecanismos de confiabilidad.</label><label><input type="radio" name="q5" value="b"> La aplicación puede implementar esos mecanismos por encima de UDP si su diseño lo requiere.</label><label><input type="radio" name="q5" value="c"> UDP los añade automáticamente sin que la aplicación haga nada.</label></fieldset>
+          <div class="action-row"><button class="btn" type="submit">Comprobar respuestas</button><button class="btn light" type="button" id="resetQuiz">Reintentar</button></div>
+          <div class="feedback" id="quizFeedback" role="status" aria-live="polite">Completa las cinco preguntas antes de comprobar.</div>
+        </form>
+      </div>
+    </section>
+
+    <section id="reflexion" aria-labelledby="reflection-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">REFLEXIÓN</div><div><h2 id="reflection-title">Explica una decisión sin caer en “rápido” contra “seguro”</h2><p class="lead">La calidad de una decisión técnica se demuestra cuando puedes relacionarla con requisitos concretos.</p></div></div>
+        <div class="reflection-grid">
+          <div><h3>Pregunta</h3><p>Un compañero afirma: “Para tiempo real siempre UDP y para todo lo demás TCP”. Explica por qué esa regla es demasiado simple y menciona al menos tres requisitos que deberías analizar antes de elegir.</p><div class="callout"><strong>Pista:</strong> piensa en pérdida tolerable, orden, vigencia temporal de los datos, límites de mensaje, interoperabilidad y mecanismos que ya implemente la aplicación.</div></div>
+          <div><label for="reflectionText"><strong>Tu explicación</strong></label><textarea id="reflectionText" placeholder="Escribe una justificación técnica con tus propias palabras..."></textarea><div class="action-row" style="margin-top:.75rem"><button class="btn" id="saveReflection" type="button">Guardar en este navegador</button><button class="btn light" id="clearReflection" type="button">Limpiar</button></div><div class="feedback" id="reflectionFeedback" role="status" aria-live="polite">La reflexión aún no se ha guardado.</div><p class="storage-note">El texto se almacena únicamente mediante localStorage en este navegador. No se transmite información.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="referencias" aria-labelledby="references-title">
+      <div class="band references">
+        <div class="section-head"><div class="section-code">REFERENCIAS Y ALCANCE</div><div><h2 id="references-title">Qué hemos cubierto y qué sigue</h2><p class="lead">Este subtema compara las propiedades de transporte necesarias para tomar decisiones de diseño. Todavía no programamos sockets ni analizamos las llamadas de una API de red.</p></div></div>
+        <ul>
+          <li>Kurose, J. F. y Ross, K. W. <em>Redes de computadoras: un enfoque descendente</em>.</li>
+          <li>RFC 9293: especificación actual de Transmission Control Protocol (TCP).</li>
+          <li>RFC 768: User Datagram Protocol (UDP).</li>
+        </ul>
+        <div class="callout"><strong>Delimitación:</strong> en 1.1.4 prepararemos el entorno de programación y el manejo básico de dependencias. La implementación concreta con sockets corresponde al Tema 1.2.</div>
+        <div class="bottom-nav"><a class="btn light" href="tema-1-1-2-direccionamiento-ip-puertos-protocolos.html">← 1.1.2 IP, puertos y protocolos</a><a class="btn" href="tema-1-1-4-entorno-programacion-dependencias.html">1.1.4 Entorno y dependencias →</a></div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="band"><span>Programación de Redes · Bloque 1</span><span>Subtema 1.1.3 · TCP y UDP aplicados al desarrollo</span></div></footer>
+
+  <script>
+    (function(){
+      "use strict";
+
+      const progressBar=document.getElementById("progressBar");
+      function updateProgress(){
+        const doc=document.documentElement;
+        const max=doc.scrollHeight-doc.clientHeight;
+        const value=max>0?(doc.scrollTop/max)*100:0;
+        progressBar.style.width=Math.min(100,Math.max(0,value))+"%";
+      }
+      document.addEventListener("scroll",updateProgress,{passive:true});
+      window.addEventListener("resize",updateProgress);updateProgress();
+
+      const predictionFeedback=document.getElementById("predictionFeedback");
+      document.getElementById("checkPrediction").addEventListener("click",function(){
+        const selected=document.querySelector('input[name="lossPrediction"]:checked');
+        predictionFeedback.classList.remove("success","warn","error");
+        if(!selected){predictionFeedback.classList.add("warn");predictionFeedback.textContent="Selecciona una predicción antes de comprobar.";return;}
+        if(selected.value==="a"){predictionFeedback.classList.add("success");predictionFeedback.textContent="Correcto. TCP incorpora mecanismos de recuperación y entrega ordenada del flujo. UDP no retransmite automáticamente un datagrama perdido. Ejecuta ahora el laboratorio para visualizar esta diferencia.";}
+        else{predictionFeedback.classList.add("error");predictionFeedback.textContent="Revisa la responsabilidad del transporte. Usar puertos no implica recuperar pérdidas, y UDP no puede entregar un datagrama que la red descartó salvo que una capa superior decida recuperarlo.";}
+      });
+      document.getElementById("resetPrediction").addEventListener("click",function(){document.querySelectorAll('input[name="lossPrediction"]').forEach(function(i){i.checked=false;});predictionFeedback.classList.remove("success","warn","error");predictionFeedback.textContent="Haz tu predicción antes de ejecutar la simulación.";});
+
+      const labTransport=document.getElementById("labTransport");
+      const lostUnit=document.getElementById("lostUnit");
+      const wireUnits=document.getElementById("wireUnits");
+      const networkObservation=document.getElementById("networkObservation");
+      const transportObservation=document.getElementById("transportObservation");
+      const appObservation=document.getElementById("appObservation");
+      const lossFeedback=document.getElementById("lossFeedback");
+      function renderUnits(states){
+        wireUnits.innerHTML="";
+        states.forEach(function(item){const span=document.createElement("span");span.className="seg "+item.state;span.textContent=item.label;wireUnits.appendChild(span);});
+      }
+      function resetLossLab(){renderUnits([1,2,3,4,5].map(function(n){return{label:String(n),state:""};}));networkObservation.textContent="Aún no se ha ejecutado el experimento.";transportObservation.textContent="Selecciona TCP o UDP.";appObservation.textContent="Observaremos qué datos quedan disponibles.";lossFeedback.classList.remove("success","warn","error");lossFeedback.textContent="Ejecuta el experimento y explica por qué el resultado cambia con el transporte.";}
+      document.getElementById("runLossLab").addEventListener("click",function(){
+        const protocol=labTransport.value;const lost=Number(lostUnit.value);const states=[];
+        [1,2,3,4,5].forEach(function(n){states.push({label:String(n),state:n===lost?"lost":"ok"});});
+        if(protocol==="TCP"){states.push({label:String(lost)+"↻",state:"retry"});networkObservation.textContent="La red descarta la unidad "+lost+" en el primer intento.";transportObservation.textContent="El modelo representa una retransmisión de la unidad perdida y la reconstrucción ordenada del flujo.";appObservation.textContent="La aplicación termina recibiendo 1, 2, 3, 4 y 5 en orden, aunque la recuperación puede añadir demora.";lossFeedback.classList.remove("warn","error");lossFeedback.classList.add("success");lossFeedback.textContent="Observación TCP: el transporte asume la recuperación y la entrega ordenada. En una implementación real intervienen números de secuencia, confirmaciones, temporizadores y otros mecanismos.";}
+        else{networkObservation.textContent="La red descarta el datagrama "+lost+".";transportObservation.textContent="UDP no retransmite ese datagrama ni espera a recuperarlo antes de entregar otros que sí lleguen.";appObservation.textContent="En este modelo la aplicación observa 1, 2, 4 y 5: existe un hueco que la propia aplicación deberá aceptar o gestionar.";lossFeedback.classList.remove("success","error");lossFeedback.classList.add("warn");lossFeedback.textContent="Observación UDP: la pérdida queda visible para la aplicación si ésta puede detectarla. Si recuperar ese dato fuera necesario, el protocolo de aplicación tendría que añadir su propio mecanismo.";}
+        renderUnits(states);
+      });
+      document.getElementById("resetLossLab").addEventListener("click",resetLossLab);resetLossLab();
+
+      const payloadRange=document.getElementById("payloadRange");
+      function updateOverhead(){
+        const payload=Number(payloadRange.value);const tcpTotal=payload+20;const udpTotal=payload+8;const tcpPct=(20/tcpTotal)*100;const udpPct=(8/udpTotal)*100;
+        document.getElementById("payloadOutput").textContent=String(payload);document.getElementById("payloadValue").textContent=payload+" B";document.getElementById("tcpTotal").textContent=tcpTotal+" B";document.getElementById("udpTotal").textContent=udpTotal+" B";document.getElementById("tcpPct").textContent=tcpPct.toFixed(2)+"%";document.getElementById("udpPct").textContent=udpPct.toFixed(2)+"%";document.getElementById("tcpMeter").style.width=Math.min(100,tcpPct*3)+"%";document.getElementById("udpMeter").style.width=Math.min(100,udpPct*3)+"%";
+        document.getElementById("overheadFeedback").textContent=payload<=120?"Con cargas pequeñas, la cabecera representa una fracción visible del total. Esto puede importar en tráfico muy frecuente, pero la elección sigue dependiendo de requisitos funcionales.":"Al aumentar la carga útil, el porcentaje correspondiente a la cabecera disminuye. La diferencia de 12 bytes entre estas cabeceras mínimas permanece, pero su peso relativo cambia.";
+      }
+      payloadRange.addEventListener("input",updateOverhead);updateOverhead();
+
+      const solutionSteps=Array.from(document.querySelectorAll("#solutionSteps .step"));const revealStep=document.getElementById("revealStep");const solutionFeedback=document.getElementById("solutionFeedback");let revealed=0;
+      revealStep.addEventListener("click",function(){if(revealed<solutionSteps.length){solutionSteps[revealed].classList.add("revealed");revealed+=1;solutionFeedback.classList.remove("success","warn");solutionFeedback.textContent=revealed<solutionSteps.length?"Paso "+revealed+" revelado. Antes de continuar, intenta anticipar la siguiente decisión.":"Solución completa. Observa que la selección surgió de requisitos de integridad y orden, no de una regla memorizada.";if(revealed===solutionSteps.length){solutionFeedback.classList.add("success");revealStep.disabled=true;}}});
+      document.getElementById("resetSolution").addEventListener("click",function(){solutionSteps.forEach(function(s){s.classList.remove("revealed");});revealed=0;revealStep.disabled=false;solutionFeedback.classList.remove("success","warn");solutionFeedback.textContent="Antes de revelar, intenta justificar tú mismo qué requisito domina la decisión.";});
+
+      function checkPractice(selectId,feedbackId,correct,successText,retryText){const value=document.getElementById(selectId).value;const fb=document.getElementById(feedbackId);fb.classList.remove("success","warn");if(!value){fb.classList.add("warn");fb.textContent="Selecciona una respuesta antes de comprobar.";return;}if(value===correct){fb.classList.add("success");fb.textContent=successText;}else{fb.classList.add("warn");fb.textContent=retryText;}}
+      document.getElementById("checkOne").addEventListener("click",function(){checkPractice("practiceOne","feedbackOne","TCP","Correcto. La transferencia exige integridad y orden; TCP ya proporciona esas propiedades al flujo.","Revisa el requisito: si falta una parte, el respaldo deja de ser válido. ¿Qué transporte incorpora recuperación y orden?");});
+      document.getElementById("checkTwo").addEventListener("click",function(){checkPractice("practiceTwo","feedbackTwo","UDP","Correcto para los requisitos planteados. La aplicación tolera pérdidas aisladas y prefiere datos nuevos antes que recuperar muestras que ya caducaron.","Aquí no se pide recuperar cada muestra. Piensa qué ocurre si una retransmisión retrasa información que ya dejó de ser actual.");});
+      document.getElementById("checkThree").addEventListener("click",function(){checkPractice("practiceThree","feedbackThree","yes","Correcto. UDP no ofrece esa confiabilidad por sí mismo, pero una aplicación puede diseñar confirmaciones y reintentos encima de UDP.","Revisa la diferencia entre las garantías del protocolo de transporte y las funciones que puede implementar una capa de aplicación.");});
+
+      const caseFeedback=document.getElementById("caseFeedback");
+      document.getElementById("checkCase").addEventListener("click",function(){const a=document.getElementById("caseA").value;const b=document.getElementById("caseB").value;caseFeedback.classList.remove("success","warn","error");if(!a||!b){caseFeedback.classList.add("warn");caseFeedback.textContent="Selecciona un transporte para ambos flujos.";return;}if(a==="TCP"&&b==="UDP"){caseFeedback.classList.add("success");caseFeedback.textContent="Diseño coherente con el escenario: TCP para la operación de configuración que requiere integridad y confirmación; UDP para las muestras que pueden perderse sin bloquear datos nuevos. En un sistema real también debes respetar el protocolo de aplicación y sus requisitos de seguridad.";}else{caseFeedback.classList.add("error");caseFeedback.textContent="Vuelve a los requisitos. El flujo A no tolera una operación incompleta; el flujo B sí tolera pérdidas aisladas y valora la vigencia temporal de cada muestra.";}});
+      document.getElementById("resetCase").addEventListener("click",function(){document.getElementById("caseA").value="";document.getElementById("caseB").value="";caseFeedback.classList.remove("success","warn","error");caseFeedback.textContent="No busques un protocolo ganador. Relaciona cada flujo con sus requisitos.";});
+
+      const quizForm=document.getElementById("quizForm");const quizFeedback=document.getElementById("quizFeedback");const quizAnswers={q1:"a",q2:"b",q3:"b",q4:"c",q5:"b"};const quizExplanations={q1:"Q1: TCP presenta un flujo de bytes confiable y ordenado.",q2:"Q2: UDP no retransmite automáticamente un datagrama perdido.",q3:"Q3: UDP preserva límites de datagrama; TCP no conserva los límites de cada envío de la aplicación.",q4:"Q4: el criterio correcto son los requisitos de la aplicación, no una regla absoluta.",q5:"Q5: la aplicación puede implementar mecanismos de confiabilidad sobre UDP."};
+      quizForm.addEventListener("submit",function(event){event.preventDefault();let answered=0,correct=0;const misses=[];Object.keys(quizAnswers).forEach(function(name){const selected=quizForm.querySelector('input[name="'+name+'"]:checked');if(selected){answered+=1;if(selected.value===quizAnswers[name]){correct+=1;}else{misses.push(quizExplanations[name]);}}});quizFeedback.classList.remove("success","warn","error");if(answered<5){quizFeedback.classList.add("warn");quizFeedback.textContent="Has respondido "+answered+" de 5 preguntas. Completa todas antes de comprobar.";return;}if(correct===5){quizFeedback.classList.add("success");quizFeedback.textContent="5/5. Puedes distinguir las propiedades de TCP y UDP y, sobre todo, relacionarlas con requisitos de una aplicación.";}else{quizFeedback.classList.add("error");quizFeedback.innerHTML="Obtuviste <strong>"+correct+"/5</strong>. Revisa: "+misses.join(" ")+" Después vuelve a intentarlo.";}});
+      document.getElementById("resetQuiz").addEventListener("click",function(){quizForm.reset();quizFeedback.classList.remove("success","warn","error");quizFeedback.textContent="Completa las cinco preguntas antes de comprobar.";});
+
+      const reflectionText=document.getElementById("reflectionText");const reflectionFeedback=document.getElementById("reflectionFeedback");const storageKey="programacion-redes-1-1-3-reflexion";
+      try{const saved=localStorage.getItem(storageKey);if(saved){reflectionText.value=saved;reflectionFeedback.classList.add("success");reflectionFeedback.textContent="Se recuperó la reflexión guardada previamente en este navegador.";}}catch(error){reflectionFeedback.classList.add("warn");reflectionFeedback.textContent="El navegador no permitió acceder al almacenamiento local. Puedes realizar la reflexión sin guardarla.";}
+      document.getElementById("saveReflection").addEventListener("click",function(){const value=reflectionText.value.trim();reflectionFeedback.classList.remove("success","warn");if(value.length<60){reflectionFeedback.classList.add("warn");reflectionFeedback.textContent="Amplía la explicación. Menciona al menos tres requisitos concretos que analizarías antes de seleccionar el transporte.";return;}try{localStorage.setItem(storageKey,value);reflectionFeedback.classList.add("success");reflectionFeedback.textContent="Reflexión guardada únicamente en este navegador.";}catch(error){reflectionFeedback.classList.add("warn");reflectionFeedback.textContent="No fue posible guardar localmente. El texto permanece visible mientras esta página siga abierta.";}});
+      document.getElementById("clearReflection").addEventListener("click",function(){reflectionText.value="";reflectionFeedback.classList.remove("success","warn");try{localStorage.removeItem(storageKey);}catch(error){}reflectionFeedback.textContent="Reflexión limpiada en esta página.";reflectionText.focus();});
+    })();
+  </script>
+</body>
+</html>
