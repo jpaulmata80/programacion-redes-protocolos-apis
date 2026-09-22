@@ -1,0 +1,154 @@
+/* Tema institucional UCACUE
+   Paleta oficial tomada del Manual Básico de Identidad Visual Corporativa.
+   Este archivo centraliza la identidad visual sin alterar el contenido académico. */
+
+:root {
+  --ucacue-red: #E20613;
+  --ucacue-red-light: #DC2137;
+  --ucacue-red-dark: #AF1C32;
+  --ucacue-gray: #E6E6E6;
+
+  --color-primary: var(--ucacue-red);
+  --color-secondary: var(--ucacue-red-dark);
+  --color-accent: var(--ucacue-red-light);
+  --color-background: #F7F7F7;
+  --color-surface: #FFFFFF;
+  --color-text: #242424;
+  --color-muted: #5D6268;
+  --color-border: var(--ucacue-gray);
+
+  /* Compatibilidad con los HTML ya publicados. */
+  --ink: var(--color-text);
+  --muted: var(--color-muted);
+  --line: #D9D9D9;
+  --soft: #F5F5F5;
+  --paper: var(--color-surface);
+  --cyan: var(--ucacue-red);
+  --cyan-dark: var(--ucacue-red-dark);
+  --cyan-light: #FFD9DE;
+  --focus: var(--ucacue-red-dark);
+  --navy: #2B2B2B;
+  --navy-deep: #171717;
+}
+
+.institution-logo-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  text-decoration: none;
+  border-radius: 6px;
+}
+
+.institution-logo-link:focus-visible {
+  outline: 3px solid var(--ucacue-red-dark);
+  outline-offset: 4px;
+}
+
+.institution-logo {
+  display: block;
+  width: 92px;
+  height: auto;
+  object-fit: contain;
+}
+
+.header-inner .institution-logo-link {
+  padding-right: .15rem;
+}
+
+/* Pantalla principal del curso */
+body.course-home {
+  background: var(--color-background);
+  color: var(--color-text);
+}
+
+.course-home header {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-bottom: 5px solid var(--ucacue-red);
+}
+
+.course-home header .wrap {
+  padding-top: 34px;
+}
+
+.course-home .institution-logo-link--home {
+  margin-bottom: 1.15rem;
+}
+
+.course-home .institution-logo-link--home .institution-logo {
+  width: 150px;
+}
+
+.course-home .eyebrow,
+.course-home .block small,
+.course-home .topic b {
+  color: var(--ucacue-red-dark);
+}
+
+.course-home header p,
+.course-home .block > p,
+.course-home .pending,
+.course-home footer {
+  color: var(--color-muted);
+}
+
+.course-home .block {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+.course-home .topic {
+  background: #FAFAFA;
+  border-color: var(--color-border);
+  transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+
+.course-home a.topic:hover {
+  border-color: var(--ucacue-red-light);
+  box-shadow: 0 8px 24px rgba(175, 28, 50, .10);
+  transform: translateY(-2px);
+}
+
+.course-home footer {
+  border-color: var(--color-border);
+}
+
+/* Páginas de temas y subtemas */
+.header-inner {
+  border-top: 3px solid var(--ucacue-red);
+}
+
+header .home-link:hover {
+  border-color: var(--ucacue-red);
+  color: var(--ucacue-red-dark);
+}
+
+.btn {
+  border-color: var(--ucacue-red-dark);
+}
+
+.scope-note,
+.feedback {
+  border-left-color: var(--ucacue-red);
+}
+
+@media (max-width: 900px) {
+  .institution-logo {
+    width: 78px;
+  }
+}
+
+@media (max-width: 680px) {
+  .header-inner .institution-logo-link {
+    width: auto;
+  }
+
+  .institution-logo {
+    width: 72px;
+  }
+
+  .course-home .institution-logo-link--home .institution-logo {
+    width: 128px;
+  }
+}
