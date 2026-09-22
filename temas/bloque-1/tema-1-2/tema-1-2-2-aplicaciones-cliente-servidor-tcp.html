@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Subtema 1.2.2: aplicaciones cliente-servidor con TCP usando sockets en Python, aplicado a redes y telecomunicaciones.">
+  <meta name="theme-color" content="#10212a">
+  <title>1.2.2 | Aplicaciones cliente-servidor con TCP</title>
+  <style>
+    :root{
+      --ink:#18212a;--muted:#586775;--line:#cbd5dc;--soft:#f3f6f8;--paper:#fff;
+      --cyan:#007c91;--cyan-dark:#005b6a;--cyan-light:#6ed2e2;--green:#16734a;--green-soft:#e8f5ee;
+      --amber:#8a5600;--amber-soft:#fff3d8;--red:#9b2c2c;--red-soft:#fdecec;--focus:#005fcc;
+      --navy:#10212a;--navy-deep:#07141a;--max:1180px;--radius:8px;--shadow:0 16px 38px rgba(24,33,42,.08)
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;min-width:280px;color:var(--ink);background:var(--paper);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55;overflow-x:hidden}
+    img,svg,canvas,video{display:block;max-width:100%}
+    button,input,select,textarea{font:inherit;max-width:100%}
+    button,input[type="checkbox"],input[type="radio"]{cursor:pointer}
+    a{color:var(--cyan-dark)}
+    a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+    .skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}.skip-link:focus{top:1rem}
+    header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+    .header-inner{width:min(100%,var(--max));min-height:66px;margin:0 auto;padding:.55rem 1.25rem;display:flex;gap:1rem;align-items:center;min-width:0}
+    .brand{min-width:190px}.brand strong{display:block;font-size:.95rem}.brand span{display:block;color:var(--muted);font-size:.78rem}
+    .nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+    nav a{color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;border-bottom:2px solid transparent;font-size:.84rem}
+    nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+    .top-link{flex:0 0 auto;text-decoration:none;border:1px solid var(--line);border-radius:5px;padding:.48rem .72rem;color:var(--ink);font-weight:750;white-space:nowrap;background:#fff}.top-link:hover{border-color:var(--cyan);color:var(--cyan-dark)}
+    main{overflow:hidden}section{scroll-margin-top:84px;border-bottom:1px solid var(--line)}.band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+    .hero{min-height:calc(100svh - 66px);display:grid;align-items:center;background:var(--navy);color:#fff}
+    .hero-grid{width:min(100%,var(--max));margin:0 auto;padding:3.4rem 1.25rem;display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:3rem;align-items:center}.hero-grid>*{min-width:0}
+    .eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+    h1{font-size:clamp(2rem,5vw,4.45rem);line-height:1.02;margin:.65rem 0 1.15rem;max-width:18ch;overflow-wrap:normal;word-break:normal;hyphens:none}
+    h2{font-size:clamp(1.75rem,3.3vw,2.8rem);line-height:1.12;margin:0 0 .8rem;overflow-wrap:normal;word-break:normal;hyphens:none}
+    h3{font-size:1.22rem;margin:0 0 .55rem}p{max-width:72ch}.hero p{color:#d7e5ea;font-size:1.08rem}
+    .hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}.hero-actions{margin-top:1.45rem}
+    .btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cyan-dark);background:var(--cyan);color:#fff;text-decoration:none;padding:.72rem 1rem;border-radius:5px;font-weight:750}.btn:hover{background:var(--cyan-dark)}
+    .btn.secondary{background:transparent;color:inherit;border-color:currentColor}.btn.secondary:hover{background:rgba(255,255,255,.1)}.btn.light{background:#fff;color:var(--ink);border-color:var(--line)}.btn.light:hover{background:var(--soft);color:var(--cyan-dark)}.btn:disabled{opacity:.48;cursor:not-allowed}
+    .flow-board{background:var(--navy-deep);border:1px solid #3b5965;border-radius:8px;padding:1.35rem;min-width:0}.flow-board h3{color:#fff}.flow-board p{color:#b8cbd2}
+    .flow-lanes{display:grid;grid-template-columns:minmax(0,1fr) 80px minmax(0,1fr);gap:.7rem;align-items:stretch;margin-top:1rem}.endpoint{border:1px solid #48616b;border-radius:7px;padding:1rem;background:#102a35;min-width:0}.endpoint strong{display:block;color:#fff}.endpoint small{display:block;color:#bfd1d7;margin-top:.25rem}.wire{display:grid;place-items:center;color:var(--cyan-light);font-weight:900;font-size:1.35rem}.mini-stack{display:grid;gap:.4rem;margin-top:.8rem}.mini-step{padding:.5rem .6rem;border:1px solid #425e69;border-radius:5px;color:#dce9ed;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.82rem}.mini-step.active{border-color:var(--cyan-light);background:#123844;color:#fff}
+    .section-head{display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem}.section-head>*{min-width:0}.section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}.lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+    .outcomes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}.outcome:last-child{border-right:0}.outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+    .scope-note,.callout{margin-top:1.4rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}
+    .concept-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}.concept-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.15rem;background:#fff;box-shadow:var(--shadow)}.tag{display:inline-block;font-size:.76rem;font-weight:850;color:var(--cyan-dark);background:#d9eef2;padding:.2rem .45rem;border-radius:999px;margin-bottom:.55rem}.concept-card p{color:var(--muted);font-size:.94rem}.concept-card ul{padding-left:1.2rem;margin-bottom:0}
+    .sequence{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.7rem;margin-top:1.2rem}.seq-step{min-width:0;border:1px solid var(--line);border-radius:6px;padding:1rem;background:#fff}.seq-step b{display:grid;place-items:center;width:2rem;height:2rem;border-radius:50%;background:#d9eef2;color:var(--cyan-dark);margin-bottom:.6rem}.seq-step strong{display:block}.seq-step span{display:block;color:var(--muted);font-size:.86rem;margin-top:.25rem}
+    .activity{margin-top:1.5rem;padding:1.35rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--soft);min-width:0}.activity h3{margin-top:0}.activity-instruction{color:var(--muted);margin-top:0}
+    .prediction,.decision-list{display:grid;gap:.6rem;margin:.85rem 0 1rem}.prediction label,.decision-list label{display:block;padding:.75rem .8rem;background:#fff;border:1px solid var(--line);border-radius:5px}.prediction input,.decision-list input{margin-right:.45rem}
+    .feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}.feedback.success{background:var(--green-soft);border-color:var(--green)}.feedback.warn{background:var(--amber-soft);border-color:var(--amber)}.feedback.error{background:var(--red-soft);border-color:var(--red)}
+    .sim-grid{display:grid;grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr);gap:1rem}.sim-grid>*{min-width:0}.sim-controls{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1rem}.sim-controls .btn{width:100%;margin:.28rem 0;justify-content:flex-start}.sim-console{background:#09161d;color:#dce9ed;border:1px solid #314b56;border-radius:7px;padding:1rem;min-width:0}.sim-console h3{color:#fff}.console{min-height:280px;max-height:360px;overflow:auto;background:#061016;border:1px solid #253c47;border-radius:6px;padding:.9rem;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.87rem;white-space:pre-wrap;overflow-wrap:anywhere}.console .ok{color:#8dd9b3}.console .info{color:#8fdceb}.console .warn{color:#ffd18a}.state-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem;margin-top:.9rem}.state{border:1px solid #314b56;border-radius:6px;padding:.7rem;background:#0c2029}.state span{display:block;color:#9eb5be;font-size:.75rem;text-transform:uppercase;font-weight:800}.state strong{display:block;color:#fff;margin-top:.2rem}
+    .code-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.code-card{min-width:0;background:#09161d;color:#dce9ed;border:1px solid #314b56;border-radius:7px;padding:1rem}.code-card h3{color:#fff}.code-block{overflow-x:auto;margin:.75rem 0;background:#061016;border:1px solid #253c47;border-radius:6px;padding:1rem}.code-block code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre;color:#e5f0f3}.code-note{color:#a9bdc5;font-size:.88rem}
+    .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);margin-top:1.5rem}.table-wrap table{width:100%;min-width:760px;border-collapse:collapse}.table-wrap th,.table-wrap td{text-align:left;padding:.8rem;border-bottom:1px solid var(--line);vertical-align:top}.table-wrap th{background:var(--soft)}
+    .exercise-box{border:1px solid var(--line);border-radius:var(--radius);background:#fff;overflow:hidden}.exercise-head{display:grid;grid-template-columns:120px minmax(0,1fr);gap:1rem;padding:1rem 1.2rem;background:var(--navy);color:#fff}.exercise-head span{color:var(--cyan-light);font-weight:850}.exercise-body{padding:1.2rem}.steps{display:grid;gap:.7rem}.step{border:1px solid var(--line);border-radius:6px;padding:.85rem;background:var(--soft)}.step .solution{display:none;margin-top:.55rem;color:var(--muted)}.step.revealed .solution{display:block}.step.revealed{border-color:#9bc9b1;background:var(--green-soft)}
+    .practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.practice-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.05rem;background:#fff}.practice-card label{display:block;font-weight:750;margin:.7rem 0 .3rem}.practice-card select{width:100%;padding:.6rem;border:1px solid var(--line);border-radius:5px;background:#fff}.mini-feedback{margin-top:.75rem;padding:.7rem;border-left:3px solid var(--cyan);background:var(--soft);font-size:.9rem}
+    .case-grid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:1rem}.case-grid>*{min-width:0}.case-card{border:1px solid var(--line);border-radius:var(--radius);padding:1.1rem;background:#fff}.case-card label{display:block;font-weight:750;margin:.7rem 0 .3rem}.case-card select,.case-card textarea{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px;background:#fff}.diagram{display:grid;grid-template-columns:minmax(0,1fr) 90px minmax(0,1fr);gap:.7rem;align-items:center}.node{border:1px solid var(--line);border-radius:6px;padding:1rem;background:var(--soft);text-align:center}.arrow{text-align:center;color:var(--cyan-dark);font-weight:900}
+    .quiz{display:grid;gap:1rem}.question{border:1px solid var(--line);border-radius:var(--radius);padding:1rem;background:#fff}.question fieldset{border:0;padding:0;margin:0}.question legend{font-weight:800;margin-bottom:.7rem}.question label{display:block;padding:.45rem 0}.score-box{padding:1rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--soft)}
+    .reflection{width:100%;min-height:140px;padding:.9rem;border:1px solid var(--line);border-radius:6px;resize:vertical}.saved-note{font-size:.86rem;color:var(--muted)}
+    .bottom-nav{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}.bottom-nav a{text-decoration:none;font-weight:800}
+    footer{background:var(--navy-deep);color:#dce9ed}.footer-inner{width:min(100%,var(--max));margin:0 auto;padding:2.2rem 1.25rem}.footer-inner p{color:#aebfc6}
+    .progress-wrap{position:fixed;right:1rem;bottom:1rem;z-index:25;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:999px;padding:.45rem .75rem;font-size:.78rem;color:var(--muted)}.progress-wrap strong{color:var(--ink)}
+    @media(max-width:900px){.hero-grid,.sim-grid,.code-grid,.case-grid{grid-template-columns:1fr}.concept-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}.outcome:nth-child(2){border-right:0}.outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}.sequence{grid-template-columns:repeat(2,minmax(0,1fr))}.practice-grid{grid-template-columns:1fr}.flow-lanes{grid-template-columns:1fr}.wire{transform:rotate(90deg);min-height:40px}.diagram{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}}
+    @media(max-width:680px){.header-inner{padding:.5rem .8rem}.brand{display:none}.top-link{font-size:.82rem}.band{padding:3.2rem .9rem}.hero-grid{padding:3rem .9rem;gap:2rem}.section-head{grid-template-columns:1fr;gap:.45rem}.concept-grid,.outcomes,.sequence{grid-template-columns:1fr}.outcome{border-right:0;border-bottom:1px solid var(--line)}.outcome:last-child{border-bottom:0}.socket-anatomy{grid-template-columns:1fr}.exercise-head{grid-template-columns:1fr}.state-grid{grid-template-columns:1fr}.progress-wrap{display:none}}
+    @media(max-width:480px){h1{font-size:clamp(2rem,10vw,2.8rem);max-width:none}.hero-actions .btn,.action-row .btn{width:100%}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <header>
+    <div class="header-inner">
+      <div class="brand"><strong>Programación de Redes</strong><span>Protocolos y APIs · Bloque 1</span></div>
+      <div class="nav-scroll" aria-label="Navegación del subtema">
+        <nav>
+          <a href="#orientacion">Cómo trabajar</a><a href="#conceptos">Conceptos</a><a href="#predice">Predice</a><a href="#experimenta">Experimenta</a><a href="#codigo">Código</a><a href="#resuelto">Resuelto</a><a href="#practica">Practica</a><a href="#caso">Caso profesional</a><a href="#comprueba">Comprueba</a><a href="#reflexion">Reflexión</a>
+        </nav>
+      </div>
+      <a class="top-link" href="tema-1-2-programacion-sockets-tcp-udp.html">← Tema 1.2</a>
+    </div>
+  </header>
+
+  <main id="contenido">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">Subtema 1.2.2 · Sockets TCP</div>
+          <h1 id="hero-title">Aplicaciones cliente-servidor con TCP</h1>
+          <p>Construye el ciclo completo de una conexión TCP: preparar el servidor, conectar el cliente, aceptar la sesión, intercambiar datos y cerrar los recursos de forma ordenada.</p>
+          <div class="hero-actions"><a class="btn" href="#orientacion">Comenzar recorrido</a><a class="btn secondary" href="#experimenta">Ir al simulador</a></div>
+        </div>
+        <div class="flow-board" aria-label="Esquema conceptual cliente servidor TCP">
+          <h3>Dos programas, una conexión</h3>
+          <p>El servidor queda a la espera; el cliente inicia la conexión. Una vez aceptada, ambos extremos disponen de un socket conectado para intercambiar un flujo de bytes.</p>
+          <div class="flow-lanes">
+            <div class="endpoint"><strong>Cliente</strong><small>Inicia la conexión</small><div class="mini-stack"><div class="mini-step">socket()</div><div class="mini-step">connect()</div><div class="mini-step">sendall() / recv()</div></div></div>
+            <div class="wire">⇄</div>
+            <div class="endpoint"><strong>Servidor</strong><small>Publica y acepta el servicio</small><div class="mini-stack"><div class="mini-step">bind()</div><div class="mini-step">listen()</div><div class="mini-step">accept()</div></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="orientacion" aria-labelledby="orientacion-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">CÓMO TRABAJAR ESTE TEMA</div><div><h2 id="orientacion-title">Primero entiende el ciclo; después memoriza la sintaxis</h2><p class="lead">La meta es que puedas explicar qué hace cada llamada y en qué lado de la comunicación debe ejecutarse.</p></div></div>
+        <div class="outcomes">
+          <div class="outcome"><b>01 · Preparar</b>Distinguir las operaciones exclusivas del servidor de las que ejecuta el cliente.</div>
+          <div class="outcome"><b>02 · Conectar</b>Interpretar qué ocurre entre <code>connect()</code> y <code>accept()</code>.</div>
+          <div class="outcome"><b>03 · Intercambiar</b>Usar <code>sendall()</code> y <code>recv()</code> en un ejemplo TCP mínimo.</div>
+          <div class="outcome"><b>04 · Diagnosticar</b>Reconocer errores básicos de dirección, puerto, orden de ejecución y cierre.</div>
+        </div>
+        <div class="scope-note"><strong>Alcance:</strong> trabajaremos con un solo cliente a la vez y mensajes sencillos. El tratamiento de múltiples clientes corresponde al 1.2.6, y la estructuración robusta de mensajes sobre el flujo TCP se profundiza en 1.2.4.</div>
+      </div>
+    </section>
+
+    <section id="conceptos" aria-labelledby="conceptos-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">EXPLORA</div><div><h2 id="conceptos-title">El servidor publica; el cliente solicita la conexión</h2><p class="lead">TCP es orientado a conexión. Eso obliga a coordinar una secuencia concreta antes de intercambiar datos.</p></div></div>
+        <div class="concept-grid">
+          <article class="concept-card"><span class="tag">Servidor</span><h3><code>bind()</code></h3><p>Asocia el socket del servidor con una dirección local y un puerto donde el servicio quedará disponible.</p><ul><li>Define el extremo local.</li><li>Puede usar una IP específica o todas las interfaces.</li></ul></article>
+          <article class="concept-card"><span class="tag">Servidor</span><h3><code>listen()</code></h3><p>Coloca el socket en modo de escucha para recibir solicitudes de conexión TCP.</p><ul><li>No acepta todavía una sesión concreta.</li><li>Prepara la cola de conexiones pendientes.</li></ul></article>
+          <article class="concept-card"><span class="tag">Servidor</span><h3><code>accept()</code></h3><p>Extrae una conexión pendiente y devuelve un nuevo socket conectado junto con la dirección del cliente.</p><ul><li>El socket de escucha permanece separado.</li><li>El nuevo socket se usa para intercambiar datos.</li></ul></article>
+          <article class="concept-card"><span class="tag">Cliente</span><h3><code>connect()</code></h3><p>Solicita una conexión TCP con el extremo remoto definido por dirección IP y puerto.</p><ul><li>El servidor debe estar disponible.</li><li>Una conexión exitosa habilita el intercambio.</li></ul></article>
+        </div>
+        <div class="sequence" aria-label="Secuencia resumida de una conexión TCP">
+          <div class="seq-step"><b>1</b><strong>Servidor</strong><span>socket → bind → listen</span></div>
+          <div class="seq-step"><b>2</b><strong>Cliente</strong><span>socket → connect</span></div>
+          <div class="seq-step"><b>3</b><strong>Servidor</strong><span>accept devuelve conn, addr</span></div>
+          <div class="seq-step"><b>4</b><strong>Ambos</strong><span>sendall / recv</span></div>
+          <div class="seq-step"><b>5</b><strong>Ambos</strong><span>cerrar recursos</span></div>
+        </div>
+        <div class="callout"><strong>Idea clave:</strong> en el servidor existen dos sockets con responsabilidades diferentes: el <em>socket de escucha</em> y el <em>socket conectado</em> que devuelve <code>accept()</code>. Confundirlos es un error muy frecuente.</div>
+      </div>
+    </section>
+
+    <section id="predice" aria-labelledby="predice-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">PREDICE</div><div><h2 id="predice-title">¿Qué debe ocurrir antes de que el cliente pueda conectarse?</h2><p class="lead">Selecciona la afirmación que representa correctamente el orden lógico.</p></div></div>
+        <div class="activity">
+          <div class="prediction" role="radiogroup" aria-label="Predicción sobre el orden de conexión">
+            <label><input type="radio" name="prediction" value="a"> El cliente ejecuta <code>connect()</code> y después el servidor decide qué puerto usar.</label>
+            <label><input type="radio" name="prediction" value="b"> El servidor debe asociarse al puerto y quedar escuchando; después el cliente intenta <code>connect()</code>.</label>
+            <label><input type="radio" name="prediction" value="c"> El servidor ejecuta <code>accept()</code> antes de <code>listen()</code>.</label>
+          </div>
+          <div class="action-row"><button class="btn" id="checkPrediction" type="button">Comprobar predicción</button><button class="btn light" id="resetPrediction" type="button">Reintentar</button></div>
+          <div class="feedback" id="predictionFeedback" role="status" aria-live="polite">Piensa en qué lado publica el servicio y cuál inicia la conexión.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="experimenta" aria-labelledby="experimenta-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">EXPERIMENTA · OBSERVA · EXPLICA</div><div><h2 id="experimenta-title">Simula una sesión TCP paso a paso</h2><p class="lead">Ejecuta las acciones en el orden correcto. El simulador bloquea pasos imposibles y explica por qué.</p></div></div>
+        <div class="sim-grid">
+          <div class="sim-controls">
+            <h3>Secuencia de acciones</h3>
+            <button class="btn light sim-action" id="simBind" type="button">1 · Servidor: bind()</button>
+            <button class="btn light sim-action" id="simListen" type="button" disabled>2 · Servidor: listen()</button>
+            <button class="btn light sim-action" id="simConnect" type="button" disabled>3 · Cliente: connect()</button>
+            <button class="btn light sim-action" id="simAccept" type="button" disabled>4 · Servidor: accept()</button>
+            <button class="btn light sim-action" id="simSendClient" type="button" disabled>5 · Cliente: sendall()</button>
+            <button class="btn light sim-action" id="simRecvServer" type="button" disabled>6 · Servidor: recv()</button>
+            <button class="btn light sim-action" id="simSendServer" type="button" disabled>7 · Servidor: sendall()</button>
+            <button class="btn light sim-action" id="simRecvClient" type="button" disabled>8 · Cliente: recv()</button>
+            <button class="btn light sim-action" id="simClose" type="button" disabled>9 · Cerrar conexión</button>
+            <button class="btn" id="simReset" type="button">Reiniciar simulación</button>
+          </div>
+          <div class="sim-console">
+            <h3>Consola conceptual</h3>
+            <div class="console" id="simConsole" role="log" aria-live="polite">[inicio] Servidor y cliente aún no están conectados.</div>
+            <div class="state-grid">
+              <div class="state"><span>Servidor</span><strong id="serverState">creado, sin publicar</strong></div>
+              <div class="state"><span>Cliente</span><strong id="clientState">creado, desconectado</strong></div>
+            </div>
+          </div>
+        </div>
+        <div class="callout"><strong>Observa:</strong> <code>connect()</code> representa la solicitud de conexión del cliente y <code>accept()</code> entrega al programa servidor un nuevo socket ya asociado a esa sesión. A partir de allí, ambos extremos pueden enviar y recibir bytes.</div>
+      </div>
+    </section>
+
+    <section id="codigo" aria-labelledby="codigo-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">EXPLICA CON CÓDIGO</div><div><h2 id="codigo-title">Un cliente y un servidor TCP mínimos</h2><p class="lead">Lee primero el servidor y luego el cliente. Observa cómo cada llamada corresponde al flujo que acabas de simular.</p></div></div>
+        <div class="code-grid">
+          <article class="code-card">
+            <h3>Servidor TCP</h3>
+            <div class="code-block"><code>import socket
+
+HOST = "127.0.0.1"
+PORT = 5000
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
+    server.bind((HOST, PORT))
+    server.listen()
+    print("Servidor esperando...")
+
+    conn, addr = server.accept()
+    with conn:
+        print("Cliente conectado:", addr)
+        data = conn.recv(1024)
+        print("Recibido:", data.decode())
+        conn.sendall(b"ACK desde servidor")</code></div>
+            <p class="code-note"><strong>Lectura:</strong> <code>server</code> escucha; <code>conn</code> representa la conexión aceptada con ese cliente.</p>
+          </article>
+          <article class="code-card">
+            <h3>Cliente TCP</h3>
+            <div class="code-block"><code>import socket
+
+HOST = "127.0.0.1"
+PORT = 5000
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
+    client.connect((HOST, PORT))
+    client.sendall(b"Estado del enlace")
+
+    data = client.recv(1024)
+    print("Respuesta:", data.decode())</code></div>
+            <p class="code-note"><strong>Lectura:</strong> el cliente conoce el extremo remoto, solicita la conexión, envía bytes y espera una respuesta.</p>
+          </article>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Llamada</th><th>Lado principal</th><th>Qué hace</th><th>Error conceptual frecuente</th></tr></thead>
+            <tbody>
+              <tr><td><code>bind()</code></td><td>Servidor</td><td>Asocia dirección local y puerto.</td><td>Intentar usarlo como si conectara al servidor remoto.</td></tr>
+              <tr><td><code>listen()</code></td><td>Servidor</td><td>Pasa a modo escucha.</td><td>Pensar que ya existe un cliente conectado.</td></tr>
+              <tr><td><code>accept()</code></td><td>Servidor</td><td>Acepta una sesión y devuelve <code>conn, addr</code>.</td><td>Usar el socket de escucha para intercambiar los datos de la sesión.</td></tr>
+              <tr><td><code>connect()</code></td><td>Cliente</td><td>Solicita conexión con IP y puerto remotos.</td><td>Usar una dirección/puerto donde no hay servicio escuchando.</td></tr>
+              <tr><td><code>sendall()</code></td><td>Ambos</td><td>Entrega todos los bytes proporcionados al sistema de sockets o produce una excepción.</td><td>Confundir bytes con texto; normalmente hay que codificar.</td></tr>
+              <tr><td><code>recv(n)</code></td><td>Ambos</td><td>Recibe hasta <em>n</em> bytes disponibles.</td><td>Suponer que una llamada equivale siempre a un mensaje completo.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="scope-note"><strong>Importante:</strong> TCP transporta un flujo de bytes. En este ejemplo didáctico usamos mensajes muy pequeños para concentrarnos en la conexión. En 1.2.4 estudiaremos cómo delimitar y estructurar los datos de forma más robusta.</div>
+      </div>
+    </section>
+
+    <section id="resuelto" aria-labelledby="resuelto-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">EJERCICIO RESUELTO</div><div><h2 id="resuelto-title">Servicio de consulta de estado de un enlace</h2><p class="lead">Traduciremos un requerimiento profesional sencillo a las responsabilidades del servidor y del cliente.</p></div></div>
+        <div class="exercise-box">
+          <div class="exercise-head"><span>Problema</span><div>Un técnico ejecutará un cliente desde su estación de trabajo. El cliente se conectará a <strong>192.0.2.10:5050</strong>, enviará la solicitud <em>ESTADO</em> y el servicio devolverá una respuesta textual. ¿Qué debe hacer cada aplicación?</div></div>
+          <div class="exercise-body">
+            <div class="steps">
+              <div class="step"><strong>Paso 1 · Identificar roles</strong><div class="solution">El proceso que permanece disponible en 192.0.2.10:5050 actúa como <strong>servidor</strong>. La herramienta del técnico actúa como <strong>cliente</strong> porque inicia la conexión.</div></div>
+              <div class="step"><strong>Paso 2 · Preparar el servidor</strong><div class="solution">Crear un socket TCP, ejecutar <code>bind(("192.0.2.10", 5050))</code> y después <code>listen()</code>. En un laboratorio local se puede sustituir la dirección por una IP realmente asignada al equipo o por <code>127.0.0.1</code> si ambos programas corren en el mismo host.</div></div>
+              <div class="step"><strong>Paso 3 · Iniciar la conexión</strong><div class="solution">El cliente crea su socket TCP y ejecuta <code>connect(("192.0.2.10", 5050))</code>. El extremo debe coincidir con el servicio publicado.</div></div>
+              <div class="step"><strong>Paso 4 · Aceptar la sesión</strong><div class="solution">El servidor ejecuta <code>conn, addr = server.accept()</code>. El objeto <code>conn</code>, no el socket de escucha, se usa para la comunicación de esa sesión.</div></div>
+              <div class="step"><strong>Paso 5 · Intercambiar datos</strong><div class="solution">El cliente envía <code>b"ESTADO"</code>; el servidor recibe, interpreta y responde con bytes. El cliente recibe y decodifica la respuesta.</div></div>
+              <div class="step"><strong>Paso 6 · Cerrar recursos</strong><div class="solution">Al finalizar, se cierra el socket conectado. El uso de bloques <code>with</code> ayuda a liberar los recursos aunque aparezca una excepción dentro del bloque.</div></div>
+            </div>
+            <div class="action-row" style="margin-top:1rem"><button class="btn" id="revealSolution" type="button">Mostrar solución paso a paso</button><button class="btn light" id="hideSolution" type="button">Ocultar</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="practica" aria-labelledby="practica-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">EJERCICIOS PROPUESTOS</div><div><h2 id="practica-title">Relaciona orden, roles y diagnóstico</h2><p class="lead">Cada ejercicio trabaja un error habitual al comenzar con TCP.</p></div></div>
+        <div class="practice-grid">
+          <article class="practice-card">
+            <h3>Ejercicio 1 · Orden del servidor</h3>
+            <p>Selecciona la secuencia correcta para publicar un servicio y aceptar un cliente.</p>
+            <label for="p1Order">Secuencia</label>
+            <select id="p1Order"><option value="">Selecciona</option><option value="a">socket → accept → bind → listen</option><option value="b">socket → bind → listen → accept</option><option value="c">bind → socket → connect → accept</option></select>
+            <button class="btn" id="checkP1" type="button">Comprobar</button><div class="mini-feedback" id="feedbackP1" role="status" aria-live="polite">Piensa en publicar el extremo antes de aceptar conexiones.</div>
+          </article>
+          <article class="practice-card">
+            <h3>Ejercicio 2 · ¿Quién ejecuta qué?</h3>
+            <p>¿Qué combinación representa correctamente los roles?</p>
+            <label for="p2Roles">Combinación</label>
+            <select id="p2Roles"><option value="">Selecciona</option><option value="a">Cliente: bind/listen · Servidor: connect</option><option value="b">Cliente: connect · Servidor: bind/listen/accept</option><option value="c">Ambos: accept antes de connect</option></select>
+            <button class="btn" id="checkP2" type="button">Comprobar</button><div class="mini-feedback" id="feedbackP2" role="status" aria-live="polite">Distingue quién inicia la conexión y quién publica el servicio.</div>
+          </article>
+          <article class="practice-card">
+            <h3>Ejercicio 3 · Conexión rechazada</h3>
+            <p>El cliente intenta <code>connect(("127.0.0.1", 6000))</code>, pero el servidor escucha en el puerto 5000. ¿Qué debes revisar primero?</p>
+            <label for="p3Diag">Diagnóstico</label>
+            <select id="p3Diag"><option value="">Selecciona</option><option value="a">Que IP y puerto del cliente coincidan con el servicio publicado</option><option value="b">Cambiar SOCK_STREAM por SOCK_DGRAM</option><option value="c">Ejecutar accept en el cliente</option></select>
+            <button class="btn" id="checkP3" type="button">Comprobar</button><div class="mini-feedback" id="feedbackP3" role="status" aria-live="polite">Compara los extremos usados por ambos programas.</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="caso" aria-labelledby="caso-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">CASO PROFESIONAL</div><div><h2 id="caso-title">Consulta remota desde un NOC</h2><p class="lead">Un servicio de laboratorio expone el estado de una estación remota mediante TCP. El NOC necesita consultar el estado y recibir una confirmación.</p></div></div>
+        <div class="case-grid">
+          <div class="case-card">
+            <h3>Analiza la arquitectura</h3>
+            <label for="caseServer">¿Qué debe permanecer escuchando?</label>
+            <select id="caseServer"><option value="">Selecciona</option><option value="remote">El servicio de la estación remota</option><option value="noc">El cliente del NOC</option><option value="both">Ambos deben ejecutar listen()</option></select>
+            <label for="caseSocket">Tras <code>accept()</code>, ¿qué socket usa el servidor para esa sesión?</label>
+            <select id="caseSocket"><option value="">Selecciona</option><option value="listen">El socket de escucha</option><option value="conn">El socket conectado devuelto por accept()</option><option value="newclient">El socket del proceso cliente</option></select>
+            <label for="caseData">Para enviar el texto ESTADO usando sockets, ¿qué requiere Python?</label>
+            <select id="caseData"><option value="">Selecciona</option><option value="bytes">Convertirlo a bytes, por ejemplo con encode()</option><option value="html">Convertirlo a HTML</option><option value="int">Convertirlo a entero</option></select>
+            <button class="btn" id="checkCase" type="button">Evaluar decisión</button>
+            <div class="feedback" id="caseFeedback" role="status" aria-live="polite">Relaciona el rol del servidor, el socket conectado y el tipo de datos que recibe la API de sockets.</div>
+          </div>
+          <div class="case-card">
+            <h3>Visualiza el flujo</h3>
+            <div class="diagram" aria-label="Flujo entre NOC y estación remota">
+              <div class="node"><strong>Cliente NOC</strong><br><small>connect → sendall → recv</small></div>
+              <div class="arrow">⇄ TCP</div>
+              <div class="node"><strong>Servicio remoto</strong><br><small>bind → listen → accept → recv → sendall</small></div>
+            </div>
+            <div class="callout"><strong>Pregunta profesional:</strong> si el cliente usa un puerto diferente del que publicó el servicio, la lógica de la aplicación puede ser correcta y aun así la conexión fallará. En operación real, configuración, firewall y disponibilidad del servicio también deben verificarse.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="comprueba" aria-labelledby="comprueba-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">COMPRUEBA</div><div><h2 id="comprueba-title">Integra lo aprendido</h2><p class="lead">Responde las cinco preguntas. Puedes corregir y volver a comprobar.</p></div></div>
+        <div class="quiz" id="quiz">
+          <article class="question"><fieldset><legend>1. ¿Qué llamada coloca al socket servidor en modo de escucha?</legend><label><input type="radio" name="q1" value="a"> connect()</label><label><input type="radio" name="q1" value="b"> listen()</label><label><input type="radio" name="q1" value="c"> recv()</label></fieldset><div class="mini-feedback" id="q1Feedback">Selecciona una respuesta.</div></article>
+          <article class="question"><fieldset><legend>2. ¿Qué devuelve normalmente <code>accept()</code> en Python?</legend><label><input type="radio" name="q2" value="a"> Un socket conectado y la dirección del cliente</label><label><input type="radio" name="q2" value="b"> Solo el número de puerto local</label><label><input type="radio" name="q2" value="c"> El texto recibido</label></fieldset><div class="mini-feedback" id="q2Feedback">Selecciona una respuesta.</div></article>
+          <article class="question"><fieldset><legend>3. ¿Quién suele ejecutar <code>connect()</code> en el modelo cliente-servidor básico?</legend><label><input type="radio" name="q3" value="a"> El cliente</label><label><input type="radio" name="q3" value="b"> El servidor</label><label><input type="radio" name="q3" value="c"> Ambos obligatoriamente</label></fieldset><div class="mini-feedback" id="q3Feedback">Selecciona una respuesta.</div></article>
+          <article class="question"><fieldset><legend>4. ¿Cuál afirmación sobre <code>recv(1024)</code> es correcta?</legend><label><input type="radio" name="q4" value="a"> Siempre devuelve exactamente 1024 bytes</label><label><input type="radio" name="q4" value="b"> Recibe hasta 1024 bytes disponibles</label><label><input type="radio" name="q4" value="c"> Solo puede recibir texto</label></fieldset><div class="mini-feedback" id="q4Feedback">Selecciona una respuesta.</div></article>
+          <article class="question"><fieldset><legend>5. En el servidor, ¿qué socket se usa para intercambiar datos con el cliente aceptado?</legend><label><input type="radio" name="q5" value="a"> El socket conectado devuelto por accept()</label><label><input type="radio" name="q5" value="b"> Siempre el socket de escucha</label><label><input type="radio" name="q5" value="c"> Ninguno; TCP no usa sockets conectados</label></fieldset><div class="mini-feedback" id="q5Feedback">Selecciona una respuesta.</div></article>
+        </div>
+        <div class="action-row" style="margin-top:1rem"><button class="btn" id="checkQuiz" type="button">Comprobar respuestas</button><button class="btn light" id="resetQuiz" type="button">Reintentar</button></div>
+        <div class="score-box" id="scoreBox" role="status" aria-live="polite" style="margin-top:1rem">Aún no has comprobado la actividad.</div>
+      </div>
+    </section>
+
+    <section id="reflexion" aria-labelledby="reflexion-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">REFLEXIÓN</div><div><h2 id="reflexion-title">Explica el ciclo con tus propias palabras</h2><p class="lead">Imagina que debes explicarle a otro estudiante por qué el servidor necesita <code>bind()</code>, <code>listen()</code> y <code>accept()</code>, mientras que el cliente usa <code>connect()</code>.</p></div></div>
+        <label for="reflectionText"><strong>Tu explicación</strong></label>
+        <textarea class="reflection" id="reflectionText" placeholder="Escribe aquí una explicación breve y técnica..."></textarea>
+        <div class="action-row" style="margin-top:.8rem"><button class="btn" id="saveReflection" type="button">Guardar en este navegador</button><button class="btn light" id="clearReflection" type="button">Borrar</button></div>
+        <p class="saved-note" id="reflectionStatus" role="status" aria-live="polite">La reflexión no se transmite. Si la guardas, permanece únicamente en el almacenamiento local de este navegador.</p>
+      </div>
+    </section>
+
+    <section id="referencias" aria-labelledby="referencias-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">REFERENCIAS Y ALCANCE</div><div><h2 id="referencias-title">Qué consolidamos y qué viene después</h2></div></div>
+        <p>Este recurso utiliza la API de sockets de la biblioteca estándar de Python como referencia conceptual. Se concentra en una única conexión TCP y en el intercambio básico de bytes.</p>
+        <ul>
+          <li>Python Standard Library: módulo <code>socket</code>.</li>
+          <li>Modelo TCP orientado a conexión: servidor en escucha, cliente que inicia y socket conectado para la sesión.</li>
+          <li>No se desarrolla aquí concurrencia, múltiples clientes, protocolo de aplicación completo ni delimitación avanzada de mensajes.</li>
+        </ul>
+        <div class="bottom-nav"><a href="tema-1-2-1-creacion-configuracion-sockets.html">← 1.2.1 Creación y configuración</a><a href="tema-1-2-programacion-sockets-tcp-udp.html">Volver al Tema 1.2</a><a href="tema-1-2-3-comunicacion-udp.html">1.2.3 Comunicación UDP →</a></div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="footer-inner"><strong>Programación de Redes: Protocolos y APIs</strong><p>Subtema 1.2.2 · Aplicaciones cliente-servidor con TCP. Material interactivo autónomo para uso académico.</p><a href="index.html" style="color:#8fdceb;font-weight:800">← Regresar a la pantalla principal del curso</a></div></footer>
+  <div class="progress-wrap" aria-live="polite">Recorrido <strong id="progressValue">0%</strong></div>
+
+  <script>
+    (() => {
+      "use strict";
+      const $ = (id) => document.getElementById(id);
+      const setFeedback = (el, text, type = "") => { el.textContent = text; el.className = "feedback" + (type ? " " + type : ""); };
+      const setMini = (el, text, ok) => { el.textContent = text; el.style.borderLeftColor = ok ? "var(--green)" : "var(--amber)"; el.style.background = ok ? "var(--green-soft)" : "var(--amber-soft)"; };
+
+      $("checkPrediction").addEventListener("click", () => {
+        const choice = document.querySelector('input[name="prediction"]:checked');
+        if (!choice) return setFeedback($("predictionFeedback"), "Selecciona una alternativa antes de comprobar.", "warn");
+        if (choice.value === "b") setFeedback($("predictionFeedback"), "Correcto. El servidor debe publicar el extremo con bind() y pasar a escucha con listen(); entonces el cliente puede intentar connect().", "success");
+        else setFeedback($("predictionFeedback"), "Revisa el orden. El servidor debe conocer y publicar su extremo antes de que el cliente pueda solicitar una conexión hacia él.", "error");
+      });
+      $("resetPrediction").addEventListener("click", () => {
+        document.querySelectorAll('input[name="prediction"]').forEach(r => r.checked = false);
+        setFeedback($("predictionFeedback"), "Piensa en qué lado publica el servicio y cuál inicia la conexión.");
+      });
+
+      const simButtons = ["simBind","simListen","simConnect","simAccept","simSendClient","simRecvServer","simSendServer","simRecvClient","simClose"].map($);
+      let simStep = 0;
+      const messages = [
+        '[servidor] bind(("127.0.0.1", 5000)) → extremo local asociado.',
+        '[servidor] listen() → servicio preparado para solicitudes TCP.',
+        '[cliente] connect(("127.0.0.1", 5000)) → solicitud de conexión iniciada.',
+        '[servidor] accept() → conexión aceptada; se obtiene conn y la dirección del cliente.',
+        '[cliente] sendall(b"ESTADO") → bytes entregados al flujo TCP.',
+        '[servidor] recv(1024) → recibe bytes de la solicitud.',
+        '[servidor] sendall(b"OK") → respuesta enviada por el socket conectado.',
+        '[cliente] recv(1024) → recibe la respuesta del servidor.',
+        '[ambos] cierre → la sesión termina y se liberan los sockets conectados.'
+      ];
+      function refreshSim(){
+        simButtons.forEach((b,i) => b.disabled = i !== simStep);
+        if (simStep >= simButtons.length) simButtons.forEach(b => b.disabled = true);
+        const serverStates = ["extremo asociado","escuchando","escuchando","conexión aceptada","conexión activa","solicitud recibida","respuesta enviada","respuesta enviada","cerrado"];
+        const clientStates = ["desconectado","desconectado","solicitud enviada","conectado","datos enviados","esperando respuesta","respuesta en tránsito","respuesta recibida","cerrado"];
+        if (simStep > 0) {
+          $("serverState").textContent = serverStates[Math.min(simStep-1,8)];
+          $("clientState").textContent = clientStates[Math.min(simStep-1,8)];
+        }
+      }
+      simButtons.forEach((button, index) => button.addEventListener("click", () => {
+        if (index !== simStep) return;
+        const line = document.createElement("div");
+        line.className = index === 8 ? "warn" : (index === 3 || index === 7 ? "ok" : "info");
+        line.textContent = messages[index];
+        $("simConsole").appendChild(document.createTextNode("\n"));
+        $("simConsole").appendChild(line);
+        $("simConsole").scrollTop = $("simConsole").scrollHeight;
+        simStep += 1;
+        refreshSim();
+      }));
+      $("simReset").addEventListener("click", () => {
+        simStep = 0;
+        $("simConsole").textContent = "[inicio] Servidor y cliente aún no están conectados.";
+        $("serverState").textContent = "creado, sin publicar";
+        $("clientState").textContent = "creado, desconectado";
+        refreshSim();
+      });
+      refreshSim();
+
+      $("revealSolution").addEventListener("click", () => document.querySelectorAll(".step").forEach(s => s.classList.add("revealed")));
+      $("hideSolution").addEventListener("click", () => document.querySelectorAll(".step").forEach(s => s.classList.remove("revealed")));
+
+      const practice = [
+        {button:"checkP1", select:"p1Order", feedback:"feedbackP1", answer:"b", ok:"Correcto. El servidor crea el socket, lo asocia con bind(), entra en escucha con listen() y luego accept() espera/acepta una sesión.", bad:"Revisa el ciclo del servidor: primero debe publicar el extremo y quedar escuchando; solo después puede aceptar."},
+        {button:"checkP2", select:"p2Roles", feedback:"feedbackP2", answer:"b", ok:"Correcto. El cliente inicia con connect(); el servidor publica y acepta con bind(), listen() y accept().", bad:"Distingue los roles: publicar/aceptar corresponde al servidor; iniciar la conexión corresponde al cliente."},
+        {button:"checkP3", select:"p3Diag", feedback:"feedbackP3", answer:"a", ok:"Correcto. IP y puerto deben identificar el mismo servicio. Un puerto diferente apunta a otro extremo lógico.", bad:"Antes de cambiar el protocolo o los roles, verifica que el cliente use exactamente el extremo donde el servidor está escuchando."}
+      ];
+      practice.forEach(p => $(p.button).addEventListener("click", () => {
+        const value = $(p.select).value;
+        if (!value) return setMini($(p.feedback), "Selecciona una alternativa antes de comprobar.", false);
+        setMini($(p.feedback), value === p.answer ? p.ok : p.bad, value === p.answer);
+      }));
+
+      $("checkCase").addEventListener("click", () => {
+        const ok = $("caseServer").value === "remote" && $("caseSocket").value === "conn" && $("caseData").value === "bytes";
+        if (ok) setFeedback($("caseFeedback"), "Decisión correcta. El servicio remoto escucha, accept() produce el socket conectado para la sesión y el texto debe codificarse a bytes antes de enviarse.", "success");
+        else setFeedback($("caseFeedback"), "Revisa los tres conceptos: quién publica el servicio, qué socket representa la sesión aceptada y qué tipo de dato envía la API de sockets.", "error");
+      });
+
+      const quizAnswers = {q1:"b",q2:"a",q3:"a",q4:"b",q5:"a"};
+      const quizExplanations = {
+        q1:"listen() coloca al socket servidor en modo de escucha.",
+        q2:"accept() devuelve un nuevo socket conectado y la dirección del cliente.",
+        q3:"En el modelo básico, el cliente inicia la conexión con connect().",
+        q4:"recv(1024) solicita recibir hasta 1024 bytes; no garantiza esa cantidad ni un mensaje completo.",
+        q5:"El intercambio de esa sesión se realiza con el socket conectado devuelto por accept()."
+      };
+      $("checkQuiz").addEventListener("click", () => {
+        let score = 0;
+        Object.keys(quizAnswers).forEach(q => {
+          const selected = document.querySelector(`input[name="${q}"]:checked`);
+          const feedback = $(`${q}Feedback`);
+          const ok = selected && selected.value === quizAnswers[q];
+          if (ok) score += 1;
+          setMini(feedback, selected ? ((ok ? "Correcto. " : "Revisa. ") + quizExplanations[q]) : "Falta responder esta pregunta.", ok);
+        });
+        $("scoreBox").textContent = `Resultado: ${score}/5. ${score === 5 ? "Dominio sólido del ciclo TCP básico." : "Revisa las explicaciones marcadas y vuelve a intentarlo."}`;
+      });
+      $("resetQuiz").addEventListener("click", () => {
+        document.querySelectorAll('#quiz input[type="radio"]').forEach(r => r.checked = false);
+        Object.keys(quizAnswers).forEach(q => { const el = $(`${q}Feedback`); el.textContent = "Selecciona una respuesta."; el.style.borderLeftColor = "var(--cyan)"; el.style.background = "var(--soft)"; });
+        $("scoreBox").textContent = "Aún no has comprobado la actividad.";
+      });
+
+      const storageKey = "pr-redes-1-2-2-reflexion";
+      try { const saved = localStorage.getItem(storageKey); if (saved) $("reflectionText").value = saved; } catch (_) {}
+      $("saveReflection").addEventListener("click", () => {
+        try { localStorage.setItem(storageKey, $("reflectionText").value); $("reflectionStatus").textContent = "Reflexión guardada únicamente en este navegador."; }
+        catch (_) { $("reflectionStatus").textContent = "Este navegador no permitió guardar la reflexión localmente."; }
+      });
+      $("clearReflection").addEventListener("click", () => {
+        $("reflectionText").value = "";
+        try { localStorage.removeItem(storageKey); } catch (_) {}
+        $("reflectionStatus").textContent = "Reflexión borrada del almacenamiento local.";
+      });
+
+      const sections = [...document.querySelectorAll("main section")];
+      function updateProgress(){
+        const viewportBottom = window.scrollY + window.innerHeight;
+        const total = document.documentElement.scrollHeight - window.innerHeight;
+        const pct = total > 0 ? Math.max(0, Math.min(100, Math.round((window.scrollY / total) * 100))) : 100;
+        $("progressValue").textContent = pct + "%";
+        const current = sections.findLast ? sections.findLast(s => s.offsetTop <= viewportBottom * .72) : sections.reduce((acc,s) => s.offsetTop <= viewportBottom * .72 ? s : acc, sections[0]);
+        document.querySelectorAll("nav a").forEach(a => a.removeAttribute("aria-current"));
+        if (current && current.id) { const link = document.querySelector(`nav a[href="#${current.id}"]`); if (link) link.setAttribute("aria-current","location"); }
+      }
+      window.addEventListener("scroll", updateProgress, {passive:true});
+      window.addEventListener("resize", updateProgress);
+      updateProgress();
+    })();
+  </script>
+</body>
+</html>

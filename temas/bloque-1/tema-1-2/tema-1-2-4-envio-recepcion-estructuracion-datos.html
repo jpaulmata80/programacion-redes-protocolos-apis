@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Subtema 1.2.4: envío, recepción y estructuración de datos para aplicaciones de red con Python.">
+  <meta name="theme-color" content="#10212a">
+  <title>1.2.4 | Envío, recepción y estructuración de datos</title>
+  <style>
+    :root{
+      --ink:#18212a;--muted:#586775;--line:#cbd5dc;--soft:#f3f6f8;--paper:#fff;
+      --cyan:#007c91;--cyan-dark:#005b6a;--cyan-light:#6ed2e2;--green:#16734a;--green-soft:#e8f5ee;
+      --amber:#8a5600;--amber-soft:#fff3d8;--red:#9b2c2c;--red-soft:#fdecec;--focus:#005fcc;
+      --navy:#10212a;--navy-deep:#07141a;--max:1180px;--radius:8px;--shadow:0 16px 38px rgba(24,33,42,.08)
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;min-width:280px;color:var(--ink);background:var(--paper);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55;overflow-x:hidden}
+    img,svg,canvas,video{display:block;max-width:100%}
+    button,input,select,textarea{font:inherit;max-width:100%}
+    button,input[type="checkbox"],input[type="radio"]{cursor:pointer}
+    a{color:var(--cyan-dark)}
+    a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+    .skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}.skip-link:focus{top:1rem}
+    header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+    .header-inner{width:min(100%,var(--max));min-height:66px;margin:0 auto;padding:.55rem 1.25rem;display:flex;gap:1rem;align-items:center;min-width:0}
+    .brand{min-width:190px}.brand strong{display:block;font-size:.95rem}.brand span{display:block;color:var(--muted);font-size:.78rem}
+    .nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+    nav a{color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;border-bottom:2px solid transparent;font-size:.84rem}
+    nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+    .top-link{flex:0 0 auto;text-decoration:none;border:1px solid var(--line);border-radius:5px;padding:.48rem .72rem;color:var(--ink);font-weight:750;white-space:nowrap;background:#fff}.top-link:hover{border-color:var(--cyan);color:var(--cyan-dark)}
+    main{overflow:hidden}section{scroll-margin-top:84px;border-bottom:1px solid var(--line)}.band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+    .hero{min-height:calc(100svh - 66px);display:grid;align-items:center;background:var(--navy);color:#fff}
+    .hero-grid{width:min(100%,var(--max));margin:0 auto;padding:3.4rem 1.25rem;display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:3rem;align-items:center}.hero-grid>*{min-width:0}
+    .eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+    h1{font-size:clamp(2rem,5vw,4.45rem);line-height:1.02;margin:.65rem 0 1.15rem;max-width:18ch;overflow-wrap:normal;word-break:normal;hyphens:none}
+    h2{font-size:clamp(1.75rem,3.3vw,2.8rem);line-height:1.12;margin:0 0 .8rem;overflow-wrap:normal;word-break:normal;hyphens:none}
+    h3{font-size:1.22rem;margin:0 0 .55rem}p{max-width:72ch}.hero p{color:#d7e5ea;font-size:1.08rem}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    .hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}.hero-actions{margin-top:1.45rem}
+    .btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cyan-dark);background:var(--cyan);color:#fff;text-decoration:none;padding:.72rem 1rem;border-radius:5px;font-weight:750}.btn:hover{background:var(--cyan-dark)}
+    .btn.secondary{background:transparent;color:inherit;border-color:currentColor}.btn.secondary:hover{background:rgba(255,255,255,.1)}.btn.light{background:#fff;color:var(--ink);border-color:var(--line)}.btn.light:hover{background:var(--soft);color:var(--cyan-dark)}.btn:disabled{opacity:.48;cursor:not-allowed}
+    .flow-board{background:var(--navy-deep);border:1px solid #3b5965;border-radius:8px;padding:1.35rem;min-width:0}.flow-board h3{color:#fff}.flow-board p{color:#b8cbd2}
+    .flow-lanes{display:grid;grid-template-columns:minmax(0,1fr) 92px minmax(0,1fr);gap:.7rem;align-items:stretch;margin-top:1rem}.endpoint{border:1px solid #48616b;border-radius:7px;padding:1rem;background:#102a35;min-width:0}.endpoint strong{display:block;color:#fff}.endpoint small{display:block;color:#bfd1d7;margin-top:.25rem}.wire{display:grid;place-items:center;color:var(--cyan-light);font-weight:900;font-size:1.25rem;text-align:center}.mini-stack{display:grid;gap:.4rem;margin-top:.8rem}.mini-step{padding:.5rem .6rem;border:1px solid #425e69;border-radius:5px;color:#dce9ed;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.82rem}.mini-step.active{border-color:var(--cyan-light);background:#123844;color:#fff}
+    .section-head{display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem}.section-head>*{min-width:0}.section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}.lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+    .outcomes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}.outcome:last-child{border-right:0}.outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+    .scope-note,.callout{margin-top:1.4rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}
+    .concept-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}.concept-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.15rem;background:#fff;box-shadow:var(--shadow)}.tag{display:inline-block;font-size:.76rem;font-weight:850;color:var(--cyan-dark);background:#d9eef2;padding:.2rem .45rem;border-radius:999px;margin-bottom:.55rem}.concept-card p{color:var(--muted);font-size:.94rem}.concept-card ul{padding-left:1.2rem;margin-bottom:0}
+    .compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin-top:1.2rem}.compare-card{border:1px solid var(--line);border-radius:var(--radius);padding:1.1rem;background:#fff;min-width:0}.compare-card h3{display:flex;justify-content:space-between;gap:.6rem;align-items:center}.pill{font-size:.72rem;border:1px solid var(--line);padding:.18rem .42rem;border-radius:999px;color:var(--muted);white-space:nowrap}
+    .activity{margin-top:1.5rem;padding:1.35rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--soft);min-width:0}.activity h3{margin-top:0}.activity-instruction{color:var(--muted);margin-top:0}
+    .prediction,.decision-list{display:grid;gap:.6rem;margin:.85rem 0 1rem}.prediction label,.decision-list label{display:block;padding:.75rem .8rem;background:#fff;border:1px solid var(--line);border-radius:5px}.prediction input,.decision-list input{margin-right:.45rem}
+    .feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}.feedback.success{background:var(--green-soft);border-color:var(--green)}.feedback.warn{background:var(--amber-soft);border-color:var(--amber)}.feedback.error{background:var(--red-soft);border-color:var(--red)}
+    .sim-grid{display:grid;grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr);gap:1rem}.sim-grid>*{min-width:0}.sim-controls{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1rem}.sim-controls .btn{width:100%;margin:.28rem 0;justify-content:flex-start}.sim-console{background:#09161d;color:#dce9ed;border:1px solid #314b56;border-radius:7px;padding:1rem;min-width:0}.sim-console h3{color:#fff}.console{min-height:300px;max-height:400px;overflow:auto;background:#061016;border:1px solid #253c47;border-radius:6px;padding:.9rem;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.87rem;white-space:pre-wrap;overflow-wrap:anywhere}.console .ok{color:#8dd9b3}.console .info{color:#8fdceb}.console .warn{color:#ffd18a}.console .bad{color:#ffaaaa}.state-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem;margin-top:.9rem}.state{border:1px solid #314b56;border-radius:6px;padding:.7rem;background:#0c2029}.state span{display:block;color:#9eb5be;font-size:.75rem;text-transform:uppercase;font-weight:800}.state strong{display:block;color:#fff;margin-top:.2rem}
+    .loss-row{display:grid;grid-template-columns:1fr auto;gap:.8rem;align-items:center;margin:.9rem 0}.loss-row input[type="range"]{width:100%}.metric{font-variant-numeric:tabular-nums;font-weight:800;color:var(--cyan-dark);min-width:3ch;text-align:right}
+    .datagrams{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-top:1rem}.datagram{border:1px solid var(--line);background:#fff;border-radius:7px;padding:.9rem;min-width:0}.datagram b{display:block;color:var(--cyan-dark)}.datagram small{color:var(--muted)}.datagram.lost{border-color:var(--red);background:var(--red-soft)}.datagram.delivered{border-color:var(--green);background:var(--green-soft)}
+    .code-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.code-card{min-width:0;background:#09161d;color:#dce9ed;border:1px solid #314b56;border-radius:7px;padding:1rem}.code-card h3{color:#fff}.code-block{overflow-x:auto;margin:.75rem 0;background:#061016;border:1px solid #253c47;border-radius:6px;padding:1rem}.code-block code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre;color:#e5f0f3}.code-note{color:#a9bdc5;font-size:.88rem}
+    .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);margin-top:1.5rem}.table-wrap table{width:100%;min-width:760px;border-collapse:collapse}.table-wrap th,.table-wrap td{text-align:left;padding:.8rem;border-bottom:1px solid var(--line);vertical-align:top}.table-wrap th{background:var(--soft)}
+    .exercise-box{border:1px solid var(--line);border-radius:var(--radius);background:#fff;overflow:hidden}.exercise-head{display:grid;grid-template-columns:120px minmax(0,1fr);gap:1rem;padding:1rem 1.2rem;background:var(--navy);color:#fff}.exercise-head span{color:var(--cyan-light);font-size:.78rem;font-weight:850;text-transform:uppercase}.exercise-body{padding:1.2rem}.solution-steps{display:grid;gap:.7rem;margin-top:1rem}.solution-step{display:grid;grid-template-columns:38px minmax(0,1fr);gap:.75rem;align-items:start;padding:.8rem;border:1px solid var(--line);border-radius:6px;background:var(--soft)}.solution-step b{display:grid;place-items:center;width:2rem;height:2rem;border-radius:50%;background:#d9eef2;color:var(--cyan-dark)}
+    .practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.practice-card{border:1px solid var(--line);border-radius:var(--radius);padding:1rem;background:#fff;min-width:0}.practice-card h3{font-size:1.05rem}.practice-card select{width:100%;padding:.62rem;border:1px solid var(--line);border-radius:5px;background:#fff;margin:.55rem 0}.mini-feedback{min-height:4.4rem;padding:.72rem;border-left:4px solid var(--cyan);background:var(--soft);font-size:.9rem}
+    .case-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1rem}.case-panel{border:1px solid var(--line);border-radius:var(--radius);padding:1.2rem;background:#fff;min-width:0}.case-panel select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px;background:#fff;margin:.3rem 0 .9rem}
+    .quiz{display:grid;gap:1rem}.quiz-item{border:1px solid var(--line);border-radius:var(--radius);padding:1rem;background:#fff}.quiz-item fieldset{border:0;padding:0;margin:0}.quiz-item legend{font-weight:800;margin-bottom:.6rem}.quiz-item label{display:block;margin:.42rem 0}.quiz-item input{margin-right:.4rem}.score-box{margin-top:1rem;padding:1rem;border:1px solid var(--line);background:var(--soft);font-weight:800}
+    .reflection-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:1rem}.reflection-grid>*{min-width:0}.reflection-grid textarea{width:100%;min-height:160px;resize:vertical;padding:.8rem;border:1px solid var(--line);border-radius:6px}.privacy{font-size:.86rem;color:var(--muted)}
+    .references{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.reference{padding:1rem;border:1px solid var(--line);border-radius:6px;background:#fff}
+    .bottom-nav{display:flex;justify-content:space-between;gap:1rem;align-items:center;flex-wrap:wrap;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--line)}
+    footer{background:var(--navy);color:#d7e5ea}.footer-inner{width:min(100%,var(--max));margin:0 auto;padding:2rem 1.25rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}.footer-inner strong{color:#fff}.progress-wrap{position:fixed;right:1rem;bottom:1rem;z-index:25;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:999px;padding:.45rem .7rem;font-size:.78rem}.progress-wrap b{color:var(--cyan-dark)}
+    @media(max-width:900px){.hero-grid,.sim-grid,.code-grid,.case-grid,.reflection-grid{grid-template-columns:1fr}.concept-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}.outcome:nth-child(2){border-right:0}.outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}.practice-grid{grid-template-columns:1fr}.flow-lanes{grid-template-columns:1fr}.wire{transform:rotate(90deg);min-height:40px}.datagrams{grid-template-columns:1fr}.compare{grid-template-columns:1fr}}
+    @media(max-width:680px){.header-inner{padding:.5rem .8rem}.brand{display:none}.top-link{font-size:.82rem}.band{padding:3.2rem .9rem}.hero-grid{padding:3rem .9rem;gap:2rem}.section-head{grid-template-columns:1fr;gap:.45rem}.concept-grid,.outcomes{grid-template-columns:1fr}.outcome{border-right:0;border-bottom:1px solid var(--line)}.outcome:last-child{border-bottom:0}.exercise-head{grid-template-columns:1fr}.state-grid,.references{grid-template-columns:1fr}.progress-wrap{display:none}}
+    @media(max-width:480px){h1{font-size:clamp(2rem,10vw,2.8rem);max-width:none}.hero-actions .btn,.action-row .btn{width:100%}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+  
+    .data-lab{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:1rem}.data-lab>*{min-width:0}
+    .lab-panel{background:#fff;border:1px solid var(--line);border-radius:7px;padding:1rem;min-width:0}.lab-panel label{display:block;font-weight:750;margin:.65rem 0 .25rem}.lab-panel input,.lab-panel textarea,.lab-panel select{width:100%;padding:.68rem;border:1px solid var(--line);border-radius:5px;background:#fff;color:var(--ink)}
+    .byte-view{margin-top:.8rem;background:#09161d;color:#dce9ed;border:1px solid #314b56;border-radius:6px;padding:.9rem;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;min-height:84px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}
+    .pipeline{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.55rem;align-items:stretch;margin:1.2rem 0}.pipe-step{border:1px solid var(--line);border-radius:7px;padding:.8rem;background:#fff;min-width:0;text-align:center}.pipe-step b{display:block;color:var(--cyan-dark);margin-bottom:.25rem}.pipe-arrow{display:none}
+    .frame-demo{display:grid;grid-template-columns:110px minmax(0,1fr);gap:.65rem;margin-top:1rem}.frame-prefix,.frame-body{border:1px solid var(--line);border-radius:6px;padding:.8rem;min-width:0}.frame-prefix{background:var(--amber-soft);text-align:center}.frame-body{background:var(--green-soft);overflow-wrap:anywhere}.frame-prefix small,.frame-body small{display:block;color:var(--muted)}
+    .chunk-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.65rem;margin-top:1rem}.chunk{border:1px solid var(--line);border-radius:6px;padding:.75rem;background:#fff;min-width:0}.chunk strong{display:block;color:var(--cyan-dark)}
+    .toggle-group{display:flex;gap:.5rem;flex-wrap:wrap}.toggle-group button[aria-pressed="true"]{background:var(--cyan-dark);color:#fff;border-color:var(--cyan-dark)}
+    .practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.practice-card{border:1px solid var(--line);border-radius:var(--radius);padding:1rem;background:#fff;min-width:0}.practice-card select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px;margin:.55rem 0}.mini-feedback{margin-top:.7rem;padding:.7rem;border-left:4px solid var(--cyan);background:var(--soft)}
+    .exercise-box{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}.exercise-head{display:grid;grid-template-columns:130px minmax(0,1fr);gap:1rem;background:var(--navy);color:#fff;padding:1rem 1.1rem}.exercise-body{padding:1.1rem;background:#fff}.solution-steps{display:grid;gap:.75rem}.solution-step{display:grid;grid-template-columns:38px minmax(0,1fr);gap:.8rem;align-items:start}.solution-step>b{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#d9eef2;color:var(--cyan-dark)}
+    .case-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.case-panel{border:1px solid var(--line);border-radius:var(--radius);padding:1.05rem;background:#fff;min-width:0}.case-panel label{display:block;font-weight:750;margin:.6rem 0 .25rem}.case-panel select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+    .quiz{display:grid;gap:1rem}.quiz-item{border:1px solid var(--line);border-radius:7px;padding:1rem;background:#fff}.quiz-item fieldset{border:0;padding:0;margin:0}.quiz-item legend{font-weight:800;margin-bottom:.6rem}.quiz-item label{display:block;margin:.42rem 0}.score-box{margin-top:1rem;padding:1rem;border:1px solid var(--line);border-radius:6px;background:var(--soft);font-weight:800}
+    .reflection-box textarea{width:100%;min-height:150px;padding:.8rem;border:1px solid var(--line);border-radius:6px;resize:vertical}.bottom-nav{display:flex;justify-content:space-between;gap:.7rem;flex-wrap:wrap;margin-top:1.6rem}.references{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.ref-card{border:1px solid var(--line);border-radius:7px;padding:1rem;background:#fff;min-width:0}
+    footer{background:var(--navy-deep);color:#dce9ed}.footer-inner{width:min(100%,var(--max));margin:0 auto;padding:1.4rem 1.25rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}.progress-wrap{position:fixed;right:1rem;bottom:1rem;z-index:20;background:#fff;border:1px solid var(--line);border-radius:999px;padding:.45rem .7rem;box-shadow:var(--shadow);font-size:.78rem}
+    @media(max-width:900px){.data-lab,.case-grid,.references{grid-template-columns:1fr}.pipeline{grid-template-columns:repeat(2,minmax(0,1fr))}.practice-grid{grid-template-columns:1fr}.chunk-grid{grid-template-columns:1fr}}
+    @media(max-width:620px){.pipeline{grid-template-columns:1fr}.frame-demo{grid-template-columns:1fr}.exercise-head{grid-template-columns:1fr}.bottom-nav .btn{width:100%}.progress-wrap{right:.65rem;bottom:.65rem}.hero-grid{padding-top:2.4rem;padding-bottom:2.4rem}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+<header>
+  <div class="header-inner">
+    <div class="brand"><strong>Programación de Redes</strong><span>Protocolos y APIs · Bloque 1</span></div>
+    <div class="nav-scroll"><nav aria-label="Navegación del subtema">
+      <a href="#orientacion">Cómo trabajar</a><a href="#conceptos">Conceptos</a><a href="#predice">Predice</a><a href="#experimenta">Experimenta</a><a href="#codigo">Código</a><a href="#resuelto">Resuelto</a><a href="#practica">Practica</a><a href="#caso">Caso profesional</a><a href="#comprueba">Comprueba</a><a href="#reflexion">Reflexión</a>
+    </nav></div>
+    <a class="top-link" href="tema-1-2-programacion-sockets-tcp-udp.html">← Tema 1.2</a>
+  </div>
+</header>
+<main id="contenido">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">Bloque 1 · Tema 1.2 · Subtema 1.2.4</div>
+        <h1 id="hero-title">Envío, recepción y estructuración de datos</h1>
+        <p>Un socket mueve bytes. La aplicación decide qué significan esos bytes, cómo se transforman desde datos útiles y cómo se reconstruyen sin ambigüedades al llegar.</p>
+        <div class="hero-actions"><a class="btn" href="#orientacion">Comenzar recorrido</a><a class="btn secondary" href="index.html">← Curso</a></div>
+      </div>
+      <div class="flow-board" aria-label="Flujo de transformación de datos">
+        <h3>Del dato al mensaje y de vuelta</h3><p>El transporte no conoce campos como dispositivo, potencia o estado. Solo transporta una secuencia de bytes o un datagrama.</p>
+        <div class="mini-stack">
+          <div class="mini-step active">dato Python: {"rssi": -67}</div>
+          <div class="mini-step">serializar → JSON</div>
+          <div class="mini-step">codificar → bytes UTF-8</div>
+          <div class="mini-step">socket → red</div>
+          <div class="mini-step">bytes → decodificar → reconstruir</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="orientacion" aria-labelledby="orientacion-title"><div class="band">
+    <div class="section-head"><div class="section-code">CÓMO TRABAJAR ESTE TEMA</div><div><h2 id="orientacion-title">No memorices llamadas: sigue la transformación del dato</h2><p class="lead">Cada actividad parte de una pregunta: ¿qué tiene la aplicación antes de enviar y qué necesita recuperar después de recibir?</p></div></div>
+    <div class="outcomes">
+      <div class="outcome"><b>1 · Diferenciar</b>texto, estructuras y bytes.</div>
+      <div class="outcome"><b>2 · Transformar</b>datos mediante codificación y serialización.</div>
+      <div class="outcome"><b>3 · Delimitar</b>mensajes cuando se usa un flujo TCP.</div>
+      <div class="outcome"><b>4 · Diseñar</b>un mensaje sencillo para una aplicación de telecomunicaciones.</div>
+    </div>
+    <div class="scope-note"><strong>Alcance:</strong> trabajaremos texto, UTF-8, JSON y una estrategia básica de longitud + contenido. No entraremos todavía en formatos binarios complejos, cifrado, autenticación ni protocolos industriales completos.</div>
+  </div></section>
+
+  <section id="conceptos" aria-labelledby="conceptos-title"><div class="band">
+    <div class="section-head"><div class="section-code">EXPLORA</div><div><h2 id="conceptos-title">Cuatro transformaciones que una aplicación debe controlar</h2><p class="lead">El error frecuente es creer que <code>send()</code> entiende objetos Python. En realidad, la interfaz de sockets recibe bytes.</p></div></div>
+    <div class="concept-grid">
+      <article class="concept-card"><span class="tag">Representación</span><h3>Dato de aplicación</h3><p>Es lo que tu programa quiere comunicar: una lectura, un estado, un identificador o varios campos relacionados.</p><ul><li>Ej.: RSSI = -67</li><li>Ej.: equipo = RTR-07</li></ul></article>
+      <article class="concept-card"><span class="tag">Serialización</span><h3>Estructura → texto</h3><p>Convierte una estructura en una representación intercambiable. JSON es útil para ejemplos legibles e interoperables.</p><ul><li><code>json.dumps()</code></li><li><code>json.loads()</code></li></ul></article>
+      <article class="concept-card"><span class="tag">Codificación</span><h3>Texto → bytes</h3><p>UTF-8 transforma caracteres en bytes antes de enviarlos y permite recuperar el texto al recibirlos.</p><ul><li><code>encode("utf-8")</code></li><li><code>decode("utf-8")</code></li></ul></article>
+      <article class="concept-card"><span class="tag">Delimitación</span><h3>¿Dónde termina el mensaje?</h3><p>En TCP la aplicación observa un flujo de bytes. Debe definir cómo reconocer el inicio y final de cada mensaje.</p><ul><li>longitud previa</li><li>delimitador o formato fijo</li></ul></article>
+    </div>
+    <div class="pipeline" aria-label="Proceso de transformación">
+      <div class="pipe-step"><b>1</b>Dato</div><div class="pipe-step"><b>2</b>Serializar</div><div class="pipe-step"><b>3</b>Codificar</div><div class="pipe-step"><b>4</b>Transmitir</div><div class="pipe-step"><b>5</b>Reconstruir</div>
+    </div>
+    <div class="callout"><strong>TCP y UDP no se comportan igual:</strong> UDP conserva los límites de cada datagrama entregado a la API. TCP entrega un flujo de bytes; una llamada a <code>recv()</code> no equivale necesariamente a “un mensaje completo”.</div>
+  </div></section>
+
+  <section id="predice" aria-labelledby="predice-title"><div class="band">
+    <div class="section-head"><div class="section-code">PREDICE</div><div><h2 id="predice-title">¿Qué puede enviarse directamente?</h2><p class="lead">Tienes el diccionario Python <code>{"equipo":"RTR-07","rssi":-67}</code> y quieres enviarlo por un socket.</p></div></div>
+    <div class="activity">
+      <div class="prediction" role="radiogroup" aria-label="Predicción sobre datos enviados por un socket">
+        <label><input type="radio" name="prediction" value="a"> Enviar el diccionario directamente con <code>sendall(diccionario)</code>.</label>
+        <label><input type="radio" name="prediction" value="b"> Serializarlo, codificar el texto resultante a bytes y enviar esos bytes.</label>
+        <label><input type="radio" name="prediction" value="c"> Convertir solamente el valor RSSI a una dirección IP.</label>
+      </div>
+      <div class="action-row"><button class="btn" id="checkPrediction" type="button">Comprobar predicción</button><button class="btn light" id="resetPrediction" type="button">Reintentar</button></div>
+      <div class="feedback" id="predictionFeedback" role="status" aria-live="polite">Piensa en el tipo de dato que la API de sockets espera para transmitir.</div>
+    </div>
+  </div></section>
+
+  <section id="experimenta" aria-labelledby="experimenta-title"><div class="band">
+    <div class="section-head"><div class="section-code">EXPERIMENTA · OBSERVA · EXPLICA</div><div><h2 id="experimenta-title">Laboratorio de transformación de mensajes</h2><p class="lead">Modifica los campos. El laboratorio genera JSON, bytes UTF-8 y una trama didáctica con longitud previa.</p></div></div>
+    <div class="data-lab">
+      <div class="lab-panel">
+        <h3>Datos de aplicación</h3>
+        <label for="deviceInput">Identificador del equipo</label><input id="deviceInput" value="RTR-07" maxlength="24">
+        <label for="rssiInput">RSSI (dBm)</label><input id="rssiInput" type="number" value="-67" min="-140" max="0">
+        <label for="stateInput">Estado</label><select id="stateInput"><option value="operativo">operativo</option><option value="degradado">degradado</option><option value="fuera_servicio">fuera_servicio</option></select>
+        <div class="action-row" style="margin-top:1rem"><button class="btn" id="buildMessage" type="button">Construir mensaje</button><button class="btn light" id="resetMessage" type="button">Restablecer</button></div>
+        <div class="feedback" id="labFeedback" aria-live="polite">Cambia los campos y construye el mensaje.</div>
+      </div>
+      <div class="lab-panel">
+        <h3>Representación transmitida</h3>
+        <strong>JSON serializado</strong><div class="byte-view" id="jsonView" aria-live="polite">—</div>
+        <strong>Bytes UTF-8</strong><div class="byte-view" id="bytesView" aria-live="polite">—</div>
+        <div class="frame-demo" aria-label="Trama con prefijo de longitud"><div class="frame-prefix"><small>4 bytes</small><strong id="lengthPrefix">0000</strong></div><div class="frame-body"><small>contenido UTF-8</small><strong id="framePayload">—</strong></div></div>
+      </div>
+    </div>
+    <div class="callout"><strong>Observa:</strong> el número de caracteres y el número de bytes pueden diferir con ciertos caracteres Unicode. Por eso una longitud de trama debe referirse a los <em>bytes realmente transmitidos</em>, no simplemente a la cantidad de caracteres.</div>
+  </div></section>
+
+  <section id="codigo" aria-labelledby="codigo-title"><div class="band">
+    <div class="section-head"><div class="section-code">EXPLICA CON CÓDIGO</div><div><h2 id="codigo-title">Serializar, codificar, enviar y reconstruir</h2><p class="lead">Este ejemplo usa JSON para la estructura y UTF-8 para convertir texto a bytes.</p></div></div>
+    <div class="code-grid">
+      <article class="code-card"><h3>Emisor</h3><div class="code-block"><code>import json
+
+mensaje = {
+    "equipo": "RTR-07",
+    "rssi": -67,
+    "estado": "operativo"
+}
+
+texto = json.dumps(mensaje)
+datos = texto.encode("utf-8")
+sock.sendall(datos)</code></div><p class="code-note"><strong>Idea:</strong> <code>json.dumps()</code> produce texto; <code>encode()</code> produce bytes.</p></article>
+      <article class="code-card"><h3>Receptor</h3><div class="code-block"><code>import json
+
+datos = sock.recv(4096)
+texto = datos.decode("utf-8")
+mensaje = json.loads(texto)
+
+print(mensaje["equipo"])
+print(mensaje["rssi"])</code></div><p class="code-note"><strong>Advertencia:</strong> este fragmento es didáctico. En TCP real, un solo <code>recv()</code> no garantiza contener exactamente un mensaje completo.</p></article>
+    </div>
+    <div class="table-wrap"><table><thead><tr><th>Etapa</th><th>Entrada</th><th>Salida</th><th>Operación típica</th></tr></thead><tbody>
+      <tr><td>Serializar</td><td>dict/list</td><td>str</td><td><code>json.dumps()</code></td></tr>
+      <tr><td>Codificar</td><td>str</td><td>bytes</td><td><code>.encode("utf-8")</code></td></tr>
+      <tr><td>Transmitir</td><td>bytes</td><td>bytes en red</td><td><code>sendall()</code> / <code>sendto()</code></td></tr>
+      <tr><td>Decodificar</td><td>bytes</td><td>str</td><td><code>.decode("utf-8")</code></td></tr>
+      <tr><td>Deserializar</td><td>str</td><td>dict/list</td><td><code>json.loads()</code></td></tr>
+    </tbody></table></div>
+  </div></section>
+
+  <section id="resuelto" aria-labelledby="resuelto-title"><div class="band">
+    <div class="section-head"><div class="section-code">EJERCICIO RESUELTO</div><div><h2 id="resuelto-title">Diseñar el mensaje de estado de un radioenlace</h2><p class="lead">Un equipo remoto debe informar identificador, potencia recibida y disponibilidad. Queremos que el receptor pueda interpretar cada campo sin depender de la posición visual del texto.</p></div></div>
+    <div class="exercise-box"><div class="exercise-head"><span>Situación</span><div>Datos: equipo <strong>RL-12</strong>, RSSI <strong>-61.5 dBm</strong>, disponibilidad <strong>true</strong>.</div></div><div class="exercise-body"><div class="solution-steps">
+      <div class="solution-step"><b>1</b><div><strong>Definir campos con significado explícito.</strong><br><code>{"equipo":"RL-12","rssi":-61.5,"disponible":true}</code></div></div>
+      <div class="solution-step"><b>2</b><div><strong>Serializar.</strong><br>JSON conserva nombres de campos y tipos básicos, facilitando que otro programa reconstruya la estructura.</div></div>
+      <div class="solution-step"><b>3</b><div><strong>Codificar a UTF-8.</strong><br>La cadena JSON se transforma en bytes porque el socket transmite bytes.</div></div>
+      <div class="solution-step"><b>4</b><div><strong>Definir el límite del mensaje.</strong><br>Si usamos TCP, una opción robusta es enviar primero una longitud fija que indique cuántos bytes componen el contenido.</div></div>
+      <div class="solution-step"><b>5</b><div><strong>Reconstruir en orden inverso.</strong><br>El receptor lee la longitud, reúne exactamente esos bytes, decodifica UTF-8 y aplica <code>json.loads()</code>.</div></div>
+    </div><div class="callout"><strong>Resultado:</strong> el receptor obtiene nuevamente una estructura donde puede consultar <code>mensaje["rssi"]</code> sin analizar manualmente una frase.</div></div></div>
+  </div></section>
+
+  <section id="practica" aria-labelledby="practica-title"><div class="band">
+    <div class="section-head"><div class="section-code">PRACTICA</div><div><h2 id="practica-title">Resuelve y comprueba</h2><p class="lead">Los ejercicios se centran en decisiones de representación, no en repetir una receta.</p></div></div>
+    <div class="practice-grid">
+      <article class="practice-card"><h3>1 · Antes de enviar</h3><p>Tienes el texto Python <code>"alarma alta"</code>. ¿Qué operación produce bytes?</p><select id="p1"><option value="">Selecciona...</option><option value="a">decode("utf-8")</option><option value="b">encode("utf-8")</option><option value="c">json.loads()</option></select><button class="btn" id="checkP1" type="button">Comprobar</button><div class="mini-feedback" id="p1Feedback" aria-live="polite">Selecciona una respuesta.</div></article>
+      <article class="practice-card"><h3>2 · TCP y mensajes</h3><p>El emisor hace dos <code>sendall()</code>. ¿Puede el receptor asumir que dos <code>recv()</code> devolverán exactamente esos dos mensajes?</p><select id="p2"><option value="">Selecciona...</option><option value="a">Sí, siempre.</option><option value="b">No. TCP es un flujo y la aplicación debe delimitar.</option><option value="c">Solo si usa JSON.</option></select><button class="btn" id="checkP2" type="button">Comprobar</button><div class="mini-feedback" id="p2Feedback" aria-live="polite">Selecciona una respuesta.</div></article>
+      <article class="practice-card"><h3>3 · Estructura</h3><p>Necesitas enviar nombre, temperatura y estado. ¿Qué alternativa facilita conservar campos con significado?</p><select id="p3"><option value="">Selecciona...</option><option value="a">JSON con claves claras</option><option value="b">una cadena sin separadores ni esquema</option><option value="c">solo el primer valor</option></select><button class="btn" id="checkP3" type="button">Comprobar</button><div class="mini-feedback" id="p3Feedback" aria-live="polite">Selecciona una respuesta.</div></article>
+    </div>
+  </div></section>
+
+  <section id="caso" aria-labelledby="caso-title"><div class="band">
+    <div class="section-head"><div class="section-code">CASO PROFESIONAL</div><div><h2 id="caso-title">Telemetría de un gabinete de telecomunicaciones</h2><p class="lead">Un agente remoto reporta temperatura, tensión de respaldo y estado de puerta. Debes decidir cómo representar el mensaje antes de enviarlo a la plataforma central.</p></div></div>
+    <div class="case-grid">
+      <div class="case-panel"><h3>Diseña el mensaje</h3><label for="caseFormat">Representación</label><select id="caseFormat"><option value="">Selecciona...</option><option value="json">JSON con claves explícitas</option><option value="raw">texto concatenado sin separadores</option></select><label for="caseEncoding">Codificación</label><select id="caseEncoding"><option value="">Selecciona...</option><option value="utf8">UTF-8</option><option value="none">ninguna; enviar str directamente</option></select><label for="caseFrame">Si se usa TCP...</label><select id="caseFrame"><option value="">Selecciona...</option><option value="length">definir longitud o delimitación</option><option value="assume">suponer que cada recv() equivale a un mensaje</option></select><button class="btn" id="checkCase" type="button">Evaluar diseño</button><div class="feedback" id="caseFeedback" aria-live="polite">Selecciona las tres decisiones antes de comprobar.</div></div>
+      <div class="case-panel"><h3>Ejemplo de contenido</h3><div class="byte-view">{"sitio":"AZO-03","temp_c":31.8,"bateria_v":52.1,"puerta":"cerrada"}</div><p>Una representación estructurada permite validar campos, añadir otros posteriormente y reducir ambigüedades entre equipos desarrollados por personas distintas.</p><div class="callout"><strong>Profesional:</strong> en sistemas reales también deben definirse versión del mensaje, unidades, rangos válidos, autenticación y respuesta ante datos incompletos o inválidos.</div></div>
+    </div>
+  </div></section>
+
+  <section id="comprueba" aria-labelledby="comprueba-title"><div class="band">
+    <div class="section-head"><div class="section-code">COMPRUEBA</div><div><h2 id="comprueba-title">Integra lo aprendido</h2><p class="lead">Responde las cinco preguntas y revisa la explicación de cada una.</p></div></div>
+    <div class="quiz" id="quiz">
+      <div class="quiz-item"><fieldset><legend>1. ¿Qué tipo de dato espera normalmente <code>sendall()</code>?</legend><label><input type="radio" name="q1" value="a"> bytes</label><label><input type="radio" name="q1" value="b"> dict</label><label><input type="radio" name="q1" value="c"> int sin conversión</label></fieldset><div class="mini-feedback" id="q1Feedback">Selecciona una respuesta.</div></div>
+      <div class="quiz-item"><fieldset><legend>2. ¿Qué hace <code>json.dumps()</code>?</legend><label><input type="radio" name="q2" value="a"> Convierte una estructura compatible en texto JSON.</label><label><input type="radio" name="q2" value="b"> Abre un socket.</label><label><input type="radio" name="q2" value="c"> Decodifica bytes TCP.</label></fieldset><div class="mini-feedback" id="q2Feedback">Selecciona una respuesta.</div></div>
+      <div class="quiz-item"><fieldset><legend>3. ¿Por qué TCP necesita una estrategia de delimitación a nivel de aplicación?</legend><label><input type="radio" name="q3" value="a"> Porque TCP entrega un flujo de bytes y no conserva límites de mensajes de la aplicación.</label><label><input type="radio" name="q3" value="b"> Porque TCP no transmite bytes.</label><label><input type="radio" name="q3" value="c"> Porque JSON desactiva la red.</label></fieldset><div class="mini-feedback" id="q3Feedback">Selecciona una respuesta.</div></div>
+      <div class="quiz-item"><fieldset><legend>4. ¿Qué operación revierte <code>encode("utf-8")</code> cuando los bytes son válidos?</legend><label><input type="radio" name="q4" value="a"> <code>decode("utf-8")</code></label><label><input type="radio" name="q4" value="b"> <code>bind()</code></label><label><input type="radio" name="q4" value="c"> <code>listen()</code></label></fieldset><div class="mini-feedback" id="q4Feedback">Selecciona una respuesta.</div></div>
+      <div class="quiz-item"><fieldset><legend>5. En una trama con prefijo de longitud, ¿qué debe describir esa longitud?</legend><label><input type="radio" name="q5" value="a"> La cantidad de bytes que el receptor debe reunir para ese contenido.</label><label><input type="radio" name="q5" value="b"> El número de routers de Internet.</label><label><input type="radio" name="q5" value="c"> El puerto local del navegador.</label></fieldset><div class="mini-feedback" id="q5Feedback">Selecciona una respuesta.</div></div>
+    </div>
+    <div class="action-row"><button class="btn" id="checkQuiz" type="button">Comprobar todo</button><button class="btn light" id="resetQuiz" type="button">Reintentar</button></div><div class="score-box" id="scoreBox" aria-live="polite">Aún no has comprobado la actividad.</div>
+  </div></section>
+
+  <section id="reflexion" aria-labelledby="reflexion-title"><div class="band">
+    <div class="section-head"><div class="section-code">REFLEXIÓN</div><div><h2 id="reflexion-title">¿Qué contrato debe compartir emisor y receptor?</h2><p class="lead">Describe qué tendrían que acordar dos equipos desarrollados por grupos distintos para intercambiar correctamente un mensaje de telemetría.</p></div></div>
+    <div class="reflection-box"><textarea id="reflectionText" aria-label="Reflexión del estudiante" placeholder="Considera campos, tipos, unidades, codificación y forma de reconocer el final del mensaje..."></textarea><div class="action-row"><button class="btn" id="saveReflection" type="button">Guardar en este navegador</button><button class="btn light" id="clearReflection" type="button">Borrar</button></div><p id="reflectionStatus" aria-live="polite">El texto no se transmite; si lo guardas, permanece únicamente en el almacenamiento local de este navegador.</p></div>
+
+    <div class="references" style="margin-top:2rem"><article class="ref-card"><h3>Referencias conceptuales</h3><p>Documentación oficial de Python: módulos <code>socket</code> y <code>json</code>. RFC 8259 para el formato JSON y RFC 793/9293 para el modelo de flujo TCP.</p></article><article class="ref-card"><h3>Delimitación</h3><p>Este subtema no implementa todavía lectura exacta en bucle, recuperación ante desconexiones, timeouts robustos, validación de esquemas ni concurrencia. Esos aspectos se ampliarán en los siguientes subtemas.</p></article></div>
+    <div class="bottom-nav"><a class="btn light" href="tema-1-2-3-comunicacion-udp.html">← 1.2.3 Comunicación UDP</a><a class="btn light" href="tema-1-2-programacion-sockets-tcp-udp.html">Volver al Tema 1.2</a><a class="btn" href="tema-1-2-5-manejo-conexiones-excepciones-timeout.html">1.2.5 Conexiones y excepciones →</a></div>
+  </div></section>
+</main>
+<footer><div class="footer-inner"><div><strong>Programación de Redes: Protocolos y APIs</strong><br><span>Subtema 1.2.4 · Envío, recepción y estructuración de datos</span></div><div>Material interactivo · uso local</div></div></footer>
+<div class="progress-wrap" aria-hidden="true">Recorrido <b id="progressValue">0%</b></div>
+<script>
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const setFeedback = (el, text, type = "") => { el.textContent = text; el.className = "feedback" + (type ? " " + type : ""); };
+  const setMini = (el, text, ok = null) => {
+    el.textContent = text;
+    el.style.borderLeftColor = ok === true ? "var(--green)" : ok === false ? "var(--red)" : "var(--cyan)";
+    el.style.background = ok === true ? "var(--green-soft)" : ok === false ? "var(--red-soft)" : "var(--soft)";
+  };
+
+  $("checkPrediction").addEventListener("click", () => {
+    const selected = document.querySelector('input[name="prediction"]:checked');
+    if (!selected) return setFeedback($("predictionFeedback"), "Selecciona primero una predicción.", "warn");
+    if (selected.value === "b") setFeedback($("predictionFeedback"), "Correcto. Una estructura Python debe convertirse a una representación intercambiable y finalmente a bytes antes de entregarla al socket.", "success");
+    else setFeedback($("predictionFeedback"), "Revisa la frontera entre aplicación y socket: send()/sendall() trabajan con bytes, no interpretan directamente un diccionario Python.", "error");
+  });
+  $("resetPrediction").addEventListener("click", () => {
+    document.querySelectorAll('input[name="prediction"]').forEach(r => r.checked = false);
+    setFeedback($("predictionFeedback"), "Piensa en el tipo de dato que la API de sockets espera para transmitir.");
+  });
+
+  const encoder = new TextEncoder();
+  function buildMessage(){
+    const device = $("deviceInput").value.trim();
+    const rssi = Number($("rssiInput").value);
+    const state = $("stateInput").value;
+    if (!device || !Number.isFinite(rssi)) return setFeedback($("labFeedback"), "Completa un identificador válido y un RSSI numérico.", "warn");
+    const obj = {equipo: device, rssi: rssi, estado: state};
+    const json = JSON.stringify(obj);
+    const bytes = encoder.encode(json);
+    $("jsonView").textContent = json;
+    $("bytesView").textContent = "[" + Array.from(bytes).join(", ") + "]\n" + bytes.length + " bytes UTF-8";
+    $("lengthPrefix").textContent = String(bytes.length).padStart(4, "0");
+    $("framePayload").textContent = json;
+    setFeedback($("labFeedback"), `Mensaje construido: ${bytes.length} bytes de contenido. El prefijo didáctico indica cuántos bytes debe reunir el receptor.`, "success");
+  }
+  $("buildMessage").addEventListener("click", buildMessage);
+  $("resetMessage").addEventListener("click", () => {
+    $("deviceInput").value = "RTR-07"; $("rssiInput").value = "-67"; $("stateInput").value = "operativo";
+    $("jsonView").textContent = "—"; $("bytesView").textContent = "—"; $("lengthPrefix").textContent = "0000"; $("framePayload").textContent = "—";
+    setFeedback($("labFeedback"), "Cambia los campos y construye el mensaje.");
+  });
+  buildMessage();
+
+  const practices = [
+    {select:"p1",button:"checkP1",feedback:"p1Feedback",answer:"b",ok:"Correcto. encode('utf-8') transforma texto (str) en bytes.",bad:"Revisa la dirección de la transformación: encode va de texto a bytes; decode hace el recorrido inverso."},
+    {select:"p2",button:"checkP2",feedback:"p2Feedback",answer:"b",ok:"Correcto. TCP no conserva los límites de las llamadas sendall(); la aplicación necesita su propia estrategia de delimitación.",bad:"No asocies una llamada recv() con un mensaje completo. TCP presenta un flujo de bytes."},
+    {select:"p3",button:"checkP3",feedback:"p3Feedback",answer:"a",ok:"Correcto. Las claves JSON conservan el significado de cada campo y facilitan reconstruir la estructura.",bad:"Busca una representación que preserve explícitamente nombre y valor de cada campo."}
+  ];
+  practices.forEach(p => $(p.button).addEventListener("click", () => {
+    const value = $(p.select).value;
+    if (!value) return setMini($(p.feedback), "Selecciona primero una respuesta.", null);
+    setMini($(p.feedback), value === p.answer ? p.ok : p.bad, value === p.answer);
+  }));
+
+  $("checkCase").addEventListener("click", () => {
+    const ok = $("caseFormat").value === "json" && $("caseEncoding").value === "utf8" && $("caseFrame").value === "length";
+    if (ok) setFeedback($("caseFeedback"), "Diseño coherente. La estructura conserva significado, UTF-8 produce bytes y la delimitación evita depender de cómo TCP agrupe o divida los datos al recibir.", "success");
+    else setFeedback($("caseFeedback"), "Revisa el contrato completo: representación estructurada, conversión a bytes y una regla explícita para reconocer cada mensaje en TCP.", "error");
+  });
+
+  const quizAnswers = {q1:"a",q2:"a",q3:"a",q4:"a",q5:"a"};
+  const quizExplanations = {
+    q1:"sendall() trabaja con un objeto bytes-like; el contenido de aplicación debe transformarse antes.",
+    q2:"json.dumps() serializa una estructura compatible y devuelve una cadena de texto JSON.",
+    q3:"TCP mantiene orden de bytes, pero no límites de mensajes definidos por la aplicación.",
+    q4:"decode('utf-8') interpreta bytes UTF-8 y produce nuevamente texto.",
+    q5:"El prefijo debe permitir saber cuántos bytes exactos pertenecen al contenido de ese mensaje."
+  };
+  $("checkQuiz").addEventListener("click", () => {
+    let score = 0;
+    Object.keys(quizAnswers).forEach(q => {
+      const selected = document.querySelector(`input[name="${q}"]:checked`);
+      const feedback = $(`${q}Feedback`);
+      const ok = selected && selected.value === quizAnswers[q];
+      if (ok) score += 1;
+      setMini(feedback, selected ? ((ok ? "Correcto. " : "Revisa. ") + quizExplanations[q]) : "Falta responder esta pregunta.", ok);
+    });
+    $("scoreBox").textContent = `Resultado: ${score}/5. ${score === 5 ? "Dominio sólido de representación y estructuración básica de mensajes." : "Revisa las explicaciones señaladas y vuelve a intentarlo."}`;
+  });
+  $("resetQuiz").addEventListener("click", () => {
+    document.querySelectorAll('#quiz input[type="radio"]').forEach(r => r.checked = false);
+    Object.keys(quizAnswers).forEach(q => { const el = $(`${q}Feedback`); el.textContent = "Selecciona una respuesta."; el.style.borderLeftColor = "var(--cyan)"; el.style.background = "var(--soft)"; });
+    $("scoreBox").textContent = "Aún no has comprobado la actividad.";
+  });
+
+  const storageKey = "pr-redes-1-2-4-reflexion";
+  try { const saved = localStorage.getItem(storageKey); if (saved) $("reflectionText").value = saved; } catch (_) {}
+  $("saveReflection").addEventListener("click", () => {
+    try { localStorage.setItem(storageKey, $("reflectionText").value); $("reflectionStatus").textContent = "Reflexión guardada únicamente en este navegador."; }
+    catch (_) { $("reflectionStatus").textContent = "Este navegador no permitió guardar la reflexión localmente."; }
+  });
+  $("clearReflection").addEventListener("click", () => {
+    $("reflectionText").value = ""; try { localStorage.removeItem(storageKey); } catch (_) {}
+    $("reflectionStatus").textContent = "Reflexión borrada del almacenamiento local.";
+  });
+
+  const sections = [...document.querySelectorAll("main section")];
+  function updateProgress(){
+    const total = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = total > 0 ? Math.max(0, Math.min(100, Math.round((window.scrollY / total) * 100))) : 100;
+    $("progressValue").textContent = pct + "%";
+    const marker = window.scrollY + window.innerHeight * .36;
+    let current = sections[0];
+    sections.forEach(s => { if (s.offsetTop <= marker) current = s; });
+    document.querySelectorAll("nav a").forEach(a => a.removeAttribute("aria-current"));
+    if (current && current.id) { const link = document.querySelector(`nav a[href="#${current.id}"]`); if (link) link.setAttribute("aria-current","location"); }
+  }
+  window.addEventListener("scroll", updateProgress, {passive:true});
+  window.addEventListener("resize", updateProgress);
+  updateProgress();
+})();
+</script>
+</body>
+</html>

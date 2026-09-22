@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Tema 1.2: visión general de la programación de sockets TCP y UDP aplicada a redes y telecomunicaciones.">
+  <meta name="theme-color" content="#10212a">
+  <title>Tema 1.2 | Programación de sockets TCP y UDP</title>
+  <style>
+    :root{
+      --ink:#18212a;--muted:#586775;--line:#cbd5dc;--soft:#f3f6f8;--paper:#ffffff;
+      --cyan:#007c91;--cyan-dark:#005b6a;--cyan-light:#6ed2e2;--green:#16734a;--green-soft:#e8f5ee;
+      --amber:#8a5600;--amber-soft:#fff3d8;--focus:#005fcc;--navy:#10212a;--navy-deep:#07141a;
+      --max:1180px;--radius:8px;--shadow:0 16px 38px rgba(24,33,42,.08)
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;min-width:280px;color:var(--ink);background:var(--paper);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55;overflow-x:hidden}
+    img,svg,canvas,video{display:block;max-width:100%}
+    button,input,select,textarea{font:inherit;max-width:100%}
+    button,input[type="checkbox"],input[type="radio"]{cursor:pointer}
+    a{color:var(--cyan-dark)}
+    a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+    .skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}.skip-link:focus{top:1rem}
+    header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+    .header-inner{width:min(100%,var(--max));min-height:66px;margin:0 auto;padding:.55rem 1.25rem;display:flex;gap:1rem;align-items:center;min-width:0}
+    .brand{min-width:190px}.brand strong{display:block;font-size:.95rem}.brand span{display:block;color:var(--muted);font-size:.78rem}
+    .nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+    nav a{color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;border-bottom:2px solid transparent;font-size:.84rem}
+    nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+    .home-link{flex:0 0 auto;text-decoration:none;border:1px solid var(--line);border-radius:5px;padding:.48rem .72rem;color:var(--ink);font-weight:750;white-space:nowrap;background:#fff}.home-link:hover{border-color:var(--cyan);color:var(--cyan-dark)}
+    main{overflow:hidden}section{scroll-margin-top:84px;border-bottom:1px solid var(--line)}.band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+    .hero{min-height:calc(100svh - 66px);display:grid;align-items:center;background:var(--navy);color:#fff}
+    .hero-grid{width:min(100%,var(--max));margin:0 auto;padding:3.4rem 1.25rem;display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.28fr);gap:3rem;align-items:center}.hero-grid>*{min-width:0}
+    .eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+    h1{font-size:clamp(2rem,5vw,4.6rem);line-height:1.02;margin:.65rem 0 1.15rem;max-width:18ch;overflow-wrap:normal;word-break:normal;hyphens:none}
+    h2{font-size:clamp(1.75rem,3.3vw,2.8rem);line-height:1.12;margin:0 0 .8rem;overflow-wrap:normal;word-break:normal;hyphens:none}
+    h3{font-size:1.22rem;margin:0 0 .55rem}p{max-width:72ch}.hero p{color:#d7e5ea;font-size:1.08rem}
+    .hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}.hero-actions{margin-top:1.45rem}
+    .btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cyan-dark);background:var(--cyan);color:#fff;text-decoration:none;padding:.72rem 1rem;border-radius:5px;font-weight:750}.btn:hover{background:var(--cyan-dark)}
+    .btn.secondary{background:transparent;color:inherit;border-color:currentColor}.btn.secondary:hover{background:rgba(255,255,255,.1)}.btn.light{background:#fff;color:var(--ink);border-color:var(--line)}.btn.light:hover{background:var(--soft);color:var(--cyan-dark)}
+    .socket-board{min-width:0;background:var(--navy-deep);border:1px solid #3b5965;border-radius:8px;padding:1.35rem}
+    .socket-flow{display:grid;grid-template-columns:minmax(0,1fr) 42px minmax(0,.8fr) 42px minmax(0,.8fr) 42px minmax(0,1fr);gap:.45rem;align-items:center}
+    .flow-node{min-width:0;text-align:center;border:1px solid #48616b;border-radius:7px;padding:.9rem .6rem;background:#102a35}.flow-node strong{display:block;color:#fff;margin-bottom:.2rem}.flow-node span{display:block;color:#bfd1d7;font-size:.79rem}
+    .flow-node.socket{border-color:var(--cyan-light);box-shadow:inset 0 0 0 1px rgba(110,210,226,.2)}.flow-arrow{text-align:center;color:var(--cyan-light);font-size:1.45rem;font-weight:900}.hero-caption{margin-top:1rem;color:#b8cbd2;font-size:.82rem}
+    .section-head{display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem}.section-head>*{min-width:0}.section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}.lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+    .outcomes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}.outcome:last-child{border-right:0}.outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+    .scope-note{margin-top:1.4rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}
+    .why-grid{display:grid;grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr);gap:2.4rem;align-items:start}.why-grid>*{min-width:0}
+    .concept-list{margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}.concept-list li{padding:1rem 0;border-bottom:1px solid var(--line)}.concept-list strong{display:block;margin-bottom:.2rem;color:var(--ink)}
+    .scenario-board{background:var(--soft);border:1px solid var(--line);border-radius:var(--radius);padding:1.35rem;min-width:0}
+    .scenario-chain{display:grid;grid-template-columns:minmax(0,1fr) 38px minmax(0,1fr) 38px minmax(0,1fr);gap:.45rem;align-items:center;margin-top:1rem}.scenario-box{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1rem;text-align:center;min-width:0;box-shadow:var(--shadow)}.scenario-box strong{display:block;color:var(--cyan-dark);margin-bottom:.25rem}.scenario-box span{display:block;color:var(--muted);font-size:.85rem}.scenario-arrow{text-align:center;color:var(--cyan-dark);font-size:1.35rem;font-weight:900}
+    .journey{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.journey-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.25rem;background:#fff;box-shadow:var(--shadow);display:flex;flex-direction:column}.journey-card .num{font-weight:850;color:var(--cyan-dark);font-size:.82rem;text-transform:uppercase;letter-spacing:.05em}.journey-card h3{margin:.35rem 0 .55rem}.journey-card p{color:var(--muted);font-size:.94rem;margin:0 0 1rem}.journey-card .question{margin-top:auto;padding-top:.9rem;border-top:1px solid var(--line);font-weight:700;font-size:.9rem}
+    .activity{margin-top:2rem;padding:1.35rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--soft);min-width:0}.activity h3{margin-top:0}.activity-instruction{color:var(--muted);margin-top:0}
+    .prediction{display:grid;gap:.65rem;margin:1rem 0}.prediction label{display:block;padding:.78rem;border:1px solid var(--line);border-radius:5px;background:#fff}.prediction input{margin-right:.5rem}
+    .feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}.feedback.success{background:var(--green-soft);border-color:var(--green)}.feedback.warn{background:var(--amber-soft);border-color:var(--amber)}
+    .steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.7rem;margin-top:1rem}.step{min-width:0;border:1px solid var(--line);border-radius:6px;background:#fff;padding:1rem}.step b{display:grid;place-items:center;width:2rem;height:2rem;border-radius:50%;background:#d9eef2;color:var(--cyan-dark);margin-bottom:.65rem}.step strong{display:block;margin-bottom:.25rem}.step span{display:block;color:var(--muted);font-size:.87rem}
+    .subtopics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.subtopic-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.3rem;background:#fff;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.8rem}.subtopic-top{display:flex;gap:1rem;align-items:flex-start;min-width:0}.badge{flex:0 0 auto;display:grid;place-items:center;min-width:64px;height:42px;border-radius:6px;background:#d9eef2;color:var(--cyan-dark);font-weight:850}.subtopic-card h3{margin:.1rem 0 .25rem}.subtopic-card p{margin:0;color:var(--muted)}.subtopic-card .goal{padding:.8rem;background:var(--soft);border-radius:5px;font-size:.91rem}.subtopic-card .btn{align-self:flex-start;margin-top:auto}
+    .reflection-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:2rem;align-items:start}.reflection-grid>*{min-width:0}textarea{width:100%;min-height:150px;resize:vertical;border:1px solid var(--line);border-radius:6px;padding:.8rem;background:#fff}.storage-note{font-size:.83rem;color:var(--muted)}
+    .references{font-size:.94rem;color:var(--muted)}.references ul{padding-left:1.2rem}
+    .bottom-nav{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:2rem;padding-top:1.25rem;border-top:1px solid var(--line)}
+    footer{background:var(--navy);color:#c9d8dd}footer .band{padding-top:2rem;padding-bottom:2rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+    @media(max-width:980px){.steps{grid-template-columns:repeat(3,minmax(0,1fr))}.socket-flow{grid-template-columns:1fr}.flow-arrow{transform:rotate(90deg)}}
+    @media(max-width:900px){.header-inner{flex-wrap:wrap}.nav-scroll{order:3;flex-basis:100%}.hero-grid,.why-grid,.reflection-grid{grid-template-columns:1fr}.outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}.outcome:nth-child(2){border-right:0}.outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}.journey{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:680px){.band{padding:3.2rem 1rem}.hero-grid{padding:2.7rem 1rem}.section-head{grid-template-columns:1fr;gap:.45rem}.outcomes,.journey,.subtopics,.steps{grid-template-columns:1fr}.outcome{border-right:0;border-bottom:1px solid var(--line)}.outcome:last-child{border-bottom:0}.scenario-chain{grid-template-columns:1fr}.scenario-arrow{transform:rotate(90deg)}.home-link{width:100%;text-align:center}}
+    @media(max-width:480px){h1{font-size:clamp(2rem,10vw,2.8rem);max-width:none}.header-inner{padding:.55rem 1rem}.brand{min-width:0;flex:1}.subtopic-top{flex-direction:column}.badge{min-width:0;width:max-content;padding:0 .7rem}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#inicio">Ir al contenido</a>
+  <header>
+    <div class="header-inner">
+      <div class="brand"><strong>Programación de Redes</strong><span>Bloque 1 · Tema 1.2</span></div>
+      <div class="nav-scroll">
+        <nav aria-label="Secciones del tema">
+          <a href="#inicio" aria-current="location">Inicio</a>
+          <a href="#proposito">Propósito</a>
+          <a href="#idea">Idea central</a>
+          <a href="#telecom">Telecomunicaciones</a>
+          <a href="#subtemas">Subtemas</a>
+          <a href="#reflexion">Reflexión</a>
+        </nav>
+      </div>
+      <a class="home-link" href="index.html" aria-label="Volver a la pantalla principal del curso">← Curso</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="inicio">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">Bloque 1 · Tema 1.2 · Visión general</div>
+          <h1>Programación de sockets TCP y UDP</h1>
+          <p>En el Tema 1.1 aprendimos a interpretar quién se comunica, dónde está el destino y qué comportamiento ofrece TCP o UDP. Ahora convertiremos esas ideas en programas capaces de abrir un punto de comunicación, enviar datos, recibir respuestas y controlar situaciones reales de red.</p>
+          <div class="hero-actions">
+            <a class="btn" href="#proposito">Comenzar el tema</a>
+            <a class="btn secondary" href="#subtemas">Ver subtemas</a>
+          </div>
+        </div>
+        <div class="socket-board" role="img" aria-label="Esquema conceptual de dos aplicaciones que se comunican mediante sockets y la red">
+          <div class="socket-flow">
+            <div class="flow-node"><strong>Aplicación A</strong><span>Genera o consume datos</span></div>
+            <div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-node socket"><strong>Socket</strong><span>Punto de acceso a la comunicación</span></div>
+            <div class="flow-arrow" aria-hidden="true">⇄</div>
+            <div class="flow-node socket"><strong>TCP / UDP</strong><span>Transporta los datos</span></div>
+            <div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-node"><strong>Aplicación B</strong><span>Recibe, procesa o responde</span></div>
+          </div>
+          <p class="hero-caption">Un socket será la interfaz práctica entre nuestro programa y los servicios de transporte de la red.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="proposito" aria-labelledby="proposito-title">
+      <div class="band">
+        <div class="section-head">
+          <div class="section-code">ORIENTACIÓN</div>
+          <div><h2 id="proposito-title">¿Qué cambia al entrar en programación de sockets?</h2><p class="lead">Pasamos de comprender la comunicación a implementarla. El estudiante empezará a tomar decisiones concretas sobre creación, configuración, conexión, intercambio de datos y cierre de comunicaciones.</p></div>
+        </div>
+        <div class="outcomes" aria-label="Resultados del recorrido general">
+          <div class="outcome"><b>Interpretar</b>El socket como punto de acceso de una aplicación a la comunicación de red.</div>
+          <div class="outcome"><b>Relacionar</b>Las etapas de creación, conexión, envío, recepción y cierre.</div>
+          <div class="outcome"><b>Anticipar</b>Diferencias de implementación entre aplicaciones TCP y UDP.</div>
+          <div class="outcome"><b>Reconocer</b>Problemas reales: errores, tiempos de espera y múltiples clientes.</div>
+        </div>
+        <div class="scope-note"><strong>Cómo trabajar este tema:</strong> este HTML es el mapa general del 1.2. La implementación paso a paso, los ejercicios resueltos y los laboratorios interactivos aparecerán en los subtemas 1.2.1–1.2.6.</div>
+      </div>
+    </section>
+
+    <section id="idea" aria-labelledby="idea-title">
+      <div class="band">
+        <div class="section-head">
+          <div class="section-code">IDEA CENTRAL</div>
+          <div><h2 id="idea-title">Un socket conecta la lógica de la aplicación con la red</h2><p class="lead">Desde la perspectiva del programador, el socket permite trabajar con una comunicación sin tener que implementar manualmente todos los mecanismos internos del sistema operativo y de los protocolos de transporte.</p></div>
+        </div>
+        <div class="why-grid">
+          <div>
+            <ul class="concept-list">
+              <li><strong>Crear</strong>La aplicación solicita al sistema operativo un punto de comunicación.</li>
+              <li><strong>Configurar</strong>Se definen parámetros que dependen del rol de la aplicación y del transporte utilizado.</li>
+              <li><strong>Comunicar</strong>El programa intercambia información con otro proceso mediante operaciones de envío y recepción.</li>
+              <li><strong>Controlar</strong>La aplicación debe responder ante desconexiones, errores, esperas excesivas o clientes simultáneos.</li>
+              <li><strong>Cerrar</strong>Los recursos de comunicación deben liberarse correctamente cuando dejan de utilizarse.</li>
+            </ul>
+          </div>
+          <div class="scenario-board">
+            <h3>Del concepto al flujo de trabajo</h3>
+            <p>En una aplicación real, la comunicación no se resume en “enviar un mensaje”. Existe una secuencia de estados y decisiones que cambia según el rol y el transporte.</p>
+            <div class="steps" aria-label="Secuencia conceptual de programación con sockets">
+              <div class="step"><b>1</b><strong>Crear</strong><span>Obtener el socket.</span></div>
+              <div class="step"><b>2</b><strong>Preparar</strong><span>Definir destino o servicio.</span></div>
+              <div class="step"><b>3</b><strong>Comunicar</strong><span>Enviar y recibir datos.</span></div>
+              <div class="step"><b>4</b><strong>Gestionar</strong><span>Errores y esperas.</span></div>
+              <div class="step"><b>5</b><strong>Cerrar</strong><span>Liberar recursos.</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity" aria-labelledby="prediction-title">
+          <h3 id="prediction-title">Predice · ¿qué representa mejor un socket?</h3>
+          <p class="activity-instruction">Selecciona la afirmación que mejor conecta lo aprendido en 1.1 con lo que empezaremos a programar en 1.2.</p>
+          <div class="prediction" id="socketPrediction">
+            <label><input type="radio" name="socketPrediction" value="a"> Un socket es únicamente una dirección IP escrita dentro del programa.</label>
+            <label><input type="radio" name="socketPrediction" value="b"> Un socket es una interfaz de comunicación que una aplicación utiliza para enviar o recibir datos a través de servicios de red.</label>
+            <label><input type="radio" name="socketPrediction" value="c"> Un socket reemplaza a TCP y UDP, por lo que ya no es necesario seleccionar un transporte.</label>
+          </div>
+          <div class="action-row"><button class="btn" id="checkPrediction" type="button">Comprobar</button><button class="btn light" id="resetPrediction" type="button">Reintentar</button></div>
+          <div class="feedback" id="predictionFeedback" role="status" aria-live="polite">Haz tu predicción antes de continuar. Piensa en la relación entre aplicación, sistema operativo y transporte.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="telecom" aria-labelledby="telecom-title">
+      <div class="band">
+        <div class="section-head">
+          <div class="section-code">APLICACIÓN</div>
+          <div><h2 id="telecom-title">¿Dónde utilizaremos sockets en Telecomunicaciones?</h2><p class="lead">Los sockets aparecen cuando necesitamos construir software que intercambia información directamente con servicios, equipos, sensores o aplicaciones distribuidas.</p></div>
+        </div>
+        <div class="why-grid">
+          <div>
+            <ul class="concept-list">
+              <li><strong>Herramientas de monitoreo</strong>Clientes que consultan el estado de servicios o reciben información desde dispositivos remotos.</li>
+              <li><strong>Telemetría</strong>Equipos que envían mediciones periódicas hacia un colector central.</li>
+              <li><strong>Control y automatización</strong>Aplicaciones que transmiten órdenes y esperan respuestas de otros procesos.</li>
+              <li><strong>Pruebas de servicios</strong>Programas que permiten observar cómo responde un puerto o servicio de red bajo condiciones controladas.</li>
+            </ul>
+          </div>
+          <div class="scenario-board">
+            <h3>Caso profesional de entrada</h3>
+            <p>Un NOC necesita una herramienta propia para recibir eventos desde varios sitios y, cuando sea necesario, consultar información adicional de un equipo remoto.</p>
+            <div class="scenario-chain" role="img" aria-label="Sitios remotos enviando información a una aplicación del centro de operaciones">
+              <div class="scenario-box"><strong>Sitios remotos</strong><span>Generan eventos o responden consultas</span></div>
+              <div class="scenario-arrow" aria-hidden="true">⇄</div>
+              <div class="scenario-box"><strong>Red IP</strong><span>Transporta la comunicación</span></div>
+              <div class="scenario-arrow" aria-hidden="true">⇄</div>
+              <div class="scenario-box"><strong>Aplicación NOC</strong><span>Recibe, procesa y visualiza</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity" aria-labelledby="case-question-title">
+          <h3 id="case-question-title">Explora · ¿qué problemas deberá resolver el programa?</h3>
+          <p class="activity-instruction">Marca las situaciones que realmente pertenecen al diseño de una aplicación de red basada en sockets.</p>
+          <div class="prediction" id="caseOptions">
+            <label><input type="checkbox" value="create"> Crear y configurar el punto de comunicación correcto.</label>
+            <label><input type="checkbox" value="data"> Definir cómo enviar, recibir e interpretar los datos.</label>
+            <label><input type="checkbox" value="errors"> Gestionar desconexiones, excepciones y tiempos de espera.</label>
+            <label><input type="checkbox" value="clients"> Decidir qué ocurre si varios clientes necesitan atención.</label>
+            <label><input type="checkbox" value="wallpaper"> Seleccionar el fondo de pantalla del computador del operador.</label>
+          </div>
+          <div class="action-row"><button class="btn" id="checkCase" type="button">Comprobar</button><button class="btn light" id="resetCase" type="button">Reintentar</button></div>
+          <div class="feedback" id="caseFeedback" role="status" aria-live="polite">Selecciona las decisiones que afectan directamente al comportamiento de la aplicación de red.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="subtemas" aria-labelledby="subtemas-title">
+      <div class="band">
+        <div class="section-head">
+          <div class="section-code">RECORRIDO</div>
+          <div><h2 id="subtemas-title">Subtemas del Tema 1.2</h2><p class="lead">El tema se desarrollará desde la creación de un socket hasta la atención básica de múltiples clientes. Cada HTML profundizará únicamente el contenido correspondiente.</p></div>
+        </div>
+        <div class="subtopics">
+          <article class="subtopic-card">
+            <div class="subtopic-top"><div class="badge">1.2.1</div><div><h3>Creación y configuración de sockets</h3><p>Qué es un socket desde el programa, cómo se crea y qué parámetros básicos determinan su comportamiento.</p></div></div>
+            <div class="goal"><strong>Pregunta central:</strong> ¿qué necesita definir una aplicación antes de poder comunicarse?</div>
+            <a class="btn" href="tema-1-2-1-creacion-configuracion-sockets.html">Ir al subtema 1.2.1</a>
+          </article>
+          <article class="subtopic-card">
+            <div class="subtopic-top"><div class="badge">1.2.2</div><div><h3>Aplicaciones cliente-servidor con TCP</h3><p>Secuencia de conexión, escucha, aceptación y comunicación entre procesos utilizando TCP.</p></div></div>
+            <div class="goal"><strong>Pregunta central:</strong> ¿cómo se construye una comunicación cliente-servidor orientada a conexión?</div>
+            <a class="btn" href="tema-1-2-2-cliente-servidor-tcp.html">Ir al subtema 1.2.2</a>
+          </article>
+          <article class="subtopic-card">
+            <div class="subtopic-top"><div class="badge">1.2.3</div><div><h3>Comunicación mediante UDP</h3><p>Envío y recepción de datagramas sin establecer previamente una conexión entre los procesos.</p></div></div>
+            <div class="goal"><strong>Pregunta central:</strong> ¿cómo cambia el flujo del programa cuando trabajamos con datagramas?</div>
+            <a class="btn" href="tema-1-2-3-comunicacion-udp.html">Ir al subtema 1.2.3</a>
+          </article>
+          <article class="subtopic-card">
+            <div class="subtopic-top"><div class="badge">1.2.4</div><div><h3>Envío, recepción y estructuración de datos</h3><p>Cómo convertir información de la aplicación en datos transmisibles y cómo reconstruirlos en el destino.</p></div></div>
+            <div class="goal"><strong>Pregunta central:</strong> ¿qué debe ocurrir entre los datos de la aplicación y los bytes que viajan por la red?</div>
+            <a class="btn" href="tema-1-2-4-envio-recepcion-estructuracion-datos.html">Ir al subtema 1.2.4</a>
+          </article>
+          <article class="subtopic-card">
+            <div class="subtopic-top"><div class="badge">1.2.5</div><div><h3>Conexiones, excepciones y tiempos de espera</h3><p>Qué hacer cuando el destino no responde, una conexión se interrumpe o una operación tarda más de lo esperado.</p></div></div>
+            <div class="goal"><strong>Pregunta central:</strong> ¿cómo evitar que una aplicación de red dependa de que todo funcione siempre?</div>
+            <a class="btn" href="tema-1-2-5-conexiones-excepciones-timeout.html">Ir al subtema 1.2.5</a>
+          </article>
+          <article class="subtopic-card">
+            <div class="subtopic-top"><div class="badge">1.2.6</div><div><h3>Atención básica de múltiples clientes</h3><p>Introducción a la necesidad de atender más de una comunicación sin bloquear completamente el servicio.</p></div></div>
+            <div class="goal"><strong>Pregunta central:</strong> ¿qué ocurre cuando varios clientes necesitan utilizar el servidor?</div>
+            <a class="btn" href="tema-1-2-6-atencion-multiples-clientes.html">Ir al subtema 1.2.6</a>
+          </article>
+        </div>
+        <div class="scope-note"><strong>Delimitación:</strong> esta página introduce el mapa del Tema 1.2. La implementación y los ejercicios de programación se desarrollarán en los subtemas. No se adelantan aquí mecanismos avanzados de concurrencia ni arquitecturas de alto rendimiento.</div>
+        <div class="bottom-nav"><a class="btn light" href="tema-1-1-fundamentos-programacion-aplicada-redes.html">← Tema 1.1</a><a class="btn" href="tema-1-2-1-creacion-configuracion-sockets.html">Comenzar 1.2.1 →</a></div>
+      </div>
+    </section>
+
+    <section id="reflexion" aria-labelledby="reflexion-title">
+      <div class="band">
+        <div class="section-head">
+          <div class="section-code">REFLEXIÓN</div>
+          <div><h2 id="reflexion-title">Antes de escribir el primer socket</h2><p class="lead">Conecta lo aprendido en 1.1 con el nuevo tema. La programación será más sencilla si primero puedes describir el flujo de comunicación.</p></div>
+        </div>
+        <div class="reflection-grid">
+          <div>
+            <h3>Pregunta de cierre</h3>
+            <p>Imagina que debes crear una aplicación que consulte un servicio remoto. ¿Qué etapas debería atravesar el programa desde que inicia hasta que termina la comunicación?</p>
+            <p class="storage-note">La reflexión se guarda únicamente en este navegador mediante almacenamiento local. No se transmite información.</p>
+          </div>
+          <div>
+            <label for="reflectionText"><strong>Escribe tu explicación inicial</strong></label>
+            <textarea id="reflectionText" placeholder="Describe con tus palabras el flujo que debería seguir la aplicación..."></textarea>
+            <div class="action-row" style="margin-top:.8rem"><button class="btn" id="saveReflection" type="button">Guardar reflexión</button><a class="btn light" href="tema-1-2-1-creacion-configuracion-sockets.html">Continuar a 1.2.1</a></div>
+            <div class="feedback" id="reflectionFeedback" role="status" aria-live="polite">Aún no se ha guardado una reflexión.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="referencias" aria-labelledby="referencias-title">
+      <div class="band">
+        <div class="section-head">
+          <div class="section-code">ALCANCE</div>
+          <div><h2 id="referencias-title">Referencias y delimitación</h2><p class="lead">Este recurso introduce la lógica general de la programación de sockets. Los detalles de implementación aparecerán de forma progresiva en cada subtema.</p></div>
+        </div>
+        <div class="references">
+          <ul>
+            <li>Kurose, J. F. y Ross, K. W. <em>Redes de computadoras: un enfoque descendente</em>. Aplicaciones de red y programación con sockets.</li>
+            <li>Tanenbaum, A. S. y Wetherall, D. J. <em>Redes de computadoras</em>. Servicios de transporte y comunicación entre procesos.</li>
+            <li>Documentación oficial de Python. Biblioteca estándar <em>socket</em>, utilizada posteriormente como referencia técnica para las prácticas.</li>
+          </ul>
+          <p><strong>No se desarrolla todavía:</strong> código completo cliente-servidor, concurrencia avanzada, selectores, programación asíncrona ni optimización de servidores. Se introducirán solo cuando correspondan al programa.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="band"><span>Programación de Redes: Protocolos y APIs · Aula interactiva</span><span>Tema 1.2 · Programación de sockets TCP y UDP</span></div></footer>
+
+  <script>
+    (function(){
+      "use strict";
+      const prediction = document.getElementById("socketPrediction");
+      const predictionFeedback = document.getElementById("predictionFeedback");
+      document.getElementById("checkPrediction").addEventListener("click", function(){
+        const selected = prediction.querySelector('input[name="socketPrediction"]:checked');
+        predictionFeedback.classList.remove("success","warn");
+        if(!selected){predictionFeedback.classList.add("warn");predictionFeedback.textContent="Selecciona una opción. Recuerda que TCP o UDP siguen siendo servicios de transporte; el socket es la interfaz que utiliza la aplicación para acceder a ellos.";return;}
+        if(selected.value === "b"){predictionFeedback.classList.add("success");predictionFeedback.textContent="Correcto. El socket actúa como interfaz de comunicación para el proceso. A través de él, la aplicación utiliza los servicios de red y de transporte para intercambiar datos con otro proceso.";return;}
+        predictionFeedback.classList.add("warn");
+        predictionFeedback.textContent = selected.value === "a" ? "Revisa la idea: una dirección IP puede formar parte de la información de destino, pero no define por sí sola un socket ni sus operaciones de comunicación." : "Revisa la idea: el socket no sustituye a TCP o UDP. El programa crea y utiliza sockets configurados para trabajar con el tipo de transporte requerido.";
+      });
+      document.getElementById("resetPrediction").addEventListener("click", function(){prediction.querySelectorAll('input[type="radio"]').forEach(function(input){input.checked=false;});predictionFeedback.classList.remove("success","warn");predictionFeedback.textContent="Haz tu predicción antes de continuar. Piensa en la relación entre aplicación, sistema operativo y transporte.";});
+
+      const caseOptions = document.getElementById("caseOptions");
+      const caseFeedback = document.getElementById("caseFeedback");
+      document.getElementById("checkCase").addEventListener("click", function(){
+        const selected = Array.from(caseOptions.querySelectorAll('input[type="checkbox"]:checked')).map(function(input){return input.value;});
+        const required = ["create","data","errors","clients"];
+        const complete = required.every(function(value){return selected.includes(value);});
+        const distractor = selected.includes("wallpaper");
+        caseFeedback.classList.remove("success","warn");
+        if(selected.length === 0){caseFeedback.classList.add("warn");caseFeedback.textContent="Selecciona al menos una opción. Concéntrate en decisiones que afectan la comunicación y el comportamiento del programa.";return;}
+        if(complete && !distractor){caseFeedback.classList.add("success");caseFeedback.textContent="Correcto. Has identificado los cuatro problemas que estructuran el Tema 1.2: crear/configurar la comunicación, intercambiar datos, manejar fallos y atender más de un cliente cuando sea necesario.";return;}
+        caseFeedback.classList.add("warn");
+        caseFeedback.textContent = distractor ? "Revisa la selección. El fondo de pantalla no forma parte de la lógica de comunicación. Busca las decisiones que cambian el comportamiento del socket y de la aplicación." : "Vas por buen camino, pero falta al menos una dimensión del problema. Pregúntate qué ocurre con los datos, con los errores y con varios clientes además de crear el socket.";
+      });
+      document.getElementById("resetCase").addEventListener("click", function(){caseOptions.querySelectorAll('input[type="checkbox"]').forEach(function(input){input.checked=false;});caseFeedback.classList.remove("success","warn");caseFeedback.textContent="Selecciona las decisiones que afectan directamente al comportamiento de la aplicación de red.";});
+
+      const reflectionText = document.getElementById("reflectionText");
+      const reflectionFeedback = document.getElementById("reflectionFeedback");
+      const storageKey = "programacion-redes-tema-1-2-reflexion";
+      try{const saved=localStorage.getItem(storageKey);if(saved){reflectionText.value=saved;reflectionFeedback.classList.add("success");reflectionFeedback.textContent="Se recuperó la reflexión guardada previamente en este navegador.";}}catch(error){reflectionFeedback.classList.add("warn");reflectionFeedback.textContent="El navegador no permitió acceder al almacenamiento local. Puedes completar la reflexión sin guardarla.";}
+      document.getElementById("saveReflection").addEventListener("click", function(){
+        const value=reflectionText.value.trim();reflectionFeedback.classList.remove("success","warn");
+        if(value.length<25){reflectionFeedback.classList.add("warn");reflectionFeedback.textContent="Amplía un poco la explicación. Intenta mencionar preparación del socket, comunicación de datos y cierre o manejo de problemas.";return;}
+        try{localStorage.setItem(storageKey,value);reflectionFeedback.classList.add("success");reflectionFeedback.textContent="Reflexión guardada únicamente en este navegador.";}catch(error){reflectionFeedback.classList.add("warn");reflectionFeedback.textContent="No fue posible guardar en el almacenamiento local. Tu texto permanece visible mientras mantengas abierta la página.";}
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,807 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Subtema 1.2.6: atención básica de múltiples clientes en servidores TCP con Python.">
+<meta name="theme-color" content="#10212a">
+<title>1.2.6 | Atención básica de múltiples clientes</title>
+<style>
+:root{
+  --ink:#18212a;--muted:#586775;--line:#cbd5dc;--soft:#f3f6f8;--paper:#fff;
+  --cyan:#007c91;--cyan-dark:#005b6a;--cyan-light:#6ed2e2;
+  --green:#16734a;--green-soft:#e8f5ee;--amber:#8a5600;--amber-soft:#fff3d8;
+  --red:#9b2c2c;--red-soft:#fdecec;--focus:#005fcc;
+  --navy:#10212a;--navy-deep:#07141a;--max:1180px;--radius:8px;
+  --shadow:0 16px 38px rgba(24,33,42,.08)
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-width:280px;color:var(--ink);background:var(--paper);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55;overflow-x:hidden}
+img,svg,canvas,video{display:block;max-width:100%}
+button,input,select,textarea{font:inherit;max-width:100%}
+button,input[type="checkbox"],input[type="radio"]{cursor:pointer}
+a{color:var(--cyan-dark)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}
+.skip-link:focus{top:1rem}
+header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.header-inner{width:min(100%,var(--max));min-height:66px;margin:0 auto;padding:.55rem 1.25rem;display:flex;gap:1rem;align-items:center;min-width:0}
+.brand{min-width:190px}.brand strong{display:block;font-size:.95rem}.brand span{display:block;color:var(--muted);font-size:.78rem}
+.nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}
+nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+nav a{color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;border-bottom:2px solid transparent;font-size:.84rem}
+nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+.top-link{flex:0 0 auto;text-decoration:none;border:1px solid var(--line);border-radius:5px;padding:.48rem .72rem;color:var(--ink);font-weight:750;white-space:nowrap;background:#fff}
+.top-link:hover{border-color:var(--cyan);color:var(--cyan-dark)}
+main{overflow:hidden}
+section{scroll-margin-top:84px;border-bottom:1px solid var(--line)}
+.band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+.hero{min-height:calc(100svh - 66px);display:grid;align-items:center;background:var(--navy);color:#fff}
+.hero-grid{width:min(100%,var(--max));margin:0 auto;padding:3.4rem 1.25rem;display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:3rem;align-items:center}
+.hero-grid>*{min-width:0}.eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+h1{font-size:clamp(2rem,5vw,4.35rem);line-height:1.02;margin:.65rem 0 1.15rem;max-width:18ch;overflow-wrap:normal;word-break:normal;hyphens:none}
+h2{font-size:clamp(1.75rem,3.3vw,2.8rem);line-height:1.12;margin:0 0 .8rem;overflow-wrap:normal;word-break:normal;hyphens:none}
+h3{font-size:1.22rem;margin:0 0 .55rem}
+p{max-width:72ch}.hero p{color:#d7e5ea;font-size:1.08rem}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}.hero-actions{margin-top:1.45rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cyan-dark);background:var(--cyan);color:#fff;text-decoration:none;padding:.72rem 1rem;border-radius:5px;font-weight:750}
+.btn:hover{background:var(--cyan-dark)}.btn.secondary{background:transparent;color:inherit;border-color:currentColor}.btn.secondary:hover{background:rgba(255,255,255,.1)}
+.btn.light{background:#fff;color:var(--ink);border-color:var(--line)}.btn.light:hover{background:var(--soft);color:var(--cyan-dark)}
+.hero-board{background:var(--navy-deep);border:1px solid #3b5965;border-radius:8px;padding:1.25rem}
+.hero-board h3{color:#fff}.hero-board p{color:#b8cbd2}
+.server-visual{display:grid;grid-template-columns:minmax(0,.9fr) 82px minmax(0,1.1fr);gap:.8rem;align-items:center;margin-top:1rem}
+.clients{display:grid;gap:.55rem}.client,.server-box{background:#102a35;border:1px solid #48616b;border-radius:7px;padding:.8rem;min-width:0}
+.client strong,.server-box strong{display:block}.client small,.server-box small{display:block;color:#bfd1d7;margin-top:.2rem}
+.arrow-stack{display:grid;gap:.4rem;text-align:center;color:var(--cyan-light);font-weight:900}
+.thread-list{display:grid;gap:.4rem;margin-top:.7rem}.thread-pill{padding:.45rem .55rem;border:1px solid #425e69;border-radius:5px;color:#dce9ed}
+.section-head{display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem}.section-head>*{min-width:0}
+.section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}.lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+.outcomes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}.outcome:last-child{border-right:0}.outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+.scope-note,.callout{margin-top:1.4rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}
+.concept-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+.concept-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.15rem;background:#fff;box-shadow:var(--shadow)}
+.tag{display:inline-block;font-size:.76rem;font-weight:850;color:var(--cyan-dark);background:#d9eef2;padding:.2rem .45rem;border-radius:999px;margin-bottom:.55rem}
+.concept-card p{color:var(--muted);font-size:.94rem}.concept-card ul{padding-left:1.2rem;margin-bottom:0}
+.activity{margin-top:1.5rem;padding:1.35rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--soft);min-width:0}
+.activity h3{margin-top:0}.activity-instruction{color:var(--muted);margin-top:0}
+.prediction,.decision-list{display:grid;gap:.6rem;margin:.85rem 0 1rem}
+.prediction label,.decision-list label{display:block;padding:.75rem .8rem;background:#fff;border:1px solid var(--line);border-radius:5px}
+.prediction input,.decision-list input{margin-right:.45rem}
+.feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}
+.feedback.success{background:var(--green-soft);border-color:var(--green)}
+.feedback.warn{background:var(--amber-soft);border-color:var(--amber)}
+.feedback.error{background:var(--red-soft);border-color:var(--red)}
+.lab-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:1rem}.lab-grid>*{min-width:0}
+.lab-panel{border:1px solid var(--line);border-radius:7px;background:#fff;padding:1rem}.lab-panel label{display:block;font-weight:750;margin:.75rem 0 .3rem}
+.lab-panel select,.lab-panel input{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+.timeline{display:grid;gap:.65rem;margin-top:.9rem}.time-row{display:grid;grid-template-columns:92px minmax(0,1fr);gap:.65rem;align-items:center;min-width:0}
+.time-label{font-weight:800;color:var(--cyan-dark);font-size:.86rem}.time-track{position:relative;min-height:38px;background:var(--soft);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.time-block{position:absolute;top:5px;height:26px;border-radius:4px;background:var(--cyan);color:#fff;font-size:.76rem;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 .35rem;white-space:nowrap;overflow:hidden}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;margin-top:1rem}.stat{padding:.7rem;border:1px solid var(--line);border-radius:6px;background:#fff;min-width:0}.stat span{display:block;color:var(--muted);font-size:.74rem;text-transform:uppercase;font-weight:800}.stat strong{display:block;margin-top:.15rem}
+.code-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.code-card{min-width:0;background:#09161d;color:#dce9ed;border:1px solid #314b56;border-radius:7px;padding:1rem}.code-card h3{color:#fff}
+.code-block{overflow-x:auto;margin:.75rem 0;background:#061016;border:1px solid #253c47;border-radius:6px;padding:1rem}.code-block code{white-space:pre}.code-note{color:#bfd1d7}
+.table-wrap{overflow-x:auto;margin-top:1.2rem;border:1px solid var(--line);border-radius:7px}table{border-collapse:collapse;width:100%;min-width:720px}th,td{padding:.8rem;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}th{background:var(--soft)}
+.exercise-box{border:1px solid var(--line);border-radius:8px;overflow:hidden}.exercise-head{padding:1rem 1.1rem;background:var(--navy);color:#fff}.exercise-head span{display:block;color:var(--cyan-light);font-size:.78rem;font-weight:850;text-transform:uppercase}
+.exercise-body{padding:1.1rem}.solution-steps{display:grid;gap:.75rem}.solution-step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:.8rem;align-items:start}.solution-step>b{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#d9eef2;color:var(--cyan-dark)}
+.practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.practice-card{border:1px solid var(--line);border-radius:7px;padding:1rem;min-width:0}.practice-card select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.mini-feedback{margin-top:.75rem;padding:.75rem;border-left:4px solid var(--cyan);background:var(--soft);min-height:4rem}
+.case-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}.case-grid label{display:block;font-weight:750}.case-grid select{width:100%;margin-top:.3rem;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.quiz{display:grid;gap:1rem}.quiz-card{border:1px solid var(--line);border-radius:7px;padding:1rem}.quiz-card fieldset{border:0;padding:0;margin:0}.quiz-card legend{font-weight:800;margin-bottom:.7rem}.quiz-card label{display:block;padding:.5rem .55rem;border-radius:4px}.quiz-card label:hover{background:var(--soft)}
+.score{margin-top:1rem;padding:1rem;border:1px solid var(--line);border-radius:6px;background:var(--soft);font-weight:800}
+.reflection-box textarea{width:100%;min-height:145px;resize:vertical;padding:.8rem;border:1px solid var(--line);border-radius:6px}
+.references{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.ref-card{border-top:4px solid var(--cyan);padding:1rem;background:var(--soft)}
+.bottom-nav{margin-top:2rem;display:flex;justify-content:space-between;gap:.7rem;flex-wrap:wrap}
+footer{background:var(--navy-deep);color:#c7d8de}.footer-inner{width:min(100%,var(--max));margin:0 auto;padding:1.4rem 1.25rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.progress-wrap{position:fixed;right:1rem;bottom:1rem;z-index:20;background:rgba(7,20,26,.93);color:#fff;padding:.45rem .7rem;border-radius:999px;font-size:.78rem;border:1px solid #3b5965}
+@media(max-width:900px){
+  .hero-grid,.section-head,.lab-grid,.code-grid{grid-template-columns:1fr}
+  .concept-grid,.outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .outcome:nth-child(2){border-right:0}.outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .practice-grid,.case-grid{grid-template-columns:1fr}
+  .server-visual{grid-template-columns:1fr}.arrow-stack{grid-auto-flow:column;justify-content:center}
+}
+@media(max-width:600px){
+  .header-inner{padding-inline:.8rem}.brand{min-width:145px}.top-link{padding:.45rem .6rem}
+  .band,.hero-grid{padding-left:.9rem;padding-right:.9rem}
+  h1{font-size:clamp(2rem,10vw,2.85rem);max-width:none}
+  .concept-grid,.outcomes,.stats,.references{grid-template-columns:1fr}
+  .outcome{border-right:0;border-bottom:1px solid var(--line)}.outcome:last-child{border-bottom:0}
+  .time-row{grid-template-columns:1fr}.time-label{margin-top:.2rem}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <strong>Programación de Redes</strong>
+      <span>Protocolos y APIs</span>
+    </div>
+    <div class="nav-scroll" aria-label="Navegación del subtema">
+      <nav>
+        <a href="#inicio">Inicio</a>
+        <a href="#orientacion">Cómo trabajar</a>
+        <a href="#conceptos">Conceptos</a>
+        <a href="#predice">Predice</a>
+        <a href="#experimenta">Experimenta</a>
+        <a href="#codigo">Código</a>
+        <a href="#resuelto">Ejercicio resuelto</a>
+        <a href="#practica">Practica</a>
+        <a href="#caso">Caso profesional</a>
+        <a href="#comprueba">Comprueba</a>
+        <a href="#reflexiona">Reflexión</a>
+      </nav>
+    </div>
+    <a class="top-link" href="index.html">← Curso</a>
+  </div>
+</header>
+
+<main id="contenido">
+<section class="hero" id="inicio">
+  <div class="hero-grid">
+    <div>
+      <div class="eyebrow">Bloque 1 · Tema 1.2 · Subtema 1.2.6</div>
+      <h1>Atención básica de múltiples clientes</h1>
+      <p>Un servidor real rara vez recibe una sola conexión. En este subtema compararás un servidor secuencial con un modelo concurrente básico y aprenderás a delegar cada conexión TCP a un hilo de atención.</p>
+      <div class="hero-actions">
+        <a class="btn" href="#orientacion">Comenzar recorrido</a>
+        <a class="btn secondary" href="tema-1-2-programacion-sockets-tcp-udp.html">Volver al Tema 1.2</a>
+      </div>
+    </div>
+    <div class="hero-board" role="img" aria-label="Tres clientes conectándose a un servidor que delega cada conexión a un hilo">
+      <h3>De una fila de espera a varias atenciones</h3>
+      <p>Modelo didáctico: cada conexión aceptada puede ser entregada a una función de atención independiente.</p>
+      <div class="server-visual">
+        <div class="clients">
+          <div class="client"><strong>Cliente A</strong><small>Consulta de estado</small></div>
+          <div class="client"><strong>Cliente B</strong><small>Lectura de alarma</small></div>
+          <div class="client"><strong>Cliente C</strong><small>Solicitud de inventario</small></div>
+        </div>
+        <div class="arrow-stack" aria-hidden="true"><span>→</span><span>→</span><span>→</span></div>
+        <div class="server-box">
+          <strong>Servidor TCP</strong>
+          <small>Socket de escucha + accept()</small>
+          <div class="thread-list">
+            <div class="thread-pill">Hilo A · atiende cliente A</div>
+            <div class="thread-pill">Hilo B · atiende cliente B</div>
+            <div class="thread-pill">Hilo C · atiende cliente C</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="orientacion">
+  <div class="band">
+    <div class="section-head">
+      <div class="section-code">Cómo trabajar este tema</div>
+      <div>
+        <h2>Primero comprende el problema; después añade concurrencia</h2>
+        <p class="lead">No se trata de “poner hilos” por costumbre. La pregunta es qué ocurre cuando una conexión tarda y existen otros clientes esperando servicio.</p>
+      </div>
+    </div>
+    <div class="outcomes">
+      <div class="outcome"><b>1. Distinguir</b> servidor secuencial y servidor concurrente básico.</div>
+      <div class="outcome"><b>2. Interpretar</b> el papel del socket de escucha y del socket conectado.</div>
+      <div class="outcome"><b>3. Implementar</b> una estrategia básica de un hilo por cliente.</div>
+      <div class="outcome"><b>4. Justificar</b> cuándo esta solución es suficiente y cuándo deja de escalar.</div>
+    </div>
+    <div class="scope-note"><strong>Alcance.</strong> Usaremos <code>threading</code> como primera estrategia didáctica de concurrencia. No entraremos todavía en <code>asyncio</code>, pools de trabajadores, multiproceso ni arquitecturas de alta escala.</div>
+  </div>
+</section>
+
+<section id="conceptos">
+  <div class="band">
+    <div class="section-head">
+      <div class="section-code">Explora</div>
+      <div>
+        <h2>¿Qué cambia cuando llegan varios clientes?</h2>
+        <p class="lead">El socket de escucha sigue aceptando conexiones. Lo que cambia es qué hacemos con cada socket conectado después de <code>accept()</code>.</p>
+      </div>
+    </div>
+
+    <div class="concept-grid">
+      <article class="concept-card">
+        <span class="tag">Secuencial</span>
+        <h3>Uno después de otro</h3>
+        <p>El servidor acepta un cliente, lo atiende completamente y recién después vuelve a aceptar o atender al siguiente.</p>
+      </article>
+      <article class="concept-card">
+        <span class="tag">Concurrente</span>
+        <h3>Atenciones solapadas</h3>
+        <p>El servidor puede mantener varias conexiones activas y avanzar con más de una atención durante el mismo intervalo.</p>
+      </article>
+      <article class="concept-card">
+        <span class="tag">Hilo</span>
+        <h3>Una función de atención</h3>
+        <p>Una estrategia inicial consiste en ejecutar la función que atiende al cliente dentro de un hilo independiente.</p>
+      </article>
+      <article class="concept-card">
+        <span class="tag">Límite</span>
+        <h3>No escala indefinidamente</h3>
+        <p>Crear un hilo por cliente simplifica el aprendizaje, pero cada hilo consume recursos. Para alta escala existen otros modelos.</p>
+      </article>
+    </div>
+
+    <div class="callout"><strong>Concurrencia no significa necesariamente paralelismo.</strong> En este contexto importa que una conexión que está esperando E/S de red no impida que el servidor progrese con otras conexiones.</div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Elemento</th><th>Servidor secuencial</th><th>Servidor con hilos</th></tr></thead>
+        <tbody>
+          <tr><td>Socket de escucha</td><td>Uno</td><td>Uno</td></tr>
+          <tr><td><code>accept()</code></td><td>Entrega una conexión</td><td>Entrega una conexión</td></tr>
+          <tr><td>Atención del cliente</td><td>En el mismo flujo principal</td><td>Se delega a un hilo</td></tr>
+          <tr><td>Cliente lento</td><td>Puede retrasar a los siguientes</td><td>No necesariamente bloquea la atención de los demás</td></tr>
+          <tr><td>Complejidad</td><td>Menor</td><td>Mayor: hay concurrencia y recursos compartidos</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="predice">
+  <div class="band">
+    <div class="section-head">
+      <div class="section-code">Predice</div>
+      <div>
+        <h2>Un cliente tarda cinco segundos</h2>
+        <p class="lead">Imagina un servidor secuencial: el cliente A ya fue aceptado y tarda cinco segundos en completar su operación. Mientras tanto llegan B y C.</p>
+      </div>
+    </div>
+    <div class="activity">
+      <h3>¿Qué comportamiento esperas?</h3>
+      <div class="prediction">
+        <label><input type="radio" name="prediction" value="a"> B y C son atendidos inmediatamente por el mismo flujo secuencial.</label>
+        <label><input type="radio" name="prediction" value="b"> La atención de A puede retrasar el procesamiento de B y C.</label>
+        <label><input type="radio" name="prediction" value="c"> TCP cancela automáticamente al cliente A para liberar el servidor.</label>
+      </div>
+      <div class="action-row">
+        <button class="btn" id="checkPrediction" type="button">Comprobar</button>
+        <button class="btn light" id="resetPrediction" type="button">Reintentar</button>
+      </div>
+      <div class="feedback" id="predictionFeedback" aria-live="polite">Piensa dónde se ejecuta la función que atiende al cliente A.</div>
+    </div>
+  </div>
+</section>
+
+<section id="experimenta">
+  <div class="band">
+    <div class="section-head">
+      <div class="section-code">Experimenta</div>
+      <div>
+        <h2>Compara secuencial vs. concurrente</h2>
+        <p class="lead">Este simulador es un modelo didáctico. Representa tiempos de servicio conocidos para visualizar el efecto de atender uno por uno o delegar cada cliente a un hilo.</p>
+      </div>
+    </div>
+
+    <div class="activity">
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <h3>Configura el escenario</h3>
+          <label for="clientCount">Número de clientes</label>
+          <select id="clientCount">
+            <option value="3">3 clientes</option>
+            <option value="4">4 clientes</option>
+            <option value="5">5 clientes</option>
+          </select>
+
+          <label for="serviceTime">Tiempo de servicio por cliente</label>
+          <select id="serviceTime">
+            <option value="2">2 s</option>
+            <option value="4" selected>4 s</option>
+            <option value="6">6 s</option>
+          </select>
+
+          <label for="model">Modelo</label>
+          <select id="model">
+            <option value="sequential">Secuencial</option>
+            <option value="threaded">Un hilo por cliente</option>
+          </select>
+
+          <div class="action-row" style="margin-top:1rem">
+            <button class="btn" id="runSimulation" type="button">Simular</button>
+            <button class="btn light" id="resetSimulation" type="button">Restablecer</button>
+          </div>
+          <div class="feedback" id="simFeedback" aria-live="polite">Configura el escenario y simula.</div>
+        </div>
+
+        <div class="lab-panel">
+          <h3>Línea de tiempo conceptual</h3>
+          <div class="timeline" id="timeline" aria-live="polite">
+            <div class="time-row"><div class="time-label">Esperando</div><div class="time-track"></div></div>
+          </div>
+          <div class="stats">
+            <div class="stat"><span>Tiempo total</span><strong id="totalTime">—</strong></div>
+            <div class="stat"><span>Clientes</span><strong id="servedClients">—</strong></div>
+            <div class="stat"><span>Modelo</span><strong id="modelName">—</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="codigo">
+  <div class="band">
+    <div class="section-head">
+      <div class="section-code">Explica</div>
+      <div>
+        <h2>Una primera implementación con <code>threading</code></h2>
+        <p class="lead">La idea clave es separar el bucle que acepta conexiones de la función que conversa con cada cliente.</p>
+      </div>
+    </div>
+
+    <div class="code-grid">
+      <article class="code-card">
+        <h3>Servidor secuencial</h3>
+        <div class="code-block"><code>import socket
+
+with socket.socket(socket.AF_INET,
+                   socket.SOCK_STREAM) as server:
+    server.bind(("0.0.0.0", 5000))
+    server.listen()
+
+    while True:
+        conn, addr = server.accept()
+
+        with conn:
+            data = conn.recv(1024)
+            conn.sendall(b"OK")</code></div>
+        <p class="code-note">Mientras el bloque de atención no termine, el flujo principal no vuelve a ejecutar <code>accept()</code>.</p>
+      </article>
+
+      <article class="code-card">
+        <h3>Servidor con un hilo por cliente</h3>
+        <div class="code-block"><code>import socket
+import threading
+
+def atender_cliente(conn, addr):
+    with conn:
+        data = conn.recv(1024)
+        conn.sendall(b"OK")
+
+with socket.socket(socket.AF_INET,
+                   socket.SOCK_STREAM) as server:
+    server.bind(("0.0.0.0", 5000))
+    server.listen()
+
+    while True:
+        conn, addr = server.accept()
+
+        hilo = threading.Thread(
+            target=atender_cliente,
+            args=(conn, addr),
+            daemon=True
+        )
+        hilo.start()</code></div>
+        <p class="code-note">El hilo principal vuelve rápidamente a <code>accept()</code>, mientras otro hilo atiende la conexión aceptada.</p>
+      </article>
+    </div>
+
+    <div class="callout"><strong>Detalle importante:</strong> el socket <code>server</code> escucha nuevas conexiones; <code>conn</code> representa una conexión concreta con un cliente. No deben confundirse.</div>
+  </div>
+</section>
+
+<section id="resuelto">
+  <div class="band">
+    <div class="section-head">
+      <div class="section-code">Ejercicio resuelto</div>
+      <div>
+        <h2>Servidor de consulta para tres técnicos de campo</h2>
+        <p class="lead">Un servidor TCP recibe consultas que pueden tardar varios segundos porque debe obtener el estado de un equipo remoto.</p>
+      </div>
+    </div>
+
+    <div class="exercise-box">
+      <div class="exercise-head">
+        <span>Problema</span>
+        <h3>Tres técnicos consultan casi al mismo tiempo</h3>
+        <p>¿Qué modificación mínima permite que una consulta lenta no obligue a esperar a todas las demás?</p>
+      </div>
+      <div class="exercise-body">
+        <div class="solution-steps">
+          <div class="solution-step"><b>1</b><div><strong>Identificar el cuello de botella.</strong><br>En el servidor secuencial, la atención completa ocurre dentro del mismo flujo que acepta nuevas conexiones.</div></div>
+          <div class="solution-step"><b>2</b><div><strong>Separar responsabilidades.</strong><br>El bucle principal conserva <code>accept()</code>; la lógica de conversación se mueve a <code>atender_cliente()</code>.</div></div>
+          <div class="solution-step"><b>3</b><div><strong>Delegar la conexión.</strong><br>Después de cada <code>accept()</code>, se crea un hilo cuyo argumento es el socket conectado <code>conn</code>.</div></div>
+          <div class="solution-step"><b>4</b><div><strong>Cerrar correctamente.</strong><br>Cada función de atención administra su propio <code>conn</code> mediante <code>with conn:</code>.</div></div>
+          <div class="solution-step"><b>5</b><div><strong>Reconocer el límite.</strong><br>La estrategia es apropiada para una práctica y cargas pequeñas/moderadas, pero no implica que debamos crear hilos sin límite en un sistema de alta escala.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="practica">
+  <div class="band">
+    <div class="section-head">
+      <div class="section-code">Practica</div>
+      <div>
+        <h2>Decide qué harías en cada situación</h2>
+        <p class="lead">No memorices líneas de código: relaciona cada decisión con el comportamiento del servidor.</p>
+      </div>
+    </div>
+
+    <div class="practice-grid">
+      <article class="practice-card">
+        <h3>Ejercicio 1</h3>
+        <p>¿Qué objeto debe recibir la función que atiende a un cliente específico?</p>
+        <select id="p1">
+          <option value="">Selecciona…</option>
+          <option value="a">El socket devuelto por accept()</option>
+          <option value="b">Siempre el socket de escucha</option>
+          <option value="c">Solo la dirección IP como texto</option>
+        </select>
+        <button class="btn" id="checkP1" type="button" style="margin-top:.7rem">Comprobar</button>
+        <div class="mini-feedback" id="p1Feedback" aria-live="polite">Selecciona una respuesta.</div>
+      </article>
+
+      <article class="practice-card">
+        <h3>Ejercicio 2</h3>
+        <p>¿Qué debe hacer el hilo principal después de delegar una conexión?</p>
+        <select id="p2">
+          <option value="">Selecciona…</option>
+          <option value="a">Volver al bucle y aceptar nuevas conexiones</option>
+          <option value="b">Esperar siempre a que termine el hilo creado</option>
+          <option value="c">Cerrar inmediatamente el socket de escucha</option>
+        </select>
+        <button class="btn" id="checkP2" type="button" style="margin-top:.7rem">Comprobar</button>
+        <div class="mini-feedback" id="p2Feedback" aria-live="polite">Selecciona una respuesta.</div>
+      </article>
+
+      <article class="practice-card">
+        <h3>Ejercicio 3</h3>
+        <p>¿Qué afirmación describe mejor esta estrategia?</p>
+        <select id="p3">
+          <option value="">Selecciona…</option>
+          <option value="a">Es una solución didáctica simple, pero no debe crecer sin límite</option>
+          <option value="b">Escala de forma ilimitada para millones de clientes</option>
+          <option value="c">Elimina la necesidad de manejar errores de red</option>
+        </select>
+        <button class="btn" id="checkP3" type="button" style="margin-top:.7rem">Comprobar</button>
+        <div class="mini-feedback" id="p3Feedback" aria-live="polite">Selecciona una respuesta.</div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="caso">
+  <div class="band">
+    <div class="section-head">
+      <div class="section-code">Caso profesional</div>
+      <div>
+        <h2>Servidor de soporte para varias estaciones remotas</h2>
+        <p class="lead">Un NOC mantiene un servicio TCP al que se conectan pequeñas herramientas de diagnóstico desde distintas estaciones.</p>
+      </div>
+    </div>
+
+    <div class="activity">
+      <h3>Diseña una estrategia básica</h3>
+      <p class="activity-instruction">Selecciona las decisiones más coherentes para un servidor pequeño que debe seguir aceptando conexiones mientras otras están esperando datos.</p>
+      <div class="case-grid">
+        <label>Atención de cada conexión
+          <select id="caseHandling">
+            <option value="">Selecciona…</option>
+            <option value="thread">Delegar a una función ejecutada en un hilo</option>
+            <option value="block">Procesar todo en el bucle principal</option>
+          </select>
+        </label>
+        <label>Socket de escucha
+          <select id="caseListen">
+            <option value="">Selecciona…</option>
+            <option value="keep">Mantenerlo en el bucle accept()</option>
+            <option value="pass">Pasarlo como socket conectado a cada cliente</option>
+          </select>
+        </label>
+        <label>Política de crecimiento
+          <select id="caseScale">
+            <option value="">Selecciona…</option>
+            <option value="limit">Reconocer límites y controlar recursos</option>
+            <option value="unlimited">Crear hilos ilimitados sin supervisión</option>
+          </select>
+        </label>
+      </div>
+      <button class="btn" id="checkCase" type="button" style="margin-top:1rem">Evaluar diseño</button>
+      <div class="feedback" id="caseFeedback" aria-live="polite">Relaciona concurrencia con disponibilidad del servicio y uso responsable de recursos.</div>
+    </div>
+  </div>
+</section>
+
+<section id="comprueba">
+  <div class="band">
+    <div class="section-head">
+      <div class="section-code">Comprueba</div>
+      <div>
+        <h2>Integra lo aprendido</h2>
+        <p class="lead">Responde las cinco preguntas y revisa la explicación de cada una.</p>
+      </div>
+    </div>
+
+    <div class="quiz" id="quiz">
+      <article class="quiz-card">
+        <fieldset>
+          <legend>1. ¿Qué problema principal puede presentar un servidor TCP puramente secuencial?</legend>
+          <label><input type="radio" name="q1" value="a"> Un cliente lento puede retrasar el procesamiento de otros.</label>
+          <label><input type="radio" name="q1" value="b"> TCP deja de usar puertos.</label>
+          <label><input type="radio" name="q1" value="c"> accept() deja de devolver sockets.</label>
+        </fieldset>
+        <div class="mini-feedback" id="q1Feedback">Selecciona una respuesta.</div>
+      </article>
+
+      <article class="quiz-card">
+        <fieldset>
+          <legend>2. ¿Qué devuelve <code>accept()</code> además de la dirección del cliente?</legend>
+          <label><input type="radio" name="q2" value="a"> Un nuevo socket conectado para esa sesión.</label>
+          <label><input type="radio" name="q2" value="b"> Una copia del intérprete de Python.</label>
+          <label><input type="radio" name="q2" value="c"> Un paquete UDP.</label>
+        </fieldset>
+        <div class="mini-feedback" id="q2Feedback">Selecciona una respuesta.</div>
+      </article>
+
+      <article class="quiz-card">
+        <fieldset>
+          <legend>3. En el modelo de un hilo por cliente, ¿qué debe seguir haciendo el hilo principal?</legend>
+          <label><input type="radio" name="q3" value="a"> Aceptar nuevas conexiones.</label>
+          <label><input type="radio" name="q3" value="b"> Cerrar el servidor después de cada cliente.</label>
+          <label><input type="radio" name="q3" value="c"> Reutilizar el mismo socket conectado para todos.</label>
+        </fieldset>
+        <div class="mini-feedback" id="q3Feedback">Selecciona una respuesta.</div>
+      </article>
+
+      <article class="quiz-card">
+        <fieldset>
+          <legend>4. ¿Por qué <code>with conn:</code> es útil dentro de la función de atención?</legend>
+          <label><input type="radio" name="q4" value="a"> Ayuda a liberar el socket conectado al salir del bloque.</label>
+          <label><input type="radio" name="q4" value="b"> Convierte automáticamente TCP en UDP.</label>
+          <label><input type="radio" name="q4" value="c"> Crea un hilo adicional.</label>
+        </fieldset>
+        <div class="mini-feedback" id="q4Feedback">Selecciona una respuesta.</div>
+      </article>
+
+      <article class="quiz-card">
+        <fieldset>
+          <legend>5. ¿Cuál es una limitación importante del modelo “un hilo por cliente”?</legend>
+          <label><input type="radio" name="q5" value="a"> Los hilos consumen recursos y no deben crecer sin control.</label>
+          <label><input type="radio" name="q5" value="b"> Solo funciona con una dirección IP.</label>
+          <label><input type="radio" name="q5" value="c"> Impide usar excepciones y timeouts.</label>
+        </fieldset>
+        <div class="mini-feedback" id="q5Feedback">Selecciona una respuesta.</div>
+      </article>
+    </div>
+
+    <div class="action-row" style="margin-top:1rem">
+      <button class="btn" id="checkQuiz" type="button">Comprobar todo</button>
+      <button class="btn light" id="resetQuiz" type="button">Reintentar</button>
+    </div>
+    <div class="score" id="scoreBox" aria-live="polite">Aún no has comprobado la actividad.</div>
+  </div>
+</section>
+
+<section id="reflexiona">
+  <div class="band">
+    <div class="section-head">
+      <div class="section-code">Reflexión</div>
+      <div>
+        <h2>¿Cuándo dejaría de ser suficiente esta solución?</h2>
+        <p class="lead">Piensa en un servicio que pase de diez clientes concurrentes a miles. ¿Qué problemas de recursos, control y arquitectura anticiparías?</p>
+      </div>
+    </div>
+
+    <div class="reflection-box">
+      <textarea id="reflectionText" aria-label="Reflexión del estudiante" placeholder="Considera cantidad de conexiones, duración de cada sesión, memoria, número de hilos, monitoreo y necesidad de otros modelos de concurrencia..."></textarea>
+      <div class="action-row">
+        <button class="btn" id="saveReflection" type="button">Guardar en este navegador</button>
+        <button class="btn light" id="clearReflection" type="button">Borrar</button>
+      </div>
+      <p id="reflectionStatus" aria-live="polite">El texto no se transmite; si lo guardas, permanece únicamente en el almacenamiento local de este navegador.</p>
+    </div>
+
+    <div class="references" style="margin-top:2rem">
+      <article class="ref-card">
+        <h3>Referencias conceptuales</h3>
+        <p>Documentación oficial de Python sobre <code>socket</code> y <code>threading</code>. El código mostrado es deliberadamente básico para estudiar la arquitectura antes de introducir modelos más avanzados.</p>
+      </article>
+      <article class="ref-card">
+        <h3>Delimitación</h3>
+        <p>Este subtema cierra el Tema 1.2 con concurrencia básica. No aborda todavía <code>asyncio</code>, servidores asíncronos, pools de hilos, sincronización compleja ni diseño de sistemas de alta concurrencia.</p>
+      </article>
+    </div>
+
+    <div class="bottom-nav">
+      <a class="btn light" href="tema-1-2-5-manejo-conexiones-excepciones-timeout.html">← 1.2.5 Conexiones y timeout</a>
+      <a class="btn light" href="tema-1-2-programacion-sockets-tcp-udp.html">Volver al Tema 1.2</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div><strong>Programación de Redes: Protocolos y APIs</strong><br><span>Subtema 1.2.6 · Atención básica de múltiples clientes</span></div>
+    <div>Material interactivo · uso local</div>
+  </div>
+</footer>
+
+<div class="progress-wrap" aria-hidden="true">Recorrido <b id="progressValue">0%</b></div>
+
+<script>
+(() => {
+"use strict";
+const $ = id => document.getElementById(id);
+const setFeedback = (el,text,type="") => {
+  el.textContent=text;
+  el.className="feedback"+(type?" "+type:"");
+};
+const setMini = (el,text,ok=null) => {
+  el.textContent=text;
+  el.style.borderLeftColor=ok===true?"var(--green)":ok===false?"var(--red)":"var(--cyan)";
+  el.style.background=ok===true?"var(--green-soft)":ok===false?"var(--red-soft)":"var(--soft)";
+};
+
+$("checkPrediction").addEventListener("click",()=>{
+  const selected=document.querySelector('input[name="prediction"]:checked');
+  if(!selected) return setFeedback($("predictionFeedback"),"Selecciona primero una predicción.","warn");
+  if(selected.value==="b"){
+    setFeedback($("predictionFeedback"),"Correcto. Si la atención de A ocurre en el mismo flujo secuencial, ese trabajo puede retrasar el procesamiento de las conexiones que llegaron después.","success");
+  }else{
+    setFeedback($("predictionFeedback"),"Revisa el modelo secuencial: mientras el mismo flujo está ocupado atendiendo a A, no puede ejecutar simultáneamente la lógica de atención de B y C.","error");
+  }
+});
+$("resetPrediction").addEventListener("click",()=>{
+  document.querySelectorAll('input[name="prediction"]').forEach(r=>r.checked=false);
+  setFeedback($("predictionFeedback"),"Piensa dónde se ejecuta la función que atiende al cliente A.");
+});
+
+function buildTimeline(){
+  const n=Number($("clientCount").value);
+  const service=Number($("serviceTime").value);
+  const model=$("model").value;
+  const timeline=$("timeline");
+  timeline.innerHTML="";
+  const total=model==="sequential"?n*service:service;
+  for(let i=0;i<n;i++){
+    const row=document.createElement("div");
+    row.className="time-row";
+    const label=document.createElement("div");
+    label.className="time-label";
+    label.textContent=`Cliente ${String.fromCharCode(65+i)}`;
+    const track=document.createElement("div");
+    track.className="time-track";
+    const block=document.createElement("div");
+    block.className="time-block";
+    const start=model==="sequential"?i*service:0;
+    block.style.left=`${(start/total)*100}%`;
+    block.style.width=`${(service/total)*100}%`;
+    block.textContent=`${service}s`;
+    track.appendChild(block);
+    row.append(label,track);
+    timeline.appendChild(row);
+  }
+  $("totalTime").textContent=`${total} s`;
+  $("servedClients").textContent=String(n);
+  $("modelName").textContent=model==="sequential"?"Secuencial":"Un hilo por cliente";
+  if(model==="sequential"){
+    setFeedback($("simFeedback"),`En este modelo didáctico, ${n} clientes de ${service}s cada uno ocupan el flujo uno después de otro: tiempo total ${total}s.`,"warn");
+  }else{
+    setFeedback($("simFeedback"),`En el modelo idealizado con un hilo por cliente, las atenciones se solapan. El tiempo total conceptual queda determinado por la operación más lenta: ${service}s.`,"success");
+  }
+}
+$("runSimulation").addEventListener("click",buildTimeline);
+$("resetSimulation").addEventListener("click",()=>{
+  $("clientCount").value="3";
+  $("serviceTime").value="4";
+  $("model").value="sequential";
+  $("timeline").innerHTML='<div class="time-row"><div class="time-label">Esperando</div><div class="time-track"></div></div>';
+  $("totalTime").textContent="—";
+  $("servedClients").textContent="—";
+  $("modelName").textContent="—";
+  setFeedback($("simFeedback"),"Configura el escenario y simula.");
+});
+
+const practices=[
+  {select:"p1",button:"checkP1",feedback:"p1Feedback",answer:"a",
+   ok:"Correcto. accept() devuelve un socket conectado específico para la sesión que debe atenderse.",
+   bad:"Revisa la diferencia entre el socket que escucha y el socket conectado que devuelve accept()."},
+  {select:"p2",button:"checkP2",feedback:"p2Feedback",answer:"a",
+   ok:"Correcto. La ventaja del diseño es que el hilo principal puede volver pronto a accept() para recibir otras conexiones.",
+   bad:"Si el hilo principal espera obligatoriamente a cada hilo, se pierde el beneficio básico de concurrencia."},
+  {select:"p3",button:"checkP3",feedback:"p3Feedback",answer:"a",
+   ok:"Correcto. Es una estrategia clara para aprender y para cargas pequeñas o moderadas, pero el número de hilos debe controlarse.",
+   bad:"Los recursos son finitos: un hilo por cliente no debe interpretarse como una solución de escalabilidad ilimitada."}
+];
+practices.forEach(p=>{
+  $(p.button).addEventListener("click",()=>{
+    const value=$(p.select).value;
+    if(!value) return setMini($(p.feedback),"Selecciona primero una respuesta.",null);
+    setMini($(p.feedback),value===p.answer?p.ok:p.bad,value===p.answer);
+  });
+});
+
+$("checkCase").addEventListener("click",()=>{
+  const ok=$("caseHandling").value==="thread" &&
+           $("caseListen").value==="keep" &&
+           $("caseScale").value==="limit";
+  if(ok){
+    setFeedback($("caseFeedback"),"Diseño coherente. El socket de escucha permanece aceptando conexiones, cada socket conectado se delega y el crecimiento de recursos se considera explícitamente.","success");
+  }else{
+    setFeedback($("caseFeedback"),"Revisa las responsabilidades: el socket de escucha debe seguir aceptando, cada conexión necesita su propio manejo y los hilos no deben crecer sin control.","error");
+  }
+});
+
+const quizAnswers={q1:"a",q2:"a",q3:"a",q4:"a",q5:"a"};
+const quizExplanations={
+  q1:"En un servidor secuencial, un cliente lento puede ocupar el único flujo de atención y retrasar a quienes llegaron después.",
+  q2:"accept() devuelve un nuevo socket conectado y la dirección del cliente; el socket de escucha permanece disponible para nuevas conexiones.",
+  q3:"El hilo principal debe continuar aceptando conexiones mientras otros hilos atienden sesiones ya aceptadas.",
+  q4:"El gestor de contexto ayuda a cerrar el socket conectado incluso cuando la función termina por una excepción.",
+  q5:"Cada hilo consume recursos; por ello esta estrategia no debe crecer sin límites."
+};
+$("checkQuiz").addEventListener("click",()=>{
+  let score=0;
+  Object.keys(quizAnswers).forEach(q=>{
+    const selected=document.querySelector(`input[name="${q}"]:checked`);
+    const feedback=$(`${q}Feedback`);
+    const ok=selected&&selected.value===quizAnswers[q];
+    if(ok) score++;
+    setMini(feedback,selected?((ok?"Correcto. ":"Revisa. ")+quizExplanations[q]):"Falta responder esta pregunta.",ok);
+  });
+  $("scoreBox").textContent=`Resultado: ${score}/5. ${score===5?"Dominio sólido de la concurrencia básica con múltiples clientes.":"Revisa las explicaciones señaladas y vuelve a intentarlo."}`;
+});
+$("resetQuiz").addEventListener("click",()=>{
+  document.querySelectorAll('#quiz input[type="radio"]').forEach(r=>r.checked=false);
+  Object.keys(quizAnswers).forEach(q=>{
+    const el=$(`${q}Feedback`);
+    el.textContent="Selecciona una respuesta.";
+    el.style.borderLeftColor="var(--cyan)";
+    el.style.background="var(--soft)";
+  });
+  $("scoreBox").textContent="Aún no has comprobado la actividad.";
+});
+
+const storageKey="pr-redes-1-2-6-reflexion";
+try{
+  const saved=localStorage.getItem(storageKey);
+  if(saved) $("reflectionText").value=saved;
+}catch(_){}
+$("saveReflection").addEventListener("click",()=>{
+  try{
+    localStorage.setItem(storageKey,$("reflectionText").value);
+    $("reflectionStatus").textContent="Reflexión guardada únicamente en este navegador.";
+  }catch(_){
+    $("reflectionStatus").textContent="Este navegador no permitió guardar la reflexión localmente.";
+  }
+});
+$("clearReflection").addEventListener("click",()=>{
+  $("reflectionText").value="";
+  try{localStorage.removeItem(storageKey);}catch(_){}
+  $("reflectionStatus").textContent="Reflexión borrada del almacenamiento local.";
+});
+
+const sections=[...document.querySelectorAll("main section")];
+function updateProgress(){
+  const total=document.documentElement.scrollHeight-window.innerHeight;
+  const pct=total>0?Math.max(0,Math.min(100,Math.round((window.scrollY/total)*100))):100;
+  $("progressValue").textContent=pct+"%";
+  const marker=window.scrollY+window.innerHeight*.36;
+  let current=sections[0];
+  sections.forEach(s=>{if(s.offsetTop<=marker) current=s;});
+  document.querySelectorAll("nav a").forEach(a=>a.removeAttribute("aria-current"));
+  if(current&&current.id){
+    const link=document.querySelector(`nav a[href="#${current.id}"]`);
+    if(link) link.setAttribute("aria-current","location");
+  }
+}
+window.addEventListener("scroll",updateProgress,{passive:true});
+window.addEventListener("resize",updateProgress);
+updateProgress();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Subtema 1.2.1: creación y configuración de sockets con Python aplicada a redes y telecomunicaciones.">
+  <meta name="theme-color" content="#10212a">
+  <title>1.2.1 | Creación y configuración de sockets</title>
+  <style>
+    :root{
+      --ink:#18212a;--muted:#586775;--line:#cbd5dc;--soft:#f3f6f8;--paper:#ffffff;
+      --cyan:#007c91;--cyan-dark:#005b6a;--cyan-light:#6ed2e2;--green:#16734a;--green-soft:#e8f5ee;
+      --amber:#8a5600;--amber-soft:#fff3d8;--red:#9b2c2c;--red-soft:#fdecec;--focus:#005fcc;
+      --navy:#10212a;--navy-deep:#07141a;--max:1180px;--radius:8px;--shadow:0 16px 38px rgba(24,33,42,.08)
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;min-width:280px;color:var(--ink);background:var(--paper);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55;overflow-x:hidden}
+    img,svg,canvas,video{display:block;max-width:100%}
+    button,input,select,textarea{font:inherit;max-width:100%}
+    button,input[type="checkbox"],input[type="radio"]{cursor:pointer}
+    a{color:var(--cyan-dark)}
+    a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+    .skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}.skip-link:focus{top:1rem}
+    header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+    .header-inner{width:min(100%,var(--max));min-height:66px;margin:0 auto;padding:.55rem 1.25rem;display:flex;gap:1rem;align-items:center;min-width:0}
+    .brand{min-width:190px}.brand strong{display:block;font-size:.95rem}.brand span{display:block;color:var(--muted);font-size:.78rem}
+    .nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+    nav a{color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;border-bottom:2px solid transparent;font-size:.84rem}
+    nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+    .top-link{flex:0 0 auto;text-decoration:none;border:1px solid var(--line);border-radius:5px;padding:.48rem .72rem;color:var(--ink);font-weight:750;white-space:nowrap;background:#fff}.top-link:hover{border-color:var(--cyan);color:var(--cyan-dark)}
+    main{overflow:hidden}section{scroll-margin-top:84px;border-bottom:1px solid var(--line)}.band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+    .hero{min-height:calc(100svh - 66px);display:grid;align-items:center;background:var(--navy);color:#fff}
+    .hero-grid{width:min(100%,var(--max));margin:0 auto;padding:3.4rem 1.25rem;display:grid;grid-template-columns:minmax(0,.94fr) minmax(0,1.06fr);gap:3rem;align-items:center}.hero-grid>*{min-width:0}
+    .eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+    h1{font-size:clamp(2rem,5vw,4.5rem);line-height:1.02;margin:.65rem 0 1.15rem;max-width:18ch;overflow-wrap:normal;word-break:normal;hyphens:none}
+    h2{font-size:clamp(1.75rem,3.3vw,2.8rem);line-height:1.12;margin:0 0 .8rem;overflow-wrap:normal;word-break:normal;hyphens:none}
+    h3{font-size:1.22rem;margin:0 0 .55rem}p{max-width:72ch}.hero p{color:#d7e5ea;font-size:1.08rem}
+    .hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}.hero-actions{margin-top:1.45rem}
+    .btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cyan-dark);background:var(--cyan);color:#fff;text-decoration:none;padding:.72rem 1rem;border-radius:5px;font-weight:750}.btn:hover{background:var(--cyan-dark)}
+    .btn.secondary{background:transparent;color:inherit;border-color:currentColor}.btn.secondary:hover{background:rgba(255,255,255,.1)}.btn.light{background:#fff;color:var(--ink);border-color:var(--line)}.btn.light:hover{background:var(--soft);color:var(--cyan-dark)}
+    .socket-board{background:var(--navy-deep);border:1px solid #3b5965;border-radius:8px;padding:1.35rem;min-width:0}.socket-board h3{color:#fff}.socket-board p{color:#b8cbd2}
+    .socket-anatomy{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-top:1rem}.socket-chip{min-width:0;border:1px solid #48616b;border-radius:7px;padding:1rem;background:#102a35}.socket-chip span{display:block;color:var(--cyan-light);font-size:.76rem;font-weight:800;text-transform:uppercase}.socket-chip strong{display:block;color:#fff;margin:.2rem 0}.socket-chip small{color:#bfd1d7}
+    .code-mini{margin-top:1rem;background:#061016;border:1px solid #314b56;border-radius:7px;padding:1rem;overflow-x:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#e3eef1;white-space:pre;tab-size:2}
+    .section-head{display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem}.section-head>*{min-width:0}.section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}.lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+    .outcomes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}.outcome:last-child{border-right:0}.outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+    .scope-note,.callout{margin-top:1.4rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}
+    .concept-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}.concept-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.15rem;background:#fff;box-shadow:var(--shadow)}.tag{display:inline-block;font-size:.76rem;font-weight:850;color:var(--cyan-dark);background:#d9eef2;padding:.2rem .45rem;border-radius:999px;margin-bottom:.55rem}.concept-card p{color:var(--muted);font-size:.94rem}.concept-card ul{padding-left:1.2rem;margin-bottom:0}
+    .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);margin-top:1.5rem}.table-wrap table{width:100%;min-width:760px;border-collapse:collapse}.table-wrap th,.table-wrap td{text-align:left;padding:.8rem;border-bottom:1px solid var(--line);vertical-align:top}.table-wrap th{background:var(--soft)}
+    .activity{margin-top:1.5rem;padding:1.35rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--soft);min-width:0}.activity h3{margin-top:0}.activity-instruction{color:var(--muted);margin-top:0}
+    .prediction,.decision-list{display:grid;gap:.6rem;margin:.85rem 0 1rem}.prediction label,.decision-list label{display:block;padding:.75rem .8rem;background:#fff;border:1px solid var(--line);border-radius:5px}.prediction input,.decision-list input{margin-right:.45rem}
+    .feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}.feedback.success{background:var(--green-soft);border-color:var(--green)}.feedback.warn{background:var(--amber-soft);border-color:var(--amber)}.feedback.error{background:var(--red-soft);border-color:var(--red)}
+    .lab-grid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:1rem}.lab-grid>*{min-width:0}.control-panel{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1rem}.control-panel label{display:block;font-weight:750;margin:.8rem 0 .3rem}.control-panel select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px;background:#fff}.control-panel .btn{margin-top:1rem}
+    .code-panel{background:#09161d;color:#dce9ed;border:1px solid #314b56;border-radius:7px;padding:1rem;min-width:0}.code-panel h3{color:#fff}.code-block{overflow-x:auto;margin:.75rem 0;background:#061016;border:1px solid #253c47;border-radius:6px;padding:1rem}.code-block code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre;color:#e5f0f3}.code-note{color:#a9bdc5;font-size:.88rem}.code-token{color:var(--cyan-light)}
+    .lifecycle{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem;margin-top:1rem}.life-step{border:1px solid var(--line);border-radius:6px;padding:1rem;background:#fff}.life-step b{display:grid;place-items:center;width:2rem;height:2rem;border-radius:50%;background:#d9eef2;color:var(--cyan-dark);margin-bottom:.65rem}.life-step strong{display:block;margin-bottom:.25rem}.life-step span{display:block;color:var(--muted);font-size:.88rem}
+    .exercise-box{border:1px solid var(--line);border-radius:var(--radius);background:#fff;overflow:hidden}.exercise-head{display:grid;grid-template-columns:120px minmax(0,1fr);gap:1rem;padding:1rem 1.2rem;background:var(--navy);color:#fff}.exercise-head span{color:var(--cyan-light);font-weight:850}.exercise-body{padding:1.2rem}.steps{display:grid;gap:.7rem}.step{border:1px solid var(--line);border-radius:6px;padding:.85rem;background:var(--soft)}.step .solution{display:none;margin-top:.55rem;color:var(--muted)}.step.revealed .solution{display:block}.step.revealed{border-color:#9bc9b1;background:var(--green-soft)}
+    .practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.practice-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.05rem;background:#fff}.practice-card label{display:block;font-weight:750;margin:.7rem 0 .3rem}.practice-card select{width:100%;padding:.6rem;border:1px solid var(--line);border-radius:5px;background:#fff}.mini-feedback{margin-top:.75rem;padding:.7rem;border-left:3px solid var(--cyan);background:var(--soft);font-size:.9rem}.mini-feedback.success{background:var(--green-soft);border-color:var(--green)}.mini-feedback.warn{background:var(--amber-soft);border-color:var(--amber)}.mini-feedback.error{background:var(--red-soft);border-color:var(--red)}
+    .case-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:1rem}.case-grid>*{min-width:0}.case-card{border:1px solid var(--line);border-radius:var(--radius);padding:1.1rem;background:#fff}.case-card label{display:block;font-weight:750;margin:.7rem 0 .3rem}.case-card select{width:100%;padding:.6rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+    .quiz{display:grid;gap:.9rem}.question{border:1px solid var(--line);border-radius:6px;padding:1rem;background:#fff}.question fieldset{border:0;padding:0;margin:0}.question legend{font-weight:800;margin-bottom:.65rem}.question label{display:block;margin:.45rem 0;padding:.45rem .55rem;border-radius:4px}.question label:hover{background:var(--soft)}
+    textarea{width:100%;min-height:150px;resize:vertical;border:1px solid var(--line);border-radius:6px;padding:.8rem;background:#fff}.storage-note,.references{font-size:.9rem;color:var(--muted)}.references ul{padding-left:1.2rem}
+    .bottom-nav{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:2rem;padding-top:1.25rem;border-top:1px solid var(--line)}
+    footer{background:var(--navy);color:#c9d8dd}footer .band{padding-top:2rem;padding-bottom:2rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+    @media(max-width:980px){.hero-grid{grid-template-columns:1fr}.socket-anatomy{grid-template-columns:repeat(3,minmax(0,1fr))}.concept-grid,.practice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.lab-grid,.case-grid{grid-template-columns:1fr}.lifecycle{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:680px){.band{padding:3.2rem 1rem}.hero-grid{padding:2.7rem 1rem}.section-head{grid-template-columns:1fr;gap:.45rem}.outcomes,.concept-grid,.practice-grid,.socket-anatomy,.lifecycle{grid-template-columns:1fr}.outcome{border-right:0;border-bottom:1px solid var(--line)}.outcome:last-child{border-bottom:0}.top-link{flex:1 1 auto;text-align:center}.exercise-head{grid-template-columns:1fr;gap:.25rem}.header-inner{flex-wrap:wrap}.brand{min-width:0;flex:1 1 100%}.nav-scroll{order:3;flex-basis:100%}}
+    @media(max-width:480px){h1{font-size:clamp(2rem,10vw,2.8rem);max-width:none}.hero-actions .btn,.action-row .btn{width:100%}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <header>
+    <div class="header-inner">
+      <div class="brand"><strong>Programación de Redes</strong><span>Protocolos y APIs · Tema 1.2</span></div>
+      <div class="nav-scroll">
+        <nav aria-label="Secciones del subtema">
+          <a href="#conceptos">Conceptos</a><a href="#predice">Predice</a><a href="#experimenta">Experimenta</a><a href="#resuelto">Resuelto</a><a href="#practica">Practica</a><a href="#caso">Caso profesional</a><a href="#comprueba">Comprueba</a><a href="#reflexion">Reflexión</a>
+        </nav>
+      </div>
+      <a class="top-link" href="tema-1-2-programacion-sockets-tcp-udp.html" aria-label="Volver al Tema 1.2">← Tema 1.2</a>
+      <a class="top-link" href="index.html" aria-label="Volver a la pantalla principal del curso">Curso</a>
+    </div>
+  </header>
+
+  <main id="contenido">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">Subtema 1.2.1 · Programación de sockets</div>
+          <h1 id="hero-title">Creación y configuración de sockets</h1>
+          <p>Antes de conectar un cliente o publicar un servicio, una aplicación debe crear un socket y definir qué familia de direcciones, tipo de comunicación y comportamiento básico utilizará.</p>
+          <div class="hero-actions"><a class="btn" href="#orientacion">Comenzar</a><a class="btn secondary" href="#experimenta">Ir al laboratorio</a></div>
+        </div>
+        <div class="socket-board" role="img" aria-label="Anatomía conceptual de la creación de un socket con familia de direcciones, tipo y configuración">
+          <h3>Un socket nace a partir de decisiones explícitas</h3>
+          <div class="socket-anatomy">
+            <div class="socket-chip"><span>Familia</span><strong>AF_INET</strong><small>Direcciones IPv4</small></div>
+            <div class="socket-chip"><span>Tipo</span><strong>SOCK_STREAM</strong><small>Flujo orientado a conexión</small></div>
+            <div class="socket-chip"><span>Configuración</span><strong>timeout</strong><small>Tiempo máximo de espera</small></div>
+          </div>
+          <div class="code-mini">socket.socket(socket.AF_INET, socket.SOCK_STREAM)</div>
+          <p>Esta línea todavía no conecta con nadie. Solo crea el recurso con el que la aplicación trabajará después.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="orientacion" aria-labelledby="orientacion-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">CÓMO TRABAJAR ESTE TEMA</div><div><h2 id="orientacion-title">Piensa primero en requisitos, luego en código</h2><p class="lead">Cada argumento de creación representa una decisión de red. La meta no es memorizar una línea, sino poder justificar por qué una aplicación necesita una familia y un tipo determinados.</p></div></div>
+        <div class="outcomes" aria-label="Resultados del recorrido">
+          <div class="outcome"><b>1 · Identificar</b>Explicar qué representa un socket dentro de una aplicación de red.</div>
+          <div class="outcome"><b>2 · Configurar</b>Distinguir AF_INET, AF_INET6, SOCK_STREAM y SOCK_DGRAM.</div>
+          <div class="outcome"><b>3 · Construir</b>Crear un socket básico en Python y ajustar un timeout.</div>
+          <div class="outcome"><b>4 · Justificar</b>Seleccionar una configuración a partir de los requisitos de una aplicación.</div>
+        </div>
+        <div class="scope-note"><strong>Alcance:</strong> aquí crearemos y configuraremos sockets, pero todavía no construiremos un cliente-servidor TCP completo ni enviaremos datagramas UDP. Eso corresponde a 1.2.2 y 1.2.3.</div>
+      </div>
+    </section>
+
+    <section id="conceptos" aria-labelledby="conceptos-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">DESARROLLO CONCEPTUAL</div><div><h2 id="conceptos-title">Cuatro ideas antes de crear un socket</h2><p class="lead">La biblioteca estándar de Python expone la interfaz de sockets del sistema operativo. Al crear uno, la aplicación especifica cómo desea comunicarse.</p></div></div>
+        <div class="concept-grid">
+          <article class="concept-card"><span class="tag">Socket</span><h3>Punto de comunicación</h3><p>Es un objeto que la aplicación utiliza para operar sobre una comunicación de red. Encapsula estado y operaciones del sistema operativo.</p><ul><li>Se crea antes de usarlo.</li><li>Debe cerrarse al terminar.</li></ul></article>
+          <article class="concept-card"><span class="tag">Familia</span><h3>AF_INET / AF_INET6</h3><p>Indica qué familia de direcciones utilizará el socket.</p><ul><li><strong>AF_INET:</strong> IPv4.</li><li><strong>AF_INET6:</strong> IPv6.</li></ul></article>
+          <article class="concept-card"><span class="tag">Tipo</span><h3>STREAM / DGRAM</h3><p>Describe la semántica básica de comunicación solicitada al sistema operativo.</p><ul><li><strong>SOCK_STREAM:</strong> flujo.</li><li><strong>SOCK_DGRAM:</strong> datagramas.</li></ul></article>
+          <article class="concept-card"><span class="tag">Configuración</span><h3>Comportamiento adicional</h3><p>Después de crearlo pueden ajustarse propiedades como tiempos de espera u opciones específicas.</p><ul><li><strong>settimeout():</strong> limita una espera.</li><li>Otras opciones aparecerán cuando hagan falta.</li></ul></article>
+        </div>
+        <div class="table-wrap" role="region" aria-label="Relación entre requisitos y argumentos de creación" tabindex="0">
+          <table>
+            <thead><tr><th>Necesidad</th><th>Familia</th><th>Tipo</th><th>Interpretación</th></tr></thead>
+            <tbody>
+              <tr><td>Aplicación sobre IPv4 con flujo orientado a conexión</td><td>AF_INET</td><td>SOCK_STREAM</td><td>Preparación típica para TCP/IPv4.</td></tr>
+              <tr><td>Aplicación sobre IPv4 basada en datagramas</td><td>AF_INET</td><td>SOCK_DGRAM</td><td>Preparación típica para UDP/IPv4.</td></tr>
+              <tr><td>Aplicación sobre IPv6 con flujo</td><td>AF_INET6</td><td>SOCK_STREAM</td><td>Misma idea de flujo, pero con direccionamiento IPv6.</td></tr>
+              <tr><td>Aplicación sobre IPv6 basada en datagramas</td><td>AF_INET6</td><td>SOCK_DGRAM</td><td>Datagramas utilizando direcciones IPv6.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout"><strong>Importante:</strong> en los primeros ejercicios omitiremos el argumento de protocolo porque Python y el sistema operativo pueden seleccionar el protocolo adecuado a partir de la familia y el tipo. Esto evita añadir complejidad que todavía no aporta al objetivo del subtema.</div>
+      </div>
+    </section>
+
+    <section id="predice" aria-labelledby="predice-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">PREDICE</div><div><h2 id="predice-title">Necesitas un socket TCP sobre IPv4</h2><p class="lead">Antes de mirar el laboratorio, decide qué combinación expresa correctamente ese requisito.</p></div></div>
+        <div class="activity">
+          <div class="prediction">
+            <label><input type="radio" name="socketPrediction" value="a"> socket.socket(socket.AF_INET, socket.SOCK_STREAM)</label>
+            <label><input type="radio" name="socketPrediction" value="b"> socket.socket(socket.AF_INET, socket.SOCK_DGRAM)</label>
+            <label><input type="radio" name="socketPrediction" value="c"> socket.socket(socket.AF_INET6, socket.SOCK_STREAM)</label>
+          </div>
+          <div class="action-row"><button class="btn" id="checkPrediction" type="button">Comprobar predicción</button><button class="btn light" id="resetPrediction" type="button">Reintentar</button></div>
+          <div class="feedback" id="predictionFeedback" role="status" aria-live="polite">Relaciona primero IPv4 con la familia y TCP con el tipo de socket.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="experimenta" aria-labelledby="experimenta-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">EXPERIMENTA · OBSERVA · EXPLICA</div><div><h2 id="experimenta-title">Construye la creación de un socket</h2><p class="lead">Selecciona los requisitos y observa cómo cambian los argumentos. El generador no ejecuta código: te ayuda a relacionar decisiones de red con la instrucción que escribirías en Python.</p></div></div>
+        <div class="lab-grid">
+          <div class="control-panel">
+            <h3>Configurador</h3>
+            <label for="familySelect">Familia de direcciones</label>
+            <select id="familySelect"><option value="AF_INET">IPv4 · AF_INET</option><option value="AF_INET6">IPv6 · AF_INET6</option></select>
+            <label for="typeSelect">Tipo de comunicación</label>
+            <select id="typeSelect"><option value="SOCK_STREAM">Flujo · SOCK_STREAM</option><option value="SOCK_DGRAM">Datagramas · SOCK_DGRAM</option></select>
+            <label for="timeoutSelect">Comportamiento de espera</label>
+            <select id="timeoutSelect"><option value="blocking">Sin timeout explícito</option><option value="3">Timeout de 3 s</option><option value="5">Timeout de 5 s</option></select>
+            <button class="btn" id="buildSocket" type="button">Generar configuración</button>
+          </div>
+          <div class="code-panel" aria-live="polite">
+            <h3>Resultado conceptual</h3>
+            <div class="code-block"><code id="generatedCode">import socket
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</code></div>
+            <p class="code-note" id="generatedExplanation">AF_INET selecciona IPv4 y SOCK_STREAM solicita una comunicación de flujo. Todavía no existe una conexión remota.</p>
+          </div>
+        </div>
+        <div class="activity">
+          <h3>Laboratorio guiado · inspecciona el objeto creado</h3>
+          <p class="activity-instruction">Este fragmento puede ejecutarse en tu entorno Python. Crea un socket, configura un timeout y consulta sus propiedades básicas.</p>
+          <div class="code-block" style="background:#09161d"><code>import socket
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+    sock.settimeout(3.0)
+
+    print("Familia:", sock.family)
+    print("Tipo:", sock.type)
+    print("Timeout:", sock.gettimeout())</code></div>
+          <div class="callout"><strong>Observa:</strong> el bloque <em>with</em> ayuda a liberar el recurso al terminar. La salida exacta de familia y tipo puede representarse mediante valores o enumeraciones según la versión de Python, pero debe corresponder a la configuración creada.</div>
+        </div>
+        <div class="lifecycle" aria-label="Ciclo básico de vida de un socket">
+          <div class="life-step"><b>1</b><strong>Crear</strong><span>Elegir familia y tipo.</span></div>
+          <div class="life-step"><b>2</b><strong>Configurar</strong><span>Ajustar opciones necesarias.</span></div>
+          <div class="life-step"><b>3</b><strong>Usar</strong><span>Conectar, escuchar o intercambiar datos según el rol.</span></div>
+          <div class="life-step"><b>4</b><strong>Cerrar</strong><span>Liberar el descriptor y recursos asociados.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="resuelto" aria-labelledby="resuelto-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">EJERCICIO RESUELTO</div><div><h2 id="resuelto-title">Traducir requisitos a una configuración</h2><p class="lead">No empieces por la sintaxis. Empieza por identificar qué necesita la aplicación.</p></div></div>
+        <div class="exercise-box">
+          <div class="exercise-head"><span>Problema</span><div>Una herramienta de administración de red utilizará IPv4, necesita una comunicación orientada a conexión y no debe quedar esperando más de 5 segundos en una operación bloqueante.</div></div>
+          <div class="exercise-body">
+            <div class="steps">
+              <div class="step"><strong>Paso 1 · Familia</strong><div class="solution">El requisito dice IPv4, por lo tanto elegimos <strong>socket.AF_INET</strong>.</div></div>
+              <div class="step"><strong>Paso 2 · Tipo</strong><div class="solution">La aplicación necesita flujo orientado a conexión, por lo tanto elegimos <strong>socket.SOCK_STREAM</strong>.</div></div>
+              <div class="step"><strong>Paso 3 · Creación</strong><div class="solution"><code>sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</code></div></div>
+              <div class="step"><strong>Paso 4 · Timeout</strong><div class="solution"><code>sock.settimeout(5.0)</code>. Esto no garantiza que la red responda: establece cuánto esperará una operación antes de producir una excepción de timeout.</div></div>
+              <div class="step"><strong>Paso 5 · Cierre</strong><div class="solution">Al terminar debe cerrarse el recurso. Una forma segura es utilizar un bloque <code>with</code> cuando el flujo del programa lo permita.</div></div>
+            </div>
+            <div class="action-row" style="margin-top:1rem"><button class="btn" id="revealSolution" type="button">Mostrar solución paso a paso</button><button class="btn light" id="hideSolution" type="button">Ocultar</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="practica" aria-labelledby="practica-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">EJERCICIOS PROPUESTOS</div><div><h2 id="practica-title">Ahora decide tú la configuración</h2><p class="lead">Resuelve cada escenario a partir de sus requisitos. Puedes reintentar cuantas veces necesites.</p></div></div>
+        <div class="practice-grid">
+          <article class="practice-card">
+            <h3>Ejercicio 1 · Telemetría</h3>
+            <p>Un sensor enviará datagramas independientes usando IPv4.</p>
+            <label for="p1Family">Familia</label><select id="p1Family"><option value="">Selecciona</option><option value="AF_INET">AF_INET</option><option value="AF_INET6">AF_INET6</option></select>
+            <label for="p1Type">Tipo</label><select id="p1Type"><option value="">Selecciona</option><option value="SOCK_STREAM">SOCK_STREAM</option><option value="SOCK_DGRAM">SOCK_DGRAM</option></select>
+            <button class="btn" id="checkP1" type="button">Comprobar</button><div class="mini-feedback" id="feedbackP1" role="status" aria-live="polite">Relaciona IPv4 con la familia y datagramas con el tipo.</div>
+          </article>
+          <article class="practice-card">
+            <h3>Ejercicio 2 · Gestión remota</h3>
+            <p>Una aplicación IPv4 necesita un flujo orientado a conexión.</p>
+            <label for="p2Family">Familia</label><select id="p2Family"><option value="">Selecciona</option><option value="AF_INET">AF_INET</option><option value="AF_INET6">AF_INET6</option></select>
+            <label for="p2Type">Tipo</label><select id="p2Type"><option value="">Selecciona</option><option value="SOCK_STREAM">SOCK_STREAM</option><option value="SOCK_DGRAM">SOCK_DGRAM</option></select>
+            <button class="btn" id="checkP2" type="button">Comprobar</button><div class="mini-feedback" id="feedbackP2" role="status" aria-live="polite">Identifica primero los dos requisitos explícitos.</div>
+          </article>
+          <article class="practice-card">
+            <h3>Ejercicio 3 · IPv6</h3>
+            <p>Un servicio experimental utilizará IPv6 y mensajes independientes.</p>
+            <label for="p3Family">Familia</label><select id="p3Family"><option value="">Selecciona</option><option value="AF_INET">AF_INET</option><option value="AF_INET6">AF_INET6</option></select>
+            <label for="p3Type">Tipo</label><select id="p3Type"><option value="">Selecciona</option><option value="SOCK_STREAM">SOCK_STREAM</option><option value="SOCK_DGRAM">SOCK_DGRAM</option></select>
+            <button class="btn" id="checkP3" type="button">Comprobar</button><div class="mini-feedback" id="feedbackP3" role="status" aria-live="polite">Piensa en IPv6 y datagramas.</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="caso" aria-labelledby="caso-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">CASO PROFESIONAL</div><div><h2 id="caso-title">Utilidad de diagnóstico para un NOC</h2><p class="lead">El equipo de operaciones quiere una herramienta que pueda probar servicios IPv4. Para una prueba concreta, necesita conectarse mediante flujo y abandonar la espera después de 3 segundos.</p></div></div>
+        <div class="case-grid">
+          <div class="case-card">
+            <h3>Configura el recurso</h3>
+            <label for="caseFamily">Familia</label><select id="caseFamily"><option value="">Selecciona</option><option value="AF_INET">AF_INET</option><option value="AF_INET6">AF_INET6</option></select>
+            <label for="caseType">Tipo</label><select id="caseType"><option value="">Selecciona</option><option value="SOCK_STREAM">SOCK_STREAM</option><option value="SOCK_DGRAM">SOCK_DGRAM</option></select>
+            <label for="caseTimeout">Timeout</label><select id="caseTimeout"><option value="">Selecciona</option><option value="none">Sin timeout</option><option value="3">3 segundos</option><option value="5">5 segundos</option></select>
+            <button class="btn" id="checkCase" type="button">Evaluar decisión</button>
+          </div>
+          <div class="case-card">
+            <h3>Justificación esperada</h3>
+            <p>No basta con acertar tres opciones. Debes poder explicar que:</p>
+            <ul><li>IPv4 conduce a <strong>AF_INET</strong>.</li><li>Flujo orientado a conexión conduce a <strong>SOCK_STREAM</strong>.</li><li>El requisito operacional fija un <strong>timeout de 3 s</strong>.</li></ul>
+            <div class="feedback" id="caseFeedback" role="status" aria-live="polite">Configura el caso y luego comprueba tu decisión.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="comprueba" aria-labelledby="quiz-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">COMPROBACIÓN INTEGRADORA</div><div><h2 id="quiz-title">Comprueba si puedes crear y justificar un socket</h2><p class="lead">Responde las cinco preguntas. La retroalimentación te indicará qué concepto revisar.</p></div></div>
+        <form class="quiz" id="quizForm">
+          <div class="question"><fieldset><legend>1. ¿Qué expresa AF_INET al crear un socket?</legend><label><input type="radio" name="q1" value="a"> Uso de direcciones IPv4.</label><label><input type="radio" name="q1" value="b"> Uso obligatorio de UDP.</label><label><input type="radio" name="q1" value="c"> Un timeout infinito.</label></fieldset></div>
+          <div class="question"><fieldset><legend>2. ¿Qué tipo se asocia a una comunicación de flujo?</legend><label><input type="radio" name="q2" value="a"> SOCK_DGRAM</label><label><input type="radio" name="q2" value="b"> SOCK_STREAM</label><label><input type="radio" name="q2" value="c"> AF_INET6</label></fieldset></div>
+          <div class="question"><fieldset><legend>3. ¿Qué hace settimeout(3.0)?</legend><label><input type="radio" name="q3" value="a"> Obliga a que la red responda en 3 segundos.</label><label><input type="radio" name="q3" value="b"> Establece un máximo de espera de 3 segundos para operaciones bloqueantes.</label><label><input type="radio" name="q3" value="c"> Cambia el socket de TCP a UDP.</label></fieldset></div>
+          <div class="question"><fieldset><legend>4. ¿Qué combinación corresponde a IPv6 con datagramas?</legend><label><input type="radio" name="q4" value="a"> AF_INET6 + SOCK_DGRAM</label><label><input type="radio" name="q4" value="b"> AF_INET + SOCK_STREAM</label><label><input type="radio" name="q4" value="c"> AF_INET6 + SOCK_STREAM</label></fieldset></div>
+          <div class="question"><fieldset><legend>5. Después de crear y configurar un socket, ¿qué afirmación es correcta?</legend><label><input type="radio" name="q5" value="a"> Ya existe necesariamente una conexión remota.</label><label><input type="radio" name="q5" value="b"> El recurso está preparado, pero su uso posterior depende del rol y del protocolo.</label><label><input type="radio" name="q5" value="c"> El socket ya ha intercambiado datos automáticamente.</label></fieldset></div>
+          <div class="action-row"><button class="btn" type="submit">Comprobar</button><button class="btn light" id="resetQuiz" type="button">Reintentar</button></div>
+          <div class="feedback" id="quizFeedback" role="status" aria-live="polite">Completa las cinco preguntas antes de comprobar.</div>
+        </form>
+      </div>
+    </section>
+
+    <section id="reflexion" aria-labelledby="reflection-title">
+      <div class="band">
+        <div class="section-head"><div class="section-code">REFLEXIÓN FINAL</div><div><h2 id="reflection-title">¿Qué decisión estás codificando?</h2><p class="lead">La sintaxis es breve, pero cada argumento representa una decisión de arquitectura y de red.</p></div></div>
+        <label for="reflectionText"><strong>Explica en 80–150 palabras cómo transformarías estos requisitos en una configuración de socket: IPv6, datagramas y tiempo máximo de espera de 5 segundos.</strong></label>
+        <textarea id="reflectionText" placeholder="Describe primero los requisitos y después justifica AF_INET6, SOCK_DGRAM y settimeout(5.0)..."></textarea>
+        <div class="action-row" style="margin-top:.8rem"><button class="btn" id="saveReflection" type="button">Guardar en este navegador</button><button class="btn light" id="clearReflection" type="button">Borrar</button></div>
+        <div class="feedback" id="reflectionFeedback" role="status" aria-live="polite">La reflexión no se envía a ningún servidor.</div>
+        <p class="storage-note">El almacenamiento local se utiliza únicamente para conservar esta reflexión en este navegador.</p>
+      </div>
+    </section>
+
+    <section id="referencias" aria-labelledby="references-title">
+      <div class="band references">
+        <div class="section-head"><div class="section-code">REFERENCIAS Y ALCANCE</div><div><h2 id="references-title">Qué conviene consolidar antes de continuar</h2><p class="lead">El siguiente subtema utilizará estos conceptos para construir una comunicación cliente-servidor TCP completa.</p></div></div>
+        <ul>
+          <li>Python Software Foundation. Documentación de la biblioteca estándar: módulo <strong>socket</strong>.</li>
+          <li>Stevens, W. R., Fenner, B. y Rudoff, A. M. <em>UNIX Network Programming, Volume 1: The Sockets Networking API</em>.</li>
+          <li>Kurose, J. F. y Ross, K. W. <em>Computer Networking: A Top-Down Approach</em>, fundamentos de transporte y aplicaciones de red.</li>
+        </ul>
+        <div class="callout"><strong>Delimitación:</strong> no se desarrolla todavía <code>connect()</code>, <code>bind()</code>, <code>listen()</code>, <code>accept()</code>, <code>send()</code> ni <code>recv()</code> en profundidad. Aparecerán en los subtemas donde su secuencia tenga sentido.</div>
+        <div class="bottom-nav"><a class="btn light" href="tema-1-2-programacion-sockets-tcp-udp.html">← Tema 1.2</a><a class="btn" href="tema-1-2-2-cliente-servidor-tcp.html">Siguiente: 1.2.2 Cliente-servidor TCP →</a></div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="band"><span>Programación de Redes: Protocolos y APIs</span><span>Subtema 1.2.1 · Creación y configuración de sockets</span></div></footer>
+
+  <script>
+    (function(){
+      "use strict";
+      function setFeedback(el,type,message){el.classList.remove("success","warn","error");if(type){el.classList.add(type);}el.textContent=message;}
+
+      const predictionFeedback=document.getElementById("predictionFeedback");
+      document.getElementById("checkPrediction").addEventListener("click",function(){
+        const chosen=document.querySelector('input[name="socketPrediction"]:checked');
+        if(!chosen){setFeedback(predictionFeedback,"warn","Selecciona una opción antes de comprobar.");return;}
+        if(chosen.value==="a"){setFeedback(predictionFeedback,"success","Correcto. AF_INET representa IPv4 y SOCK_STREAM representa un flujo, configuración típica para TCP/IPv4.");}
+        else if(chosen.value==="b"){setFeedback(predictionFeedback,"error","AF_INET sí representa IPv4, pero SOCK_DGRAM describe datagramas. Revisa la diferencia entre STREAM y DGRAM.");}
+        else{setFeedback(predictionFeedback,"error","SOCK_STREAM coincide con flujo, pero AF_INET6 selecciona IPv6. El requisito pedía IPv4.");}
+      });
+      document.getElementById("resetPrediction").addEventListener("click",function(){document.querySelectorAll('input[name="socketPrediction"]').forEach(function(r){r.checked=false;});setFeedback(predictionFeedback,"","Relaciona primero IPv4 con la familia y TCP con el tipo de socket.");});
+
+      const familySelect=document.getElementById("familySelect");
+      const typeSelect=document.getElementById("typeSelect");
+      const timeoutSelect=document.getElementById("timeoutSelect");
+      const generatedCode=document.getElementById("generatedCode");
+      const generatedExplanation=document.getElementById("generatedExplanation");
+      document.getElementById("buildSocket").addEventListener("click",function(){
+        const family=familySelect.value;const type=typeSelect.value;const timeout=timeoutSelect.value;
+        let code='import socket\n\nsock = socket.socket(socket.'+family+', socket.'+type+')';
+        if(timeout!=="blocking"){code+='\nsock.settimeout('+timeout+'.0)';}
+        generatedCode.textContent=code;
+        const ipText=family==="AF_INET"?"IPv4":"IPv6";
+        const typeText=type==="SOCK_STREAM"?"flujo orientado a conexión":"datagramas independientes";
+        const waitText=timeout==="blocking"?"No se ha establecido un timeout explícito.":"Las operaciones bloqueantes podrán generar un timeout después de "+timeout+" segundos.";
+        generatedExplanation.textContent=family+" selecciona "+ipText+" y "+type+" solicita "+typeText+". "+waitText+" Crear el socket todavía no conecta con un destino ni publica un servicio.";
+      });
+
+      document.getElementById("revealSolution").addEventListener("click",function(){document.querySelectorAll("#resuelto .step").forEach(function(step){step.classList.add("revealed");});});
+      document.getElementById("hideSolution").addEventListener("click",function(){document.querySelectorAll("#resuelto .step").forEach(function(step){step.classList.remove("revealed");});});
+
+      function checkPair(familyId,typeId,feedbackId,expectedFamily,expectedType,successText){
+        const family=document.getElementById(familyId).value;const type=document.getElementById(typeId).value;const feedback=document.getElementById(feedbackId);
+        if(!family||!type){feedback.className="mini-feedback warn";feedback.textContent="Selecciona familia y tipo antes de comprobar.";return;}
+        if(family===expectedFamily&&type===expectedType){feedback.className="mini-feedback success";feedback.textContent=successText;return;}
+        feedback.className="mini-feedback error";
+        if(family!==expectedFamily&&type!==expectedType){feedback.textContent="Debes revisar ambos requisitos: la familia de direcciones y la forma de comunicación.";}
+        else if(family!==expectedFamily){feedback.textContent="El tipo es correcto, pero la familia no corresponde al requisito de direccionamiento.";}
+        else{feedback.textContent="La familia es correcta, pero revisa si el escenario pide flujo o datagramas.";}
+      }
+      document.getElementById("checkP1").addEventListener("click",function(){checkPair("p1Family","p1Type","feedbackP1","AF_INET","SOCK_DGRAM","Correcto. IPv4 → AF_INET y datagramas → SOCK_DGRAM.");});
+      document.getElementById("checkP2").addEventListener("click",function(){checkPair("p2Family","p2Type","feedbackP2","AF_INET","SOCK_STREAM","Correcto. IPv4 → AF_INET y flujo orientado a conexión → SOCK_STREAM.");});
+      document.getElementById("checkP3").addEventListener("click",function(){checkPair("p3Family","p3Type","feedbackP3","AF_INET6","SOCK_DGRAM","Correcto. IPv6 → AF_INET6 y mensajes independientes → SOCK_DGRAM.");});
+
+      const caseFeedback=document.getElementById("caseFeedback");
+      document.getElementById("checkCase").addEventListener("click",function(){
+        const family=document.getElementById("caseFamily").value;const type=document.getElementById("caseType").value;const timeout=document.getElementById("caseTimeout").value;
+        if(!family||!type||!timeout){setFeedback(caseFeedback,"warn","Completa las tres decisiones antes de evaluar el caso.");return;}
+        if(family==="AF_INET"&&type==="SOCK_STREAM"&&timeout==="3"){setFeedback(caseFeedback,"success","Decisión coherente. El requisito se traduce a AF_INET + SOCK_STREAM y un timeout de 3 s. El siguiente paso, todavía no realizado aquí, sería utilizar ese socket según el rol de la aplicación.");return;}
+        const misses=[];if(family!=="AF_INET"){misses.push("el caso utiliza IPv4, por lo que la familia debe ser AF_INET");}if(type!=="SOCK_STREAM"){misses.push("el caso pide flujo orientado a conexión, por lo que el tipo debe ser SOCK_STREAM");}if(timeout!=="3"){misses.push("el límite operativo indicado es 3 segundos");}setFeedback(caseFeedback,"error","Revisa: "+misses.join("; ")+".");
+      });
+
+      const quizForm=document.getElementById("quizForm");const quizFeedback=document.getElementById("quizFeedback");
+      const answers={q1:"a",q2:"b",q3:"b",q4:"a",q5:"b"};
+      const explanations={q1:"Q1: AF_INET selecciona la familia IPv4.",q2:"Q2: SOCK_STREAM representa una comunicación de flujo.",q3:"Q3: settimeout limita la espera; no obliga a la red a responder.",q4:"Q4: IPv6 + datagramas corresponde a AF_INET6 + SOCK_DGRAM.",q5:"Q5: crear el socket solo prepara el recurso; conectarse, escuchar o enviar datos son pasos posteriores."};
+      quizForm.addEventListener("submit",function(event){event.preventDefault();let answered=0;let correct=0;const misses=[];Object.keys(answers).forEach(function(name){const selected=quizForm.querySelector('input[name="'+name+'"]:checked');if(selected){answered+=1;if(selected.value===answers[name]){correct+=1;}else{misses.push(explanations[name]);}}});if(answered<5){setFeedback(quizFeedback,"warn","Has respondido "+answered+" de 5 preguntas. Completa todas antes de comprobar.");return;}if(correct===5){setFeedback(quizFeedback,"success","5/5. Puedes relacionar requisitos de direccionamiento y transporte con la creación y configuración básica de un socket.");}else{quizFeedback.classList.remove("success","warn","error");quizFeedback.classList.add("error");quizFeedback.innerHTML="Obtuviste <strong>"+correct+"/5</strong>. Revisa: "+misses.join(" ")+" Después vuelve a intentarlo.";}});
+      document.getElementById("resetQuiz").addEventListener("click",function(){quizForm.reset();setFeedback(quizFeedback,"","Completa las cinco preguntas antes de comprobar.");});
+
+      const reflectionText=document.getElementById("reflectionText");const reflectionFeedback=document.getElementById("reflectionFeedback");const storageKey="redes_tema_1_2_1_reflexion";
+      try{const saved=localStorage.getItem(storageKey);if(saved){reflectionText.value=saved;setFeedback(reflectionFeedback,"success","Se recuperó la reflexión guardada previamente en este navegador.");}}catch(error){setFeedback(reflectionFeedback,"warn","El navegador no permitió acceder al almacenamiento local. Puedes realizar la reflexión sin guardarla.");}
+      document.getElementById("saveReflection").addEventListener("click",function(){const value=reflectionText.value.trim();if(!value){setFeedback(reflectionFeedback,"warn","Escribe una reflexión antes de guardarla.");return;}try{localStorage.setItem(storageKey,value);setFeedback(reflectionFeedback,"success","Reflexión guardada únicamente en este navegador.");}catch(error){setFeedback(reflectionFeedback,"error","No fue posible guardar la reflexión en este navegador.");}});
+      document.getElementById("clearReflection").addEventListener("click",function(){reflectionText.value="";try{localStorage.removeItem(storageKey);}catch(error){}setFeedback(reflectionFeedback,"","La reflexión fue borrada de esta página y del almacenamiento local disponible.");});
+    })();
+  </script>
+</body>
+</html>
