@@ -1,0 +1,832 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Subtema 2.1.5: cabeceras y parámetros en HTTP.">
+<meta name="theme-color" content="#10212a">
+<title>2.1.5 | Cabeceras y parámetros en HTTP</title>
+<style>
+:root{
+  --ink:#18212a;--muted:#586775;--line:#cbd5dc;--soft:#f3f6f8;--paper:#fff;
+  --cyan:#007c91;--cyan-dark:#005b6a;--cyan-light:#6ed2e2;
+  --green:#16734a;--green-soft:#e8f5ee;--amber:#8a5600;--amber-soft:#fff3d8;
+  --red:#9b2c2c;--red-soft:#fdecec;--focus:#005fcc;
+  --navy:#10212a;--navy-deep:#07141a;--max:1180px;--radius:8px;
+  --shadow:0 16px 38px rgba(24,33,42,.08)
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-width:280px;color:var(--ink);background:var(--paper);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55;overflow-x:hidden}
+button,input,select,textarea{font:inherit;max-width:100%}
+a{color:var(--cyan-dark)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}.skip-link:focus{top:1rem}
+header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.header-inner{width:min(100%,var(--max));min-height:66px;margin:0 auto;padding:.55rem 1.25rem;display:flex;gap:1rem;align-items:center;min-width:0}
+.brand{min-width:190px}.brand strong{display:block;font-size:.95rem}.brand span{display:block;color:var(--muted);font-size:.78rem}
+.nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}
+nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+nav a{color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;border-bottom:2px solid transparent;font-size:.84rem}
+nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+.top-link{flex:0 0 auto;text-decoration:none;border:1px solid var(--line);border-radius:5px;padding:.48rem .72rem;color:var(--ink);font-weight:750;white-space:nowrap;background:#fff}
+main{overflow:hidden}
+section{scroll-margin-top:84px;border-bottom:1px solid var(--line)}
+.band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+.hero{min-height:calc(100svh - 66px);display:grid;align-items:center;background:var(--navy);color:#fff}
+.hero-grid{width:min(100%,var(--max));margin:0 auto;padding:3.4rem 1.25rem;display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:3rem;align-items:center}
+.hero-grid>*{min-width:0}.eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+h1{font-size:clamp(2rem,5vw,4rem);line-height:1.02;margin:.65rem 0 1.15rem;max-width:19ch;overflow-wrap:normal;word-break:normal;hyphens:none}
+h2{font-size:clamp(1.75rem,3.3vw,2.8rem);line-height:1.12;margin:0 0 .8rem;overflow-wrap:normal;word-break:normal;hyphens:none}
+h3{font-size:1.22rem;margin:0 0 .55rem}
+p{max-width:72ch}.hero p{color:#d7e5ea;font-size:1.08rem}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}.hero-actions{margin-top:1.45rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cyan-dark);background:var(--cyan);color:#fff;text-decoration:none;padding:.72rem 1rem;border-radius:5px;font-weight:750}
+.btn:hover{background:var(--cyan-dark)}.btn.secondary{background:transparent;color:inherit;border-color:currentColor}.btn.secondary:hover{background:rgba(255,255,255,.1)}
+.btn.light{background:#fff;color:var(--ink);border-color:var(--line)}.btn.light:hover{background:var(--soft);color:var(--cyan-dark)}
+.hero-board{background:var(--navy-deep);border:1px solid #3b5965;border-radius:8px;padding:1.25rem}
+.http-map{display:grid;gap:.55rem;margin-top:1rem}
+.map-row{padding:.7rem;border:1px solid #3b5965;border-radius:6px;background:#0d2630}
+.map-row strong{display:block;color:var(--cyan-light)}.map-row small{display:block;color:#b8cbd2;margin-top:.2rem}
+.section-head{display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem}.section-head>*{min-width:0}
+.section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}.lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+.outcomes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}.outcome:last-child{border-right:0}.outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+.scope-note,.callout{margin-top:1.4rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}
+.concept-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+.concept-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.15rem;background:#fff;box-shadow:var(--shadow)}
+.tag{display:inline-block;font-size:.76rem;font-weight:850;color:var(--cyan-dark);background:#d9eef2;padding:.2rem .45rem;border-radius:999px;margin-bottom:.55rem}
+.concept-card p{color:var(--muted);font-size:.94rem}
+.table-wrap{overflow-x:auto;margin-top:1.2rem;border:1px solid var(--line);border-radius:7px}table{border-collapse:collapse;width:100%;min-width:880px}th,td{padding:.8rem;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}th{background:var(--soft)}
+.activity{margin-top:1.5rem;padding:1.35rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--soft);min-width:0}
+.prediction{display:grid;gap:.6rem;margin:.85rem 0 1rem}.prediction label{display:block;padding:.75rem .8rem;background:#fff;border:1px solid var(--line);border-radius:5px}
+.feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}
+.feedback.success{background:var(--green-soft);border-color:var(--green)}.feedback.warn{background:var(--amber-soft);border-color:var(--amber)}.feedback.error{background:var(--red-soft);border-color:var(--red)}
+.lab-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:1rem}.lab-grid>*{min-width:0}
+.lab-panel{border:1px solid var(--line);border-radius:7px;background:#fff;padding:1rem}.lab-panel label{display:block;font-weight:750;margin:.75rem 0 .3rem}.lab-panel select,.lab-panel input{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+.result-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-top:1rem}.result-card{padding:.8rem;border:1px solid var(--line);border-radius:6px;background:#fff;min-width:0}.result-card b{display:block;color:var(--cyan-dark);font-size:.78rem;text-transform:uppercase}.result-card span{display:block;margin-top:.25rem;overflow-wrap:anywhere}
+.terminal{margin-top:1rem;background:#07141a;color:#dce9ed;border-radius:7px;padding:1rem;border:1px solid #314b56;overflow-x:auto}.terminal pre{margin:0;white-space:pre-wrap;word-break:break-word}
+.request-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.request-card{border:1px solid var(--line);border-radius:7px;padding:1rem;background:#fff;min-width:0}.request-card code{display:block;background:#08151c;color:#dce9ed;padding:1rem;border-radius:6px;overflow-x:auto;white-space:pre}
+.exercise-box{border:1px solid var(--line);border-radius:8px;overflow:hidden}.exercise-head{padding:1rem 1.1rem;background:var(--navy);color:#fff}.exercise-head span{display:block;color:var(--cyan-light);font-size:.78rem;font-weight:850;text-transform:uppercase}
+.exercise-body{padding:1.1rem}.solution-steps{display:grid;gap:.75rem}.solution-step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:.8rem;align-items:start}.solution-step>b{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#d9eef2;color:var(--cyan-dark)}
+.practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.practice-card{border:1px solid var(--line);border-radius:7px;padding:1rem;min-width:0}.practice-card select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.mini-feedback{margin-top:.75rem;padding:.75rem;border-left:4px solid var(--cyan);background:var(--soft);min-height:4rem}
+.case-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}.case-grid label{display:block;font-weight:750}.case-grid select{width:100%;margin-top:.3rem;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.quiz{display:grid;gap:1rem}.quiz-card{border:1px solid var(--line);border-radius:7px;padding:1rem}.quiz-card fieldset{border:0;padding:0;margin:0}.quiz-card legend{font-weight:800;margin-bottom:.7rem}.quiz-card label{display:block;padding:.5rem .55rem;border-radius:4px}.quiz-card label:hover{background:var(--soft)}
+.score{margin-top:1rem;padding:1rem;border:1px solid var(--line);border-radius:6px;background:var(--soft);font-weight:800}
+.reflection-box textarea{width:100%;min-height:145px;resize:vertical;padding:.8rem;border:1px solid var(--line);border-radius:6px}
+.references{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.ref-card{border-top:4px solid var(--cyan);padding:1rem;background:var(--soft)}
+.bottom-nav{margin-top:2rem;display:flex;justify-content:space-between;gap:.7rem;flex-wrap:wrap}
+footer{background:var(--navy-deep);color:#c7d8de}.footer-inner{width:min(100%,var(--max));margin:0 auto;padding:1.4rem 1.25rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.progress-wrap{position:fixed;right:1rem;bottom:1rem;z-index:20;background:rgba(7,20,26,.93);color:#fff;padding:.45rem .7rem;border-radius:999px;font-size:.78rem;border:1px solid #3b5965}
+@media(max-width:900px){
+  .hero-grid,.section-head,.lab-grid,.request-grid{grid-template-columns:1fr}
+  .concept-grid,.outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .outcome:nth-child(2){border-right:0}.outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .practice-grid,.case-grid{grid-template-columns:1fr}
+}
+@media(max-width:650px){.result-grid,.references{grid-template-columns:1fr}}
+@media(max-width:600px){
+  .header-inner{padding-inline:.8rem}.brand{min-width:145px}.top-link{padding:.45rem .6rem}
+  .band,.hero-grid{padding-left:.9rem;padding-right:.9rem}
+  h1{font-size:clamp(2rem,10vw,2.72rem);max-width:none}
+  .concept-grid,.outcomes{grid-template-columns:1fr}
+  .outcome{border-right:0;border-bottom:1px solid var(--line)}.outcome:last-child{border-bottom:0}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+<header>
+<div class="header-inner">
+  <div class="brand"><strong>Programación de Redes</strong><span>Protocolos y APIs</span></div>
+  <div class="nav-scroll" aria-label="Navegación del subtema"><nav>
+    <a href="#inicio">Inicio</a><a href="#orientacion">Cómo trabajar</a><a href="#conceptos">Conceptos</a><a href="#predice">Predice</a><a href="#experimenta">Experimenta</a><a href="#ejemplo">Ejemplo</a><a href="#resuelto">Ejercicio resuelto</a><a href="#practica">Practica</a><a href="#caso">Caso profesional</a><a href="#comprueba">Comprueba</a><a href="#reflexiona">Reflexión</a>
+  </nav></div>
+  <a class="top-link" href="index.html">← Curso</a>
+</div>
+</header>
+
+<main id="contenido">
+<section class="hero" id="inicio">
+<div class="hero-grid">
+  <div>
+    <div class="eyebrow">Bloque 2 · Tema 2.1 · Subtema 2.1.5</div>
+    <h1>Cabeceras y parámetros en HTTP</h1>
+    <p>Aprende a identificar la información adicional que acompaña una solicitud HTTP y a distinguir entre metadatos de cabecera, parámetros de consulta y valores que forman parte de la ruta.</p>
+
+    <div class="hero-actions">
+      <a class="btn" href="#orientacion">Comenzar recorrido</a>
+      <a class="btn secondary" href="tema-2-1-fundamentos-servicios-web-protocolo-http.html">Volver al Tema 2.1</a>
+    </div>
+  </div>
+
+  <div class="hero-board" role="img" aria-label="Partes de una solicitud HTTP con ruta, parámetros y cabeceras">
+    <h3>Una solicitud tiene más que método y ruta</h3>
+
+    <div class="http-map">
+      <div class="map-row"><strong>Ruta</strong><small>/api/enlaces/15</small></div>
+      <div class="map-row"><strong>Parámetros de consulta</strong><small>?estado=up&amp;zona=sur</small></div>
+      <div class="map-row"><strong>Cabeceras</strong><small>Accept · Content-Type · Authorization</small></div>
+      <div class="map-row"><strong>Cuerpo</strong><small>datos enviados cuando la operación lo requiere</small></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="orientacion">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Cómo trabajar este tema</div>
+    <div>
+      <h2>Cada dato tiene un lugar y una función</h2>
+      <p class="lead">Las cabeceras describen cómo debe interpretarse o procesarse el mensaje. Los parámetros ajustan la consulta o identifican recursos dentro de la interfaz.</p>
+    </div>
+  </div>
+
+  <div class="outcomes">
+    <div class="outcome"><b>1. Diferenciar</b> cabeceras, parámetros de consulta y parámetros de ruta.</div>
+    <div class="outcome"><b>2. Interpretar</b> cabeceras comunes de una API.</div>
+    <div class="outcome"><b>3. Construir</b> consultas con filtros y valores de ruta.</div>
+    <div class="outcome"><b>4. Aplicar</b> estas estructuras a servicios de Telecomunicaciones.</div>
+  </div>
+
+  <div class="scope-note"><strong>Alcance.</strong> Nos concentraremos en cabeceras y parámetros frecuentes. JSON y fundamentos REST se desarrollarán en 2.1.6.</div>
+</div>
+</section>
+
+<section id="conceptos">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Explora</div>
+    <div>
+      <h2>Cuatro componentes frecuentes</h2>
+      <p class="lead">Identificar cada uno ayuda a leer documentación de APIs con mucha más facilidad.</p>
+    </div>
+  </div>
+
+  <div class="concept-grid">
+    <article class="concept-card">
+      <span class="tag">Header</span>
+      <h3>Accept</h3>
+      <p>Indica qué tipo de representación puede recibir el cliente, por ejemplo <code>application/json</code>.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">Header</span>
+      <h3>Content-Type</h3>
+      <p>Describe el formato del contenido que realmente se envía en el cuerpo del mensaje.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">Header</span>
+      <h3>Authorization</h3>
+      <p>Transporta información de autenticación según el esquema definido por el servicio. No debe exponerse en logs o URLs.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">Parámetro</span>
+      <h3>Consulta y ruta</h3>
+      <p>Permiten filtrar, ordenar, paginar o identificar un recurso específico.</p>
+    </article>
+  </div>
+
+  <div class="callout"><strong>Accept vs Content-Type.</strong> <code>Accept</code> expresa qué quiere recibir el cliente. <code>Content-Type</code> describe qué formato tiene el contenido que se está enviando.</div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Elemento</th><th>Ejemplo</th><th>Función</th><th>Uso frecuente</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Accept</td><td><code>Accept: application/json</code></td><td>Preferencia de representación de respuesta.</td><td>Solicitar JSON.</td></tr>
+        <tr><td>Content-Type</td><td><code>Content-Type: application/json</code></td><td>Formato del cuerpo enviado.</td><td>Enviar un objeto JSON.</td></tr>
+        <tr><td>Authorization</td><td><code>Authorization: Bearer &lt;token&gt;</code></td><td>Presentar credencial o token.</td><td>Acceder a recursos protegidos.</td></tr>
+        <tr><td>User-Agent</td><td><code>User-Agent: cliente-noc/1.0</code></td><td>Identificar el software cliente.</td><td>Trazabilidad y compatibilidad.</td></tr>
+        <tr><td>Query</td><td><code>?estado=alerta&amp;zona=sur</code></td><td>Filtrar o ajustar una consulta.</td><td>Listar solo elementos relevantes.</td></tr>
+        <tr><td>Ruta</td><td><code>/api/enlaces/15</code></td><td>Identificar un recurso concreto.</td><td>Consultar el enlace 15.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout"><strong>Seguridad.</strong> Tokens, contraseñas y secretos no deben colocarse en parámetros de consulta porque pueden quedar registrados en historiales, proxies o logs. La autenticación debe seguir el mecanismo definido por la API y utilizar HTTPS.</div>
+</div>
+</section>
+
+<section id="predice">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Predice</div>
+    <div>
+      <h2>¿Dónde colocar un filtro?</h2>
+      <p class="lead">Quieres consultar únicamente los enlaces que estén en estado <code>alerta</code> dentro de una colección.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="prediction">
+      <label><input type="radio" name="prediction" value="a"> Como parámetro de consulta: <code>?estado=alerta</code>.</label>
+      <label><input type="radio" name="prediction" value="b"> Dentro de <code>Authorization</code>.</label>
+      <label><input type="radio" name="prediction" value="c"> Como contraseña en la URL.</label>
+    </div>
+
+    <div class="action-row">
+      <button class="btn" id="checkPrediction" type="button">Comprobar</button>
+      <button class="btn light" id="resetPrediction" type="button">Reintentar</button>
+    </div>
+
+    <div class="feedback" id="predictionFeedback" aria-live="polite">El filtro modifica qué elementos de la colección deseas consultar.</div>
+  </div>
+</div>
+</section>
+
+<section id="experimenta">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Experimenta</div>
+    <div>
+      <h2>Construye una solicitud</h2>
+      <p class="lead">Selecciona recurso, filtro y formato esperado. Observa cómo cada decisión aparece en la solicitud.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="lab-grid">
+      <div class="lab-panel">
+        <label for="resource">Recurso</label>
+        <select id="resource">
+          <option value="links">Colección de enlaces</option>
+          <option value="link15">Enlace 15</option>
+          <option value="alarms">Colección de alarmas</option>
+        </select>
+
+        <label for="filter">Filtro</label>
+        <select id="filter">
+          <option value="none">Sin filtro</option>
+          <option value="alert">estado=alerta</option>
+          <option value="south">zona=sur</option>
+        </select>
+
+        <label for="acceptType">Formato esperado</label>
+        <select id="acceptType">
+          <option value="application/json">application/json</option>
+          <option value="text/plain">text/plain</option>
+        </select>
+
+        <button class="btn" id="buildRequest" type="button" style="margin-top:1rem">Construir solicitud</button>
+        <div class="feedback" id="requestFeedback" aria-live="polite">Configura la consulta.</div>
+      </div>
+
+      <div class="lab-panel">
+        <h3>Solicitud resultante</h3>
+
+        <div class="result-grid">
+          <div class="result-card"><b>Ruta</b><span id="outPath">/api/enlaces</span></div>
+          <div class="result-card"><b>Query</b><span id="outQuery">—</span></div>
+          <div class="result-card"><b>Accept</b><span id="outAccept">application/json</span></div>
+        </div>
+
+        <div class="terminal">
+          <pre id="requestPreview">GET /api/enlaces HTTP/1.1
+Host: noc.example
+Accept: application/json</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="ejemplo">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Observa y explica</div>
+    <div>
+      <h2>Ruta, query y cabeceras cumplen funciones diferentes</h2>
+      <p class="lead">Separar responsabilidades hace que una API sea más predecible.</p>
+    </div>
+  </div>
+
+  <div class="request-grid">
+    <article class="request-card">
+      <h3>Recurso individual</h3>
+      <code>GET /api/enlaces/15
+Accept: application/json</code>
+      <p>El identificador <code>15</code> forma parte de la ruta y selecciona un recurso concreto.</p>
+    </article>
+
+    <article class="request-card">
+      <h3>Colección filtrada</h3>
+      <code>GET /api/enlaces?estado=alerta
+Accept: application/json</code>
+      <p>El parámetro de consulta filtra la colección sin cambiar su identidad básica.</p>
+    </article>
+
+    <article class="request-card">
+      <h3>Enviar JSON</h3>
+      <code>POST /api/incidencias
+Content-Type: application/json
+
+{"enlace":15,"detalle":"latencia alta"}</code>
+      <p><code>Content-Type</code> describe el formato del cuerpo enviado.</p>
+    </article>
+
+    <article class="request-card">
+      <h3>Solicitar JSON</h3>
+      <code>GET /api/alarmas
+Accept: application/json</code>
+      <p><code>Accept</code> indica el formato que el cliente desea recibir.</p>
+    </article>
+  </div>
+</div>
+</section>
+
+<section id="resuelto">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Ejercicio resuelto</div>
+    <div>
+      <h2>Consultar alarmas críticas de una zona</h2>
+      <p class="lead">El NOC necesita consultar una colección y aplicar dos filtros sin modificar los datos.</p>
+    </div>
+  </div>
+
+  <div class="exercise-box">
+    <div class="exercise-head">
+      <span>Problema</span>
+      <h3>Construir la solicitud correcta</h3>
+    </div>
+
+    <div class="exercise-body">
+      <div class="solution-steps">
+        <div class="solution-step"><b>1</b><div><strong>Método.</strong><br>GET, porque se trata de una consulta.</div></div>
+        <div class="solution-step"><b>2</b><div><strong>Ruta.</strong><br><code>/api/alarmas</code>, porque se consulta la colección.</div></div>
+        <div class="solution-step"><b>3</b><div><strong>Filtros.</strong><br><code>?severidad=critica&amp;zona=sur</code>.</div></div>
+        <div class="solution-step"><b>4</b><div><strong>Formato esperado.</strong><br><code>Accept: application/json</code>.</div></div>
+        <div class="solution-step"><b>5</b><div><strong>Seguridad.</strong><br>Si el recurso está protegido, la credencial se envía según el mecanismo de autenticación de la API y sobre HTTPS.</div></div>
+      </div>
+
+      <div class="request-card" style="margin-top:1rem">
+        <code>GET /api/alarmas?severidad=critica&amp;zona=sur HTTP/1.1
+Host: noc.example
+Accept: application/json
+Authorization: Bearer &lt;token&gt;</code>
+      </div>
+
+      <div class="callout"><strong>Nota:</strong> la sintaxis concreta de filtros depende de la documentación de cada API. No existe un conjunto universal de nombres de parámetros.</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="practica">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Practica</div>
+    <div>
+      <h2>Ubica cada dato en el lugar adecuado</h2>
+      <p class="lead">Distingue metadatos, filtros e identificadores.</p>
+    </div>
+  </div>
+
+  <div class="practice-grid">
+    <article class="practice-card">
+      <h3>Ejercicio 1</h3>
+      <p>El cliente desea recibir JSON.</p>
+      <select id="p1">
+        <option value="">Selecciona…</option>
+        <option value="a">Accept: application/json</option>
+        <option value="b">Authorization: application/json</option>
+        <option value="c">?password=json</option>
+      </select>
+      <button class="btn" id="checkP1" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p1Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 2</h3>
+      <p>Quieres filtrar solo dispositivos de la zona norte.</p>
+      <select id="p2">
+        <option value="">Selecciona…</option>
+        <option value="a">?zona=norte</option>
+        <option value="b">Content-Type: zona/norte</option>
+        <option value="c">Authorization: norte</option>
+      </select>
+      <button class="btn" id="checkP2" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p2Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 3</h3>
+      <p>Enviarás un cuerpo JSON en una solicitud.</p>
+      <select id="p3">
+        <option value="">Selecciona…</option>
+        <option value="a">Content-Type: application/json</option>
+        <option value="b">Accept: password</option>
+        <option value="c">?content=json-secret</option>
+      </select>
+      <button class="btn" id="checkP3" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p3Feedback">Selecciona una respuesta.</div>
+    </article>
+  </div>
+</div>
+</section>
+
+<section id="caso">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Caso profesional</div>
+    <div>
+      <h2>Consulta de inventario desde el NOC</h2>
+      <p class="lead">Una aplicación debe consultar equipos de acceso de una zona concreta y recibir la información en JSON.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="case-grid">
+      <label>Filtro
+        <select id="caseFilter">
+          <option value="">Selecciona…</option>
+          <option value="query">Parámetro de consulta zona=centro</option>
+          <option value="auth">Guardar zona en Authorization</option>
+        </select>
+      </label>
+
+      <label>Formato esperado
+        <select id="caseAccept">
+          <option value="">Selecciona…</option>
+          <option value="json">Accept: application/json</option>
+          <option value="none">Sin indicar representación</option>
+        </select>
+      </label>
+
+      <label>Credencial
+        <select id="caseCredential">
+          <option value="">Selecciona…</option>
+          <option value="header">Usar el mecanismo de autenticación documentado en cabecera</option>
+          <option value="query">Poner el token como query visible</option>
+        </select>
+      </label>
+    </div>
+
+    <button class="btn" id="checkCase" type="button" style="margin-top:1rem">Evaluar diseño</button>
+    <div class="feedback" id="caseFeedback" aria-live="polite">Separa filtros de autenticación y representación.</div>
+  </div>
+</div>
+</section>
+
+<section id="comprueba">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Comprueba</div>
+    <div>
+      <h2>Integra lo aprendido</h2>
+      <p class="lead">Responde las cinco preguntas.</p>
+    </div>
+  </div>
+
+  <div class="quiz" id="quiz">
+    <article class="quiz-card"><fieldset><legend>1. ¿Qué expresa Accept?</legend><label><input type="radio" name="q1" value="a"> Qué representación desea recibir el cliente.</label><label><input type="radio" name="q1" value="b"> La contraseña del usuario.</label><label><input type="radio" name="q1" value="c"> El puerto TCP obligatorio.</label></fieldset><div class="mini-feedback" id="q1Feedback">Selecciona una respuesta.</div></article>
+
+    <article class="quiz-card"><fieldset><legend>2. ¿Qué describe Content-Type?</legend><label><input type="radio" name="q2" value="a"> El formato del contenido enviado.</label><label><input type="radio" name="q2" value="b"> El nombre del router.</label><label><input type="radio" name="q2" value="c"> El código de estado.</label></fieldset><div class="mini-feedback" id="q2Feedback">Selecciona una respuesta.</div></article>
+
+    <article class="quiz-card"><fieldset><legend>3. ¿Cuál es un uso típico de parámetros de consulta?</legend><label><input type="radio" name="q3" value="a"> Filtrar o paginar una colección.</label><label><input type="radio" name="q3" value="b"> Cifrar automáticamente HTTP.</label><label><input type="radio" name="q3" value="c"> Sustituir el certificado TLS.</label></fieldset><div class="mini-feedback" id="q3Feedback">Selecciona una respuesta.</div></article>
+
+    <article class="quiz-card"><fieldset><legend>4. ¿Dónde NO conviene poner un token sensible?</legend><label><input type="radio" name="q4" value="a"> En un parámetro de consulta visible.</label><label><input type="radio" name="q4" value="b"> En el mecanismo de autenticación definido por la API.</label><label><input type="radio" name="q4" value="c"> En una cabecera de autenticación sobre HTTPS.</label></fieldset><div class="mini-feedback" id="q4Feedback">Selecciona una respuesta.</div></article>
+
+    <article class="quiz-card"><fieldset><legend>5. ¿Qué se estudiará en 2.1.6?</legend><label><input type="radio" name="q5" value="a"> JSON y fundamentos REST.</label><label><input type="radio" name="q5" value="b"> Modulación QAM avanzada.</label><label><input type="radio" name="q5" value="c"> Lógica secuencial.</label></fieldset><div class="mini-feedback" id="q5Feedback">Selecciona una respuesta.</div></article>
+  </div>
+
+  <div class="action-row" style="margin-top:1rem">
+    <button class="btn" id="checkQuiz" type="button">Comprobar todo</button>
+    <button class="btn light" id="resetQuiz" type="button">Reintentar</button>
+  </div>
+
+  <div class="score" id="scoreBox" aria-live="polite">Aún no has comprobado la actividad.</div>
+</div>
+</section>
+
+<section id="reflexiona">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Reflexión</div>
+    <div>
+      <h2>Diseña una consulta para una API de red</h2>
+      <p class="lead">Define la ruta, dos filtros, el formato que deseas recibir y qué cabeceras serían necesarias para acceder al recurso.</p>
+    </div>
+  </div>
+
+  <div class="reflection-box">
+    <textarea id="reflectionText" aria-label="Reflexión del estudiante" placeholder="Ejemplo: GET /api/enlaces?zona=sur&estado=alerta, Accept: application/json y autenticación según la API..."></textarea>
+    <div class="action-row">
+      <button class="btn" id="saveReflection" type="button">Guardar en este navegador</button>
+      <button class="btn light" id="clearReflection" type="button">Borrar</button>
+    </div>
+    <p id="reflectionStatus" aria-live="polite">El texto no se transmite; si lo guardas, permanece únicamente en el almacenamiento local de este navegador.</p>
+  </div>
+
+  <div class="references" style="margin-top:2rem">
+    <article class="ref-card">
+      <h3>Ideas clave</h3>
+      <p>Las cabeceras transportan metadatos del mensaje. Los parámetros de consulta ajustan la consulta y los valores de ruta identifican recursos dentro de la interfaz.</p>
+    </article>
+
+    <article class="ref-card">
+      <h3>Delimitación</h3>
+      <p>En 2.1.6 se integrarán estos elementos con JSON y fundamentos REST para comprender el diseño básico de APIs.</p>
+    </article>
+  </div>
+
+  <div class="bottom-nav">
+    <a class="btn light" href="tema-2-1-4-codigos-estado-http.html">← 2.1.4 Códigos de estado HTTP</a>
+    <a class="btn light" href="tema-2-1-6-json-fundamentos-rest.html">2.1.6 JSON y fundamentos REST →</a>
+  </div>
+</div>
+</section>
+</main>
+
+<footer>
+<div class="footer-inner">
+  <div><strong>Programación de Redes: Protocolos y APIs</strong><br><span>Subtema 2.1.5 · Cabeceras y parámetros en HTTP</span></div>
+  <div>Material interactivo · uso local</div>
+</div>
+</footer>
+
+<div class="progress-wrap" aria-hidden="true">Recorrido <b id="progressValue">0%</b></div>
+
+<script>
+(() => {
+"use strict";
+
+const $=id=>document.getElementById(id);
+
+const setFeedback=(el,text,type="")=>{
+  el.textContent=text;
+  el.className="feedback"+(type?" "+type:"");
+};
+
+const setMini=(el,text,ok=null)=>{
+  el.textContent=text;
+  el.style.borderLeftColor=ok===true?"var(--green)":ok===false?"var(--red)":"var(--cyan)";
+  el.style.background=ok===true?"var(--green-soft)":ok===false?"var(--red-soft)":"var(--soft)";
+};
+
+$("checkPrediction").addEventListener("click",()=>{
+  const s=document.querySelector('input[name="prediction"]:checked');
+
+  if(!s){
+    return setFeedback(
+      $("predictionFeedback"),
+      "Selecciona primero una opción.",
+      "warn"
+    );
+  }
+
+  if(s.value==="a"){
+    setFeedback(
+      $("predictionFeedback"),
+      "Correcto. Un parámetro de consulta es apropiado para filtrar una colección.",
+      "success"
+    );
+  }else{
+    setFeedback(
+      $("predictionFeedback"),
+      "Revisa la función de cada elemento: Authorization no se usa para filtros de negocio.",
+      "error"
+    );
+  }
+});
+
+$("resetPrediction").addEventListener("click",()=>{
+  document.querySelectorAll('input[name="prediction"]').forEach(r=>r.checked=false);
+
+  setFeedback(
+    $("predictionFeedback"),
+    "El filtro modifica qué elementos de la colección deseas consultar."
+  );
+});
+
+const resources={
+  links:"/api/enlaces",
+  link15:"/api/enlaces/15",
+  alarms:"/api/alarmas"
+};
+
+const filters={
+  none:"",
+  alert:"estado=alerta",
+  south:"zona=sur"
+};
+
+$("buildRequest").addEventListener("click",()=>{
+  const path=resources[$("resource").value];
+  const query=filters[$("filter").value];
+  const accept=$("acceptType").value;
+
+  const fullPath=query?`${path}?${query}`:path;
+
+  $("outPath").textContent=path;
+  $("outQuery").textContent=query||"—";
+  $("outAccept").textContent=accept;
+
+  $("requestPreview").textContent=
+`GET ${fullPath} HTTP/1.1
+Host: noc.example
+Accept: ${accept}`;
+
+  setFeedback(
+    $("requestFeedback"),
+    query
+      ? "Solicitud construida: la ruta identifica el recurso y el query aplica un filtro."
+      : "Solicitud construida sin filtros adicionales.",
+    "success"
+  );
+});
+
+const practices=[
+  {
+    s:"p1",b:"checkP1",f:"p1Feedback",a:"a",
+    ok:"Correcto. Accept indica qué representación desea recibir el cliente.",
+    bad:"Accept no transporta credenciales ni debe usarse como parámetro de contraseña."
+  },
+  {
+    s:"p2",b:"checkP2",f:"p2Feedback",a:"a",
+    ok:"Correcto. Un query parameter puede filtrar la colección por zona.",
+    bad:"Los filtros de consulta no deben mezclarse con Content-Type o Authorization."
+  },
+  {
+    s:"p3",b:"checkP3",f:"p3Feedback",a:"a",
+    ok:"Correcto. Content-Type describe el formato del cuerpo que se envía.",
+    bad:"Cuando envías JSON, Content-Type debe describir ese contenido."
+  }
+];
+
+practices.forEach(p=>{
+  $(p.b).addEventListener("click",()=>{
+    const v=$(p.s).value;
+
+    if(!v){
+      return setMini(
+        $(p.f),
+        "Selecciona primero una respuesta."
+      );
+    }
+
+    setMini(
+      $(p.f),
+      v===p.a?p.ok:p.bad,
+      v===p.a
+    );
+  });
+});
+
+$("checkCase").addEventListener("click",()=>{
+  const ok=
+    $("caseFilter").value==="query" &&
+    $("caseAccept").value==="json" &&
+    $("caseCredential").value==="header";
+
+  setFeedback(
+    $("caseFeedback"),
+    ok
+      ? "Diseño coherente. Los filtros viajan como query, la representación se expresa con Accept y la autenticación usa el mecanismo documentado por la API."
+      : "Revisa la separación entre filtros, representación y autenticación.",
+    ok?"success":"error"
+  );
+});
+
+const answers={
+  q1:"a",
+  q2:"a",
+  q3:"a",
+  q4:"a",
+  q5:"a"
+};
+
+const explanations={
+  q1:"Accept expresa qué representación desea recibir el cliente.",
+  q2:"Content-Type describe el formato del contenido que se está enviando.",
+  q3:"Los parámetros de consulta se utilizan con frecuencia para filtrar, ordenar o paginar.",
+  q4:"Los secretos no deben exponerse en URLs o query parameters.",
+  q5:"El siguiente subtema estudia JSON y fundamentos REST."
+};
+
+$("checkQuiz").addEventListener("click",()=>{
+  let score=0;
+
+  Object.keys(answers).forEach(q=>{
+    const s=document.querySelector(`input[name="${q}"]:checked`);
+    const ok=s&&s.value===answers[q];
+
+    if(ok){
+      score++;
+    }
+
+    setMini(
+      $(`${q}Feedback`),
+      s?((ok?"Correcto. ":"Revisa. ")+explanations[q]):"Falta responder esta pregunta.",
+      ok
+    );
+  });
+
+  $("scoreBox").textContent=
+    `Resultado: ${score}/5. ${
+      score===5
+        ? "Dominio sólido de cabeceras y parámetros HTTP."
+        : "Revisa las explicaciones y vuelve a intentarlo."
+    }`;
+});
+
+$("resetQuiz").addEventListener("click",()=>{
+  document.querySelectorAll('#quiz input[type="radio"]').forEach(r=>r.checked=false);
+
+  Object.keys(answers).forEach(q=>{
+    setMini(
+      $(`${q}Feedback`),
+      "Selecciona una respuesta."
+    );
+  });
+
+  $("scoreBox").textContent=
+    "Aún no has comprobado la actividad.";
+});
+
+const key="pr-redes-2-1-5-reflexion";
+
+try{
+  const saved=localStorage.getItem(key);
+
+  if(saved){
+    $("reflectionText").value=saved;
+  }
+}catch(_){}
+
+$("saveReflection").addEventListener("click",()=>{
+  try{
+    localStorage.setItem(
+      key,
+      $("reflectionText").value
+    );
+
+    $("reflectionStatus").textContent=
+      "Reflexión guardada únicamente en este navegador.";
+  }catch(_){
+    $("reflectionStatus").textContent=
+      "Este navegador no permitió guardar la reflexión localmente.";
+  }
+});
+
+$("clearReflection").addEventListener("click",()=>{
+  $("reflectionText").value="";
+
+  try{
+    localStorage.removeItem(key);
+  }catch(_){}
+
+  $("reflectionStatus").textContent=
+    "Reflexión borrada del almacenamiento local.";
+});
+
+const sections=[...document.querySelectorAll("main section")];
+
+function updateProgress(){
+  const total=document.documentElement.scrollHeight-window.innerHeight;
+
+  const pct=
+    total>0
+      ? Math.max(0,Math.min(100,Math.round((window.scrollY/total)*100)))
+      : 100;
+
+  $("progressValue").textContent=pct+"%";
+
+  const marker=window.scrollY+window.innerHeight*.36;
+  let current=sections[0];
+
+  sections.forEach(s=>{
+    if(s.offsetTop<=marker){
+      current=s;
+    }
+  });
+
+  document.querySelectorAll("nav a").forEach(
+    a=>a.removeAttribute("aria-current")
+  );
+
+  if(current&&current.id){
+    const link=document.querySelector(`nav a[href="#${current.id}"]`);
+
+    if(link){
+      link.setAttribute("aria-current","location");
+    }
+  }
+}
+
+window.addEventListener("scroll",updateProgress,{passive:true});
+window.addEventListener("resize",updateProgress);
+updateProgress();
+})();
+</script>
+</body>
+</html>

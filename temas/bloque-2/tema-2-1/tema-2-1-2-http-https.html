@@ -1,0 +1,1242 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Subtema 2.1.2: HTTP y HTTPS.">
+<meta name="theme-color" content="#10212a">
+<title>2.1.2 | HTTP y HTTPS</title>
+<style>
+:root{
+  --ink:#18212a;--muted:#586775;--line:#cbd5dc;--soft:#f3f6f8;--paper:#fff;
+  --cyan:#007c91;--cyan-dark:#005b6a;--cyan-light:#6ed2e2;
+  --green:#16734a;--green-soft:#e8f5ee;--amber:#8a5600;--amber-soft:#fff3d8;
+  --red:#9b2c2c;--red-soft:#fdecec;--focus:#005fcc;
+  --navy:#10212a;--navy-deep:#07141a;--max:1180px;--radius:8px;
+  --shadow:0 16px 38px rgba(24,33,42,.08)
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;min-width:280px;color:var(--ink);background:var(--paper);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  line-height:1.55;overflow-x:hidden
+}
+button,input,select,textarea{font:inherit;max-width:100%}
+a{color:var(--cyan-dark)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:3px solid var(--focus);outline-offset:3px
+}
+.skip-link{
+  position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;
+  background:var(--ink);color:#fff
+}
+.skip-link:focus{top:1rem}
+header{
+  position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);
+  border-bottom:1px solid var(--line);backdrop-filter:blur(8px)
+}
+.header-inner{
+  width:min(100%,var(--max));min-height:66px;margin:0 auto;padding:.55rem 1.25rem;
+  display:flex;gap:1rem;align-items:center;min-width:0
+}
+.brand{min-width:190px}.brand strong{display:block;font-size:.95rem}
+.brand span{display:block;color:var(--muted);font-size:.78rem}
+.nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}
+nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+nav a{
+  color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;
+  border-bottom:2px solid transparent;font-size:.84rem
+}
+nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+.top-link{
+  flex:0 0 auto;text-decoration:none;border:1px solid var(--line);border-radius:5px;
+  padding:.48rem .72rem;color:var(--ink);font-weight:750;white-space:nowrap;background:#fff
+}
+main{overflow:hidden}
+section{scroll-margin-top:84px;border-bottom:1px solid var(--line)}
+.band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+.hero{
+  min-height:calc(100svh - 66px);display:grid;align-items:center;
+  background:var(--navy);color:#fff
+}
+.hero-grid{
+  width:min(100%,var(--max));margin:0 auto;padding:3.4rem 1.25rem;
+  display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);
+  gap:3rem;align-items:center
+}
+.hero-grid>*{min-width:0}
+.eyebrow{
+  color:var(--cyan-light);font-size:.82rem;font-weight:800;
+  text-transform:uppercase;letter-spacing:.08em
+}
+h1{
+  font-size:clamp(2rem,5vw,4.1rem);line-height:1.02;margin:.65rem 0 1.15rem;
+  max-width:18ch;overflow-wrap:normal;word-break:normal;hyphens:none
+}
+h2{
+  font-size:clamp(1.75rem,3.3vw,2.8rem);line-height:1.12;margin:0 0 .8rem;
+  overflow-wrap:normal;word-break:normal;hyphens:none
+}
+h3{font-size:1.22rem;margin:0 0 .55rem}
+p{max-width:72ch}.hero p{color:#d7e5ea;font-size:1.08rem}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}
+.hero-actions{margin-top:1.45rem}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cyan-dark);
+  background:var(--cyan);color:#fff;text-decoration:none;padding:.72rem 1rem;
+  border-radius:5px;font-weight:750
+}
+.btn:hover{background:var(--cyan-dark)}
+.btn.secondary{background:transparent;color:inherit;border-color:currentColor}
+.btn.secondary:hover{background:rgba(255,255,255,.1)}
+.btn.light{background:#fff;color:var(--ink);border-color:var(--line)}
+.btn.light:hover{background:var(--soft);color:var(--cyan-dark)}
+.hero-board{background:var(--navy-deep);border:1px solid #3b5965;border-radius:8px;padding:1.25rem}
+.proto-flow{display:grid;gap:.7rem;margin-top:1rem}
+.proto-row{
+  display:grid;grid-template-columns:minmax(0,1fr) 58px minmax(0,1fr);
+  gap:.7rem;align-items:center
+}
+.proto-box{
+  min-width:0;padding:.9rem;border:1px solid #3b5965;border-radius:6px;background:#0d2630
+}
+.proto-box strong{display:block}.proto-box small{display:block;color:#b8cbd2;margin-top:.2rem}
+.proto-arrow{text-align:center;color:var(--cyan-light);font-weight:900}
+.section-head{
+  display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;
+  align-items:start;margin-bottom:2.2rem
+}
+.section-head>*{min-width:0}
+.section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}
+.lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+.outcomes{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line)
+}
+.outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}
+.outcome:last-child{border-right:0}
+.outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+.scope-note,.callout{
+  margin-top:1.4rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)
+}
+.concept-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+.concept-card{
+  min-width:0;border:1px solid var(--line);border-radius:var(--radius);
+  padding:1.15rem;background:#fff;box-shadow:var(--shadow)
+}
+.tag{
+  display:inline-block;font-size:.76rem;font-weight:850;color:var(--cyan-dark);
+  background:#d9eef2;padding:.2rem .45rem;border-radius:999px;margin-bottom:.55rem
+}
+.concept-card p{color:var(--muted);font-size:.94rem}
+.compare-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.compare-card{border:1px solid var(--line);border-radius:7px;padding:1rem;min-width:0}
+.compare-card h3{color:var(--cyan-dark)}
+.compare-card ul{padding-left:1.15rem}
+.table-wrap{overflow-x:auto;margin-top:1.2rem;border:1px solid var(--line);border-radius:7px}
+table{border-collapse:collapse;width:100%;min-width:760px}
+th,td{padding:.8rem;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--soft)}
+.activity{
+  margin-top:1.5rem;padding:1.35rem;border:1px solid var(--line);
+  border-radius:var(--radius);background:var(--soft);min-width:0
+}
+.prediction{display:grid;gap:.6rem;margin:.85rem 0 1rem}
+.prediction label{
+  display:block;padding:.75rem .8rem;background:#fff;border:1px solid var(--line);border-radius:5px
+}
+.feedback{
+  margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);
+  background:#fff;min-height:3rem
+}
+.feedback.success{background:var(--green-soft);border-color:var(--green)}
+.feedback.warn{background:var(--amber-soft);border-color:var(--amber)}
+.feedback.error{background:var(--red-soft);border-color:var(--red)}
+.lab-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:1rem}
+.lab-grid>*{min-width:0}
+.lab-panel{border:1px solid var(--line);border-radius:7px;background:#fff;padding:1rem}
+.lab-panel label{display:block;font-weight:750;margin:.75rem 0 .3rem}
+.lab-panel select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+.security-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-top:1rem}
+.security-card{padding:.8rem;border:1px solid var(--line);border-radius:6px;background:#fff;min-width:0}
+.security-card b{display:block;color:var(--cyan-dark);margin-bottom:.3rem}
+.security-card span{display:block;color:var(--muted)}
+.terminal{
+  margin-top:1rem;background:#07141a;color:#dce9ed;border-radius:7px;
+  padding:1rem;border:1px solid #314b56;overflow-x:auto
+}
+.terminal pre{margin:0;white-space:pre-wrap;word-break:break-word}
+.request-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.request-card{border:1px solid var(--line);border-radius:7px;padding:1rem;background:#fff;min-width:0}
+.request-card code{
+  display:block;background:#08151c;color:#dce9ed;padding:1rem;border-radius:6px;
+  overflow-x:auto;white-space:pre
+}
+.exercise-box{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.exercise-head{padding:1rem 1.1rem;background:var(--navy);color:#fff}
+.exercise-head span{
+  display:block;color:var(--cyan-light);font-size:.78rem;font-weight:850;text-transform:uppercase
+}
+.exercise-body{padding:1.1rem}
+.solution-steps{display:grid;gap:.75rem}
+.solution-step{
+  display:grid;grid-template-columns:34px minmax(0,1fr);gap:.8rem;align-items:start
+}
+.solution-step>b{
+  display:grid;place-items:center;width:34px;height:34px;border-radius:50%;
+  background:#d9eef2;color:var(--cyan-dark)
+}
+.practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+.practice-card{border:1px solid var(--line);border-radius:7px;padding:1rem;min-width:0}
+.practice-card select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.mini-feedback{
+  margin-top:.75rem;padding:.75rem;border-left:4px solid var(--cyan);
+  background:var(--soft);min-height:4rem
+}
+.case-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}
+.case-grid label{display:block;font-weight:750}
+.case-grid select{width:100%;margin-top:.3rem;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.quiz{display:grid;gap:1rem}
+.quiz-card{border:1px solid var(--line);border-radius:7px;padding:1rem}
+.quiz-card fieldset{border:0;padding:0;margin:0}
+.quiz-card legend{font-weight:800;margin-bottom:.7rem}
+.quiz-card label{display:block;padding:.5rem .55rem;border-radius:4px}
+.quiz-card label:hover{background:var(--soft)}
+.score{
+  margin-top:1rem;padding:1rem;border:1px solid var(--line);
+  border-radius:6px;background:var(--soft);font-weight:800
+}
+.reflection-box textarea{
+  width:100%;min-height:145px;resize:vertical;padding:.8rem;border:1px solid var(--line);border-radius:6px
+}
+.references{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.ref-card{border-top:4px solid var(--cyan);padding:1rem;background:var(--soft)}
+.bottom-nav{
+  margin-top:2rem;display:flex;justify-content:space-between;gap:.7rem;flex-wrap:wrap
+}
+footer{background:var(--navy-deep);color:#c7d8de}
+.footer-inner{
+  width:min(100%,var(--max));margin:0 auto;padding:1.4rem 1.25rem;
+  display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap
+}
+.progress-wrap{
+  position:fixed;right:1rem;bottom:1rem;z-index:20;background:rgba(7,20,26,.93);
+  color:#fff;padding:.45rem .7rem;border-radius:999px;font-size:.78rem;border:1px solid #3b5965
+}
+@media(max-width:900px){
+  .hero-grid,.section-head,.lab-grid,.request-grid{grid-template-columns:1fr}
+  .concept-grid,.outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .outcome:nth-child(2){border-right:0}
+  .outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .practice-grid,.case-grid,.security-grid{grid-template-columns:1fr}
+}
+@media(max-width:700px){.compare-grid,.references{grid-template-columns:1fr}}
+@media(max-width:600px){
+  .header-inner{padding-inline:.8rem}.brand{min-width:145px}.top-link{padding:.45rem .6rem}
+  .band,.hero-grid{padding-left:.9rem;padding-right:.9rem}
+  h1{font-size:clamp(2rem,10vw,2.75rem);max-width:none}
+  .concept-grid,.outcomes{grid-template-columns:1fr}
+  .outcome{border-right:0;border-bottom:1px solid var(--line)}
+  .outcome:last-child{border-bottom:0}
+  .proto-row{grid-template-columns:1fr}
+  .proto-arrow{transform:rotate(90deg)}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+<header>
+<div class="header-inner">
+  <div class="brand">
+    <strong>Programación de Redes</strong>
+    <span>Protocolos y APIs</span>
+  </div>
+
+  <div class="nav-scroll" aria-label="Navegación del subtema">
+    <nav>
+      <a href="#inicio">Inicio</a>
+      <a href="#orientacion">Cómo trabajar</a>
+      <a href="#conceptos">Conceptos</a>
+      <a href="#predice">Predice</a>
+      <a href="#experimenta">Experimenta</a>
+      <a href="#ejemplo">Ejemplo</a>
+      <a href="#resuelto">Ejercicio resuelto</a>
+      <a href="#practica">Practica</a>
+      <a href="#caso">Caso profesional</a>
+      <a href="#comprueba">Comprueba</a>
+      <a href="#reflexiona">Reflexión</a>
+    </nav>
+  </div>
+
+  <a class="top-link" href="index.html">← Curso</a>
+</div>
+</header>
+
+<main id="contenido">
+
+<section class="hero" id="inicio">
+<div class="hero-grid">
+  <div>
+    <div class="eyebrow">Bloque 2 · Tema 2.1 · Subtema 2.1.2</div>
+    <h1>HTTP y HTTPS</h1>
+    <p>Comprende cómo HTTP organiza la comunicación entre aplicaciones web y qué añade HTTPS mediante TLS para proteger la información mientras viaja entre cliente y servidor.</p>
+
+    <div class="hero-actions">
+      <a class="btn" href="#orientacion">Comenzar recorrido</a>
+      <a class="btn secondary" href="tema-2-1-fundamentos-servicios-web-protocolo-http.html">Volver al Tema 2.1</a>
+    </div>
+  </div>
+
+  <div class="hero-board" role="img" aria-label="Comparación conceptual entre HTTP y HTTPS">
+    <h3>HTTP frente a HTTPS</h3>
+
+    <div class="proto-flow">
+      <div class="proto-row">
+        <div class="proto-box">
+          <strong>HTTP</strong>
+          <small>mensaje de aplicación</small>
+        </div>
+        <div class="proto-arrow">→</div>
+        <div class="proto-box">
+          <strong>Sin TLS</strong>
+          <small>el contenido no queda protegido por HTTP</small>
+        </div>
+      </div>
+
+      <div class="proto-row">
+        <div class="proto-box">
+          <strong>HTTPS</strong>
+          <small>HTTP protegido mediante TLS</small>
+        </div>
+        <div class="proto-arrow">→</div>
+        <div class="proto-box">
+          <strong>TLS</strong>
+          <small>cifrado · integridad · autenticación</small>
+        </div>
+      </div>
+
+      <div class="proto-row">
+        <div class="proto-box">
+          <strong>Cliente</strong>
+          <small>valida el servidor</small>
+        </div>
+        <div class="proto-arrow">↔</div>
+        <div class="proto-box">
+          <strong>Servidor</strong>
+          <small>presenta identidad mediante certificado</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="orientacion">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Cómo trabajar este tema</div>
+    <div>
+      <h2>Separa protocolo de aplicación y protección del canal</h2>
+      <p class="lead">HTTP define cómo se intercambian mensajes web. HTTPS no es “otro HTTP”: es HTTP utilizado sobre una comunicación protegida mediante TLS.</p>
+    </div>
+  </div>
+
+  <div class="outcomes">
+    <div class="outcome"><b>1. Explicar</b> qué función cumple HTTP en una aplicación web.</div>
+    <div class="outcome"><b>2. Diferenciar</b> HTTP de HTTPS sin confundirlos con TCP o UDP.</div>
+    <div class="outcome"><b>3. Relacionar</b> TLS con cifrado, integridad y autenticación.</div>
+    <div class="outcome"><b>4. Justificar</b> por qué los servicios web modernos deben proteger información sensible en tránsito.</div>
+  </div>
+
+  <div class="scope-note">
+    <strong>Alcance.</strong> Se estudia la función general de HTTP/HTTPS. Los métodos HTTP y los códigos de estado se desarrollarán en 2.1.3 y 2.1.4.
+  </div>
+</div>
+</section>
+
+<section id="conceptos">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Explora</div>
+    <div>
+      <h2>Cuatro conceptos que no deben confundirse</h2>
+      <p class="lead">Distinguir capas evita errores frecuentes al explicar cómo funciona un servicio web.</p>
+    </div>
+  </div>
+
+  <div class="concept-grid">
+    <article class="concept-card">
+      <span class="tag">HTTP</span>
+      <h3>Protocolo de aplicación</h3>
+      <p>Define la estructura conceptual de solicitudes y respuestas entre clientes y servidores web.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">HTTPS</span>
+      <h3>HTTP protegido</h3>
+      <p>Utiliza TLS para proteger la comunicación HTTP en tránsito.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">TLS</span>
+      <h3>Seguridad del canal</h3>
+      <p>Aporta confidencialidad, integridad y autenticación del servidor; puede incluir autenticación del cliente en ciertos escenarios.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">Transporte</span>
+      <h3>Debajo de HTTP</h3>
+      <p>HTTP/1.1 y HTTP/2 usan normalmente TCP; HTTP/3 utiliza QUIC, que funciona sobre UDP.</p>
+    </article>
+  </div>
+
+  <div class="callout">
+    <strong>Convención de puertos:</strong> HTTP utiliza habitualmente el puerto 80 y HTTPS el 443, aunque un servicio puede configurarse en otros puertos.
+  </div>
+
+  <div class="compare-grid" style="margin-top:1.5rem">
+    <article class="compare-card">
+      <h3>HTTP</h3>
+      <ul>
+        <li>No proporciona por sí mismo cifrado del contenido.</li>
+        <li>El esquema habitual es <code>http://</code>.</li>
+        <li>Puede ser útil en entornos controlados de laboratorio.</li>
+        <li>No debe utilizarse para transmitir secretos en una red no confiable.</li>
+      </ul>
+    </article>
+
+    <article class="compare-card">
+      <h3>HTTPS</h3>
+      <ul>
+        <li>Protege el contenido HTTP mediante TLS.</li>
+        <li>El esquema habitual es <code>https://</code>.</li>
+        <li>Permite validar la identidad del servidor mediante certificados.</li>
+        <li>Reduce el riesgo de lectura o modificación del contenido en tránsito.</li>
+      </ul>
+    </article>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Propiedad</th><th>HTTP</th><th>HTTPS</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Cifrado del contenido en tránsito</td><td>No por HTTP</td><td>Sí, mediante TLS</td></tr>
+        <tr><td>Integridad del canal</td><td>No garantizada por HTTP</td><td>Protegida mediante TLS</td></tr>
+        <tr><td>Autenticación del servidor</td><td>No proporcionada por HTTP</td><td>Se apoya en certificados TLS</td></tr>
+        <tr><td>Esquema habitual</td><td><code>http://</code></td><td><code>https://</code></td></tr>
+        <tr><td>Puerto convencional</td><td>80</td><td>443</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<section id="predice">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Predice</div>
+    <div>
+      <h2>¿Qué protege HTTPS?</h2>
+      <p class="lead">Un operador accede a una plataforma web de gestión desde una red Wi‑Fi compartida.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="prediction">
+      <label>
+        <input type="radio" name="prediction" value="a">
+        HTTPS protege el contenido HTTP en tránsito mediante TLS, si la validación es correcta.
+      </label>
+
+      <label>
+        <input type="radio" name="prediction" value="b">
+        HTTPS garantiza que el equipo del usuario jamás pueda tener malware.
+      </label>
+
+      <label>
+        <input type="radio" name="prediction" value="c">
+        HTTPS hace que la dirección IP del servidor deje de existir.
+      </label>
+    </div>
+
+    <div class="action-row">
+      <button class="btn" id="checkPrediction" type="button">Comprobar</button>
+      <button class="btn light" id="resetPrediction" type="button">Reintentar</button>
+    </div>
+
+    <div class="feedback" id="predictionFeedback" aria-live="polite">
+      Piensa en qué parte de la comunicación protege TLS y qué problemas quedan fuera de su alcance.
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="experimenta">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Experimenta</div>
+    <div>
+      <h2>Compara escenarios HTTP y HTTPS</h2>
+      <p class="lead">La simulación no realiza conexiones reales; muestra qué propiedades de seguridad aporta cada opción.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="lab-grid">
+      <div class="lab-panel">
+        <label for="protocol">Protocolo</label>
+        <select id="protocol">
+          <option value="http">HTTP</option>
+          <option value="https">HTTPS</option>
+        </select>
+
+        <label for="scenario">Información transmitida</label>
+        <select id="scenario">
+          <option value="status">Estado de un enlace</option>
+          <option value="credentials">Credenciales de acceso</option>
+          <option value="inventory">Inventario de equipos</option>
+        </select>
+
+        <button class="btn" id="simulate" type="button" style="margin-top:1rem">
+          Evaluar escenario
+        </button>
+
+        <div class="feedback" id="simFeedback" aria-live="polite">
+          Selecciona protocolo e información.
+        </div>
+      </div>
+
+      <div class="lab-panel">
+        <h3>Propiedades del canal</h3>
+
+        <div class="security-grid">
+          <div class="security-card">
+            <b>Confidencialidad</b>
+            <span id="confidentiality">No protegida por HTTP</span>
+          </div>
+
+          <div class="security-card">
+            <b>Integridad</b>
+            <span id="integrity">No protegida por HTTP</span>
+          </div>
+
+          <div class="security-card">
+            <b>Identidad del servidor</b>
+            <span id="authentication">No validada por HTTP</span>
+          </div>
+        </div>
+
+        <div class="terminal">
+          <pre id="channelOutput">Cliente → HTTP → Servidor
+Contenido sin protección TLS.</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="ejemplo">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Observa y explica</div>
+    <div>
+      <h2>La URL también comunica el esquema</h2>
+      <p class="lead">El inicio de la URL indica si la comunicación web se plantea con HTTP o HTTPS.</p>
+    </div>
+  </div>
+
+  <div class="request-grid">
+    <article class="request-card">
+      <h3>HTTP</h3>
+      <code>http://monitor.example/api/enlaces/15</code>
+      <p>La aplicación utiliza HTTP sin la protección que proporciona TLS.</p>
+    </article>
+
+    <article class="request-card">
+      <h3>HTTPS</h3>
+      <code>https://monitor.example/api/enlaces/15</code>
+      <p>La aplicación utiliza HTTP protegido mediante TLS.</p>
+    </article>
+  </div>
+
+  <div class="callout">
+    <strong>No confundas HTTPS con “sitio confiable”.</strong> HTTPS protege el canal y permite validar la identidad presentada por el servidor; no garantiza que el contenido de la aplicación sea correcto, seguro o legítimo por sí mismo.
+  </div>
+</div>
+</section>
+
+<section id="resuelto">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Ejercicio resuelto</div>
+    <div>
+      <h2>Acceso a una plataforma de gestión</h2>
+      <p class="lead">Un operador debe consultar alarmas y autenticarse en una plataforma web desde una red que no controla.</p>
+    </div>
+  </div>
+
+  <div class="exercise-box">
+    <div class="exercise-head">
+      <span>Problema</span>
+      <h3>Elegir HTTP o HTTPS y justificar</h3>
+    </div>
+
+    <div class="exercise-body">
+      <div class="solution-steps">
+        <div class="solution-step">
+          <b>1</b>
+          <div>
+            <strong>Identificar sensibilidad.</strong><br>
+            Se transmitirán credenciales y datos operativos.
+          </div>
+        </div>
+
+        <div class="solution-step">
+          <b>2</b>
+          <div>
+            <strong>Evaluar la red.</strong><br>
+            El operador no controla todos los sistemas intermedios.
+          </div>
+        </div>
+
+        <div class="solution-step">
+          <b>3</b>
+          <div>
+            <strong>Elegir HTTPS.</strong><br>
+            Se necesita protección del contenido en tránsito.
+          </div>
+        </div>
+
+        <div class="solution-step">
+          <b>4</b>
+          <div>
+            <strong>Validar el servidor.</strong><br>
+            El cliente debe comprobar correctamente el certificado presentado.
+          </div>
+        </div>
+
+        <div class="solution-step">
+          <b>5</b>
+          <div>
+            <strong>Reconocer límites.</strong><br>
+            HTTPS no corrige vulnerabilidades de la aplicación ni protege un endpoint comprometido.
+          </div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>Conclusión:</strong> para una plataforma operativa con autenticación, HTTPS debe ser la opción normal porque protege la comunicación en tránsito mediante TLS.
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="practica">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Practica</div>
+    <div>
+      <h2>Distingue protocolo, seguridad y transporte</h2>
+      <p class="lead">Evita mezclar conceptos de capas distintas.</p>
+    </div>
+  </div>
+
+  <div class="practice-grid">
+    <article class="practice-card">
+      <h3>Ejercicio 1</h3>
+      <p>¿Qué añade HTTPS respecto de HTTP?</p>
+
+      <select id="p1">
+        <option value="">Selecciona…</option>
+        <option value="a">Protección TLS para la comunicación</option>
+        <option value="b">Una base de datos automática</option>
+        <option value="c">Una dirección IP diferente por obligación</option>
+      </select>
+
+      <button class="btn" id="checkP1" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p1Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 2</h3>
+      <p>¿Cuál es un beneficio de TLS?</p>
+
+      <select id="p2">
+        <option value="">Selecciona…</option>
+        <option value="a">Confidencialidad e integridad del canal</option>
+        <option value="b">Eliminar la necesidad de autenticación de usuarios</option>
+        <option value="c">Garantizar que nunca exista un error de aplicación</option>
+      </select>
+
+      <button class="btn" id="checkP2" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p2Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 3</h3>
+      <p>HTTP/3 utiliza normalmente:</p>
+
+      <select id="p3">
+        <option value="">Selecciona…</option>
+        <option value="a">QUIC sobre UDP</option>
+        <option value="b">Solo ICMP</option>
+        <option value="c">ARP como protocolo de aplicación</option>
+      </select>
+
+      <button class="btn" id="checkP3" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p3Feedback">Selecciona una respuesta.</div>
+    </article>
+  </div>
+</div>
+</section>
+
+<section id="caso">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Caso profesional</div>
+    <div>
+      <h2>Portal web para mantenimiento de estaciones</h2>
+      <p class="lead">Los técnicos de campo acceden a una plataforma desde diferentes redes para revisar inventario y registrar observaciones.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="case-grid">
+      <label>Esquema
+        <select id="caseProtocol">
+          <option value="">Selecciona…</option>
+          <option value="https">HTTPS</option>
+          <option value="http">HTTP sin TLS</option>
+        </select>
+      </label>
+
+      <label>Validación
+        <select id="caseCert">
+          <option value="">Selecciona…</option>
+          <option value="validate">Validar certificado del servidor</option>
+          <option value="ignore">Ignorar cualquier problema de certificado</option>
+        </select>
+      </label>
+
+      <label>Credenciales
+        <select id="caseCredentials">
+          <option value="">Selecciona…</option>
+          <option value="protected">Transmitirlas únicamente sobre canal protegido</option>
+          <option value="plain">Aceptar transmisión sin TLS</option>
+        </select>
+      </label>
+    </div>
+
+    <button class="btn" id="checkCase" type="button" style="margin-top:1rem">
+      Evaluar diseño
+    </button>
+
+    <div class="feedback" id="caseFeedback" aria-live="polite">
+      Considera que el técnico puede utilizar una red que la organización no controla.
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="comprueba">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Comprueba</div>
+    <div>
+      <h2>Integra lo aprendido</h2>
+      <p class="lead">Responde las cinco preguntas.</p>
+    </div>
+  </div>
+
+  <div class="quiz" id="quiz">
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>1. ¿Qué es HTTP?</legend>
+        <label><input type="radio" name="q1" value="a"> Un protocolo de aplicación para intercambio de mensajes web.</label>
+        <label><input type="radio" name="q1" value="b"> Un algoritmo de cifrado.</label>
+        <label><input type="radio" name="q1" value="c"> Una dirección IP.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q1Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>2. ¿Qué describe mejor HTTPS?</legend>
+        <label><input type="radio" name="q2" value="a"> HTTP protegido mediante TLS.</label>
+        <label><input type="radio" name="q2" value="b"> HTTP convertido en UDP obligatoriamente.</label>
+        <label><input type="radio" name="q2" value="c"> Un sistema operativo.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q2Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>3. ¿Qué aporta TLS?</legend>
+        <label><input type="radio" name="q3" value="a"> Cifrado, integridad y autenticación del servidor.</label>
+        <label><input type="radio" name="q3" value="b"> Garantía de que la aplicación no tiene vulnerabilidades.</label>
+        <label><input type="radio" name="q3" value="c"> Eliminación de los routers intermedios.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q3Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>4. ¿Qué puerto se asocia convencionalmente con HTTPS?</legend>
+        <label><input type="radio" name="q4" value="a"> 443.</label>
+        <label><input type="radio" name="q4" value="b"> 21 exclusivamente.</label>
+        <label><input type="radio" name="q4" value="c"> 0 obligatoriamente.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q4Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>5. ¿Qué se estudiará en 2.1.3?</legend>
+        <label><input type="radio" name="q5" value="a"> Métodos HTTP.</label>
+        <label><input type="radio" name="q5" value="b"> Álgebra booleana.</label>
+        <label><input type="radio" name="q5" value="c"> Modulación analógica.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q5Feedback">Selecciona una respuesta.</div>
+    </article>
+
+  </div>
+
+  <div class="action-row" style="margin-top:1rem">
+    <button class="btn" id="checkQuiz" type="button">Comprobar todo</button>
+    <button class="btn light" id="resetQuiz" type="button">Reintentar</button>
+  </div>
+
+  <div class="score" id="scoreBox" aria-live="polite">
+    Aún no has comprobado la actividad.
+  </div>
+</div>
+</section>
+
+<section id="reflexiona">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Reflexión</div>
+    <div>
+      <h2>¿Qué riesgos tendría usar HTTP en una plataforma operativa?</h2>
+      <p class="lead">Piensa en credenciales, datos de monitoreo, redes compartidas y posibilidad de modificación del tráfico en tránsito.</p>
+    </div>
+  </div>
+
+  <div class="reflection-box">
+    <textarea id="reflectionText" aria-label="Reflexión del estudiante" placeholder="Explica qué información podría quedar expuesta y por qué HTTPS reduce parte de esos riesgos..."></textarea>
+
+    <div class="action-row">
+      <button class="btn" id="saveReflection" type="button">Guardar en este navegador</button>
+      <button class="btn light" id="clearReflection" type="button">Borrar</button>
+    </div>
+
+    <p id="reflectionStatus" aria-live="polite">
+      El texto no se transmite; si lo guardas, permanece únicamente en el almacenamiento local de este navegador.
+    </p>
+  </div>
+
+  <div class="references" style="margin-top:2rem">
+    <article class="ref-card">
+      <h3>Ideas clave</h3>
+      <p>HTTP organiza el intercambio web. HTTPS utiliza TLS para proteger la comunicación en tránsito y autenticar al servidor mediante certificados.</p>
+    </article>
+
+    <article class="ref-card">
+      <h3>Delimitación</h3>
+      <p>En 2.1.3 se analizará la intención de operaciones mediante los métodos HTTP: GET, POST, PUT/PATCH y DELETE.</p>
+    </article>
+  </div>
+
+  <div class="bottom-nav">
+    <a class="btn light" href="tema-2-1-1-arquitectura-cliente-servidor-servicios-web.html">← 2.1.1 Arquitectura cliente-servidor</a>
+    <a class="btn light" href="tema-2-1-3-metodos-http.html">2.1.3 Métodos HTTP →</a>
+  </div>
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="footer-inner">
+  <div>
+    <strong>Programación de Redes: Protocolos y APIs</strong><br>
+    <span>Subtema 2.1.2 · HTTP y HTTPS</span>
+  </div>
+
+  <div>Material interactivo · uso local</div>
+</div>
+</footer>
+
+<div class="progress-wrap" aria-hidden="true">
+  Recorrido <b id="progressValue">0%</b>
+</div>
+
+<script>
+(() => {
+"use strict";
+
+const $=id=>document.getElementById(id);
+
+const setFeedback=(el,text,type="")=>{
+  el.textContent=text;
+  el.className="feedback"+(type?" "+type:"");
+};
+
+const setMini=(el,text,ok=null)=>{
+  el.textContent=text;
+
+  el.style.borderLeftColor=
+    ok===true
+      ?"var(--green)"
+      :ok===false
+        ?"var(--red)"
+        :"var(--cyan)";
+
+  el.style.background=
+    ok===true
+      ?"var(--green-soft)"
+      :ok===false
+        ?"var(--red-soft)"
+        :"var(--soft)";
+};
+
+$("checkPrediction").addEventListener("click",()=>{
+  const s=document.querySelector(
+    'input[name="prediction"]:checked'
+  );
+
+  if(!s){
+    return setFeedback(
+      $("predictionFeedback"),
+      "Selecciona primero una opción.",
+      "warn"
+    );
+  }
+
+  if(s.value==="a"){
+    setFeedback(
+      $("predictionFeedback"),
+      "Correcto. HTTPS protege el contenido HTTP en tránsito mediante TLS, siempre que la validación y los extremos de la comunicación sean adecuados.",
+      "success"
+    );
+  }else{
+    setFeedback(
+      $("predictionFeedback"),
+      "Revisa el alcance de TLS: protege la comunicación en tránsito, pero no resuelve todos los riesgos del dispositivo, la aplicación o la red.",
+      "error"
+    );
+  }
+});
+
+$("resetPrediction").addEventListener("click",()=>{
+  document.querySelectorAll(
+    'input[name="prediction"]'
+  ).forEach(r=>r.checked=false);
+
+  setFeedback(
+    $("predictionFeedback"),
+    "Piensa en qué parte de la comunicación protege TLS y qué problemas quedan fuera de su alcance."
+  );
+});
+
+$("simulate").addEventListener("click",()=>{
+  const protocol=$("protocol").value;
+  const scenario=$("scenario").value;
+
+  if(protocol==="https"){
+    $("confidentiality").textContent=
+      "Protegida mediante TLS";
+
+    $("integrity").textContent=
+      "Protegida mediante TLS";
+
+    $("authentication").textContent=
+      "Validable mediante certificado";
+
+    $("channelOutput").textContent=
+`Cliente → HTTPS/TLS → Servidor
+Contenido HTTP protegido durante el tránsito.`;
+
+    const message=
+      scenario==="credentials"
+        ?"Elección adecuada: las credenciales no deberían transmitirse mediante HTTP sin TLS."
+        :"HTTPS protege el contenido de esta comunicación mientras viaja por la red.";
+
+    setFeedback(
+      $("simFeedback"),
+      message,
+      "success"
+    );
+  }else{
+    $("confidentiality").textContent=
+      "No protegida por HTTP";
+
+    $("integrity").textContent=
+      "No protegida por HTTP";
+
+    $("authentication").textContent=
+      "No proporcionada por HTTP";
+
+    $("channelOutput").textContent=
+`Cliente → HTTP → Servidor
+Contenido sin protección TLS.`;
+
+    const message=
+      scenario==="credentials"
+        ?"Riesgo elevado: transmitir credenciales mediante HTTP sin TLS puede exponer información sensible en tránsito."
+        :"HTTP no aporta por sí mismo cifrado, integridad ni autenticación del servidor.";
+
+    setFeedback(
+      $("simFeedback"),
+      message,
+      scenario==="credentials"?"error":"warn"
+    );
+  }
+});
+
+const practices=[
+  {
+    s:"p1",b:"checkP1",f:"p1Feedback",a:"a",
+    ok:"Correcto. HTTPS es HTTP utilizado sobre una comunicación protegida mediante TLS.",
+    bad:"La diferencia principal no es una nueva base de datos ni una IP obligatoriamente distinta."
+  },
+  {
+    s:"p2",b:"checkP2",f:"p2Feedback",a:"a",
+    ok:"Correcto. TLS aporta confidencialidad e integridad y permite autenticar al servidor.",
+    bad:"TLS protege el canal; no elimina todos los controles de seguridad de la aplicación."
+  },
+  {
+    s:"p3",b:"checkP3",f:"p3Feedback",a:"a",
+    ok:"Correcto. HTTP/3 utiliza QUIC, y QUIC funciona sobre UDP.",
+    bad:"HTTP/3 no utiliza ICMP ni ARP como protocolo de aplicación."
+  }
+];
+
+practices.forEach(p=>{
+  $(p.b).addEventListener("click",()=>{
+    const v=$(p.s).value;
+
+    if(!v){
+      return setMini(
+        $(p.f),
+        "Selecciona primero una respuesta."
+      );
+    }
+
+    setMini(
+      $(p.f),
+      v===p.a?p.ok:p.bad,
+      v===p.a
+    );
+  });
+});
+
+$("checkCase").addEventListener("click",()=>{
+  const ok=
+    $("caseProtocol").value==="https" &&
+    $("caseCert").value==="validate" &&
+    $("caseCredentials").value==="protected";
+
+  setFeedback(
+    $("caseFeedback"),
+    ok
+      ? "Diseño coherente. Se utiliza HTTPS, se valida la identidad del servidor y las credenciales viajan sobre un canal protegido."
+      : "Revisa los tres aspectos: canal cifrado, validación del servidor y protección de credenciales.",
+    ok?"success":"error"
+  );
+});
+
+const answers={
+  q1:"a",
+  q2:"a",
+  q3:"a",
+  q4:"a",
+  q5:"a"
+};
+
+const explanations={
+  q1:"HTTP es un protocolo de aplicación utilizado para intercambiar mensajes web.",
+  q2:"HTTPS describe HTTP protegido mediante TLS.",
+  q3:"TLS aporta confidencialidad, integridad y autenticación del servidor.",
+  q4:"El puerto 443 es la convención más habitual para HTTPS.",
+  q5:"El siguiente subtema estudia los métodos HTTP."
+};
+
+$("checkQuiz").addEventListener("click",()=>{
+  let score=0;
+
+  Object.keys(answers).forEach(q=>{
+    const s=document.querySelector(
+      `input[name="${q}"]:checked`
+    );
+
+    const ok=
+      s &&
+      s.value===answers[q];
+
+    if(ok){
+      score++;
+    }
+
+    setMini(
+      $(`${q}Feedback`),
+      s
+        ? ((ok?"Correcto. ":"Revisa. ")+explanations[q])
+        : "Falta responder esta pregunta.",
+      ok
+    );
+  });
+
+  $("scoreBox").textContent=
+    `Resultado: ${score}/5. ${
+      score===5
+        ? "Dominio sólido de los fundamentos de HTTP y HTTPS."
+        : "Revisa las explicaciones y vuelve a intentarlo."
+    }`;
+});
+
+$("resetQuiz").addEventListener("click",()=>{
+  document
+    .querySelectorAll('#quiz input[type="radio"]')
+    .forEach(r=>r.checked=false);
+
+  Object.keys(answers).forEach(q=>{
+    setMini(
+      $(`${q}Feedback`),
+      "Selecciona una respuesta."
+    );
+  });
+
+  $("scoreBox").textContent=
+    "Aún no has comprobado la actividad.";
+});
+
+const key=
+  "pr-redes-2-1-2-reflexion";
+
+try{
+  const saved=
+    localStorage.getItem(key);
+
+  if(saved){
+    $("reflectionText").value=saved;
+  }
+}catch(_){}
+
+$("saveReflection").addEventListener("click",()=>{
+  try{
+    localStorage.setItem(
+      key,
+      $("reflectionText").value
+    );
+
+    $("reflectionStatus").textContent=
+      "Reflexión guardada únicamente en este navegador.";
+  }catch(_){
+    $("reflectionStatus").textContent=
+      "Este navegador no permitió guardar la reflexión localmente.";
+  }
+});
+
+$("clearReflection").addEventListener("click",()=>{
+  $("reflectionText").value="";
+
+  try{
+    localStorage.removeItem(key);
+  }catch(_){}
+
+  $("reflectionStatus").textContent=
+    "Reflexión borrada del almacenamiento local.";
+});
+
+const sections=[
+  ...document.querySelectorAll(
+    "main section"
+  )
+];
+
+function updateProgress(){
+  const total=
+    document.documentElement.scrollHeight -
+    window.innerHeight;
+
+  const pct=
+    total>0
+      ? Math.max(
+          0,
+          Math.min(
+            100,
+            Math.round(
+              (window.scrollY/total)*100
+            )
+          )
+        )
+      : 100;
+
+  $("progressValue").textContent=
+    pct+"%";
+
+  const marker=
+    window.scrollY +
+    window.innerHeight*.36;
+
+  let current=sections[0];
+
+  sections.forEach(s=>{
+    if(s.offsetTop<=marker){
+      current=s;
+    }
+  });
+
+  document
+    .querySelectorAll("nav a")
+    .forEach(
+      a=>a.removeAttribute(
+        "aria-current"
+      )
+    );
+
+  if(current && current.id){
+    const link=
+      document.querySelector(
+        `nav a[href="#${current.id}"]`
+      );
+
+    if(link){
+      link.setAttribute(
+        "aria-current",
+        "location"
+      );
+    }
+  }
+}
+
+window.addEventListener(
+  "scroll",
+  updateProgress,
+  {passive:true}
+);
+
+window.addEventListener(
+  "resize",
+  updateProgress
+);
+
+updateProgress();
+})();
+</script>
+</body>
+</html>

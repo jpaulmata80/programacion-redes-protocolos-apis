@@ -1,0 +1,833 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Subtema 2.1.4: códigos de estado HTTP.">
+<meta name="theme-color" content="#10212a">
+<title>2.1.4 | Códigos de estado HTTP</title>
+<style>
+:root{
+  --ink:#18212a;--muted:#586775;--line:#cbd5dc;--soft:#f3f6f8;--paper:#fff;
+  --cyan:#007c91;--cyan-dark:#005b6a;--cyan-light:#6ed2e2;
+  --green:#16734a;--green-soft:#e8f5ee;--amber:#8a5600;--amber-soft:#fff3d8;
+  --red:#9b2c2c;--red-soft:#fdecec;--focus:#005fcc;
+  --navy:#10212a;--navy-deep:#07141a;--max:1180px;--radius:8px;
+  --shadow:0 16px 38px rgba(24,33,42,.08)
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-width:280px;color:var(--ink);background:var(--paper);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55;overflow-x:hidden}
+button,input,select,textarea{font:inherit;max-width:100%}
+a{color:var(--cyan-dark)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}.skip-link:focus{top:1rem}
+header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.header-inner{width:min(100%,var(--max));min-height:66px;margin:0 auto;padding:.55rem 1.25rem;display:flex;gap:1rem;align-items:center;min-width:0}
+.brand{min-width:190px}.brand strong{display:block;font-size:.95rem}.brand span{display:block;color:var(--muted);font-size:.78rem}
+.nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}
+nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+nav a{color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;border-bottom:2px solid transparent;font-size:.84rem}
+nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+.top-link{flex:0 0 auto;text-decoration:none;border:1px solid var(--line);border-radius:5px;padding:.48rem .72rem;color:var(--ink);font-weight:750;white-space:nowrap;background:#fff}
+main{overflow:hidden}
+section{scroll-margin-top:84px;border-bottom:1px solid var(--line)}
+.band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+.hero{min-height:calc(100svh - 66px);display:grid;align-items:center;background:var(--navy);color:#fff}
+.hero-grid{width:min(100%,var(--max));margin:0 auto;padding:3.4rem 1.25rem;display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:3rem;align-items:center}
+.hero-grid>*{min-width:0}.eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+h1{font-size:clamp(2rem,5vw,4rem);line-height:1.02;margin:.65rem 0 1.15rem;max-width:18ch;overflow-wrap:normal;word-break:normal;hyphens:none}
+h2{font-size:clamp(1.75rem,3.3vw,2.8rem);line-height:1.12;margin:0 0 .8rem;overflow-wrap:normal;word-break:normal;hyphens:none}
+h3{font-size:1.22rem;margin:0 0 .55rem}
+p{max-width:72ch}.hero p{color:#d7e5ea;font-size:1.08rem}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}.hero-actions{margin-top:1.45rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cyan-dark);background:var(--cyan);color:#fff;text-decoration:none;padding:.72rem 1rem;border-radius:5px;font-weight:750}
+.btn:hover{background:var(--cyan-dark)}.btn.secondary{background:transparent;color:inherit;border-color:currentColor}.btn.secondary:hover{background:rgba(255,255,255,.1)}
+.btn.light{background:#fff;color:var(--ink);border-color:var(--line)}.btn.light:hover{background:var(--soft);color:var(--cyan-dark)}
+.hero-board{background:var(--navy-deep);border:1px solid #3b5965;border-radius:8px;padding:1.25rem}
+.family-flow{display:grid;gap:.55rem;margin-top:1rem}
+.family-row{display:grid;grid-template-columns:72px minmax(0,1fr);gap:.7rem;align-items:center;padding:.7rem;border:1px solid #3b5965;border-radius:6px;background:#0d2630}
+.family-row b{color:var(--cyan-light);font-size:1.05rem}.family-row small{display:block;color:#b8cbd2}
+.section-head{display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem}.section-head>*{min-width:0}
+.section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}.lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+.outcomes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}.outcome:last-child{border-right:0}.outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+.scope-note,.callout{margin-top:1.4rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}
+.family-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1rem}
+.family-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.1rem;background:#fff;box-shadow:var(--shadow)}
+.family-card .family{display:inline-block;font-size:.8rem;font-weight:900;color:#fff;background:var(--cyan-dark);padding:.25rem .5rem;border-radius:4px;margin-bottom:.55rem}
+.family-card p{color:var(--muted);font-size:.93rem}
+.table-wrap{overflow-x:auto;margin-top:1.2rem;border:1px solid var(--line);border-radius:7px}table{border-collapse:collapse;width:100%;min-width:900px}th,td{padding:.8rem;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}th{background:var(--soft)}
+.activity{margin-top:1.5rem;padding:1.35rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--soft);min-width:0}
+.prediction{display:grid;gap:.6rem;margin:.85rem 0 1rem}.prediction label{display:block;padding:.75rem .8rem;background:#fff;border:1px solid var(--line);border-radius:5px}
+.feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}
+.feedback.success{background:var(--green-soft);border-color:var(--green)}.feedback.warn{background:var(--amber-soft);border-color:var(--amber)}.feedback.error{background:var(--red-soft);border-color:var(--red)}
+.lab-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:1rem}.lab-grid>*{min-width:0}
+.lab-panel{border:1px solid var(--line);border-radius:7px;background:#fff;padding:1rem}.lab-panel label{display:block;font-weight:750;margin:.75rem 0 .3rem}.lab-panel select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+.result-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-top:1rem}.result-card{padding:.8rem;border:1px solid var(--line);border-radius:6px;background:#fff;min-width:0}.result-card b{display:block;color:var(--cyan-dark);font-size:.78rem;text-transform:uppercase}.result-card span{display:block;margin-top:.25rem;overflow-wrap:anywhere}
+.terminal{margin-top:1rem;background:#07141a;color:#dce9ed;border-radius:7px;padding:1rem;border:1px solid #314b56;overflow-x:auto}.terminal pre{margin:0;white-space:pre-wrap;word-break:break-word}
+.request-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.request-card{border:1px solid var(--line);border-radius:7px;padding:1rem;background:#fff;min-width:0}.request-card code{display:block;background:#08151c;color:#dce9ed;padding:1rem;border-radius:6px;overflow-x:auto;white-space:pre}
+.exercise-box{border:1px solid var(--line);border-radius:8px;overflow:hidden}.exercise-head{padding:1rem 1.1rem;background:var(--navy);color:#fff}.exercise-head span{display:block;color:var(--cyan-light);font-size:.78rem;font-weight:850;text-transform:uppercase}
+.exercise-body{padding:1.1rem}.solution-steps{display:grid;gap:.75rem}.solution-step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:.8rem;align-items:start}.solution-step>b{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#d9eef2;color:var(--cyan-dark)}
+.practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.practice-card{border:1px solid var(--line);border-radius:7px;padding:1rem;min-width:0}.practice-card select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.mini-feedback{margin-top:.75rem;padding:.75rem;border-left:4px solid var(--cyan);background:var(--soft);min-height:4rem}
+.case-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}.case-grid label{display:block;font-weight:750}.case-grid select{width:100%;margin-top:.3rem;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.quiz{display:grid;gap:1rem}.quiz-card{border:1px solid var(--line);border-radius:7px;padding:1rem}.quiz-card fieldset{border:0;padding:0;margin:0}.quiz-card legend{font-weight:800;margin-bottom:.7rem}.quiz-card label{display:block;padding:.5rem .55rem;border-radius:4px}.quiz-card label:hover{background:var(--soft)}
+.score{margin-top:1rem;padding:1rem;border:1px solid var(--line);border-radius:6px;background:var(--soft);font-weight:800}
+.reflection-box textarea{width:100%;min-height:145px;resize:vertical;padding:.8rem;border:1px solid var(--line);border-radius:6px}
+.references{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.ref-card{border-top:4px solid var(--cyan);padding:1rem;background:var(--soft)}
+.bottom-nav{margin-top:2rem;display:flex;justify-content:space-between;gap:.7rem;flex-wrap:wrap}
+footer{background:var(--navy-deep);color:#c7d8de}.footer-inner{width:min(100%,var(--max));margin:0 auto;padding:1.4rem 1.25rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.progress-wrap{position:fixed;right:1rem;bottom:1rem;z-index:20;background:rgba(7,20,26,.93);color:#fff;padding:.45rem .7rem;border-radius:999px;font-size:.78rem;border:1px solid #3b5965}
+@media(max-width:1050px){.family-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:900px){
+  .hero-grid,.section-head,.lab-grid,.request-grid{grid-template-columns:1fr}
+  .outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .outcome:nth-child(2){border-right:0}.outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .practice-grid,.case-grid{grid-template-columns:1fr}
+}
+@media(max-width:650px){.family-grid,.result-grid,.references{grid-template-columns:1fr}}
+@media(max-width:600px){
+  .header-inner{padding-inline:.8rem}.brand{min-width:145px}.top-link{padding:.45rem .6rem}
+  .band,.hero-grid{padding-left:.9rem;padding-right:.9rem}
+  h1{font-size:clamp(2rem,10vw,2.72rem);max-width:none}
+  .outcomes{grid-template-columns:1fr}
+  .outcome{border-right:0;border-bottom:1px solid var(--line)}.outcome:last-child{border-bottom:0}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+<header>
+<div class="header-inner">
+  <div class="brand"><strong>Programación de Redes</strong><span>Protocolos y APIs</span></div>
+  <div class="nav-scroll" aria-label="Navegación del subtema"><nav>
+    <a href="#inicio">Inicio</a><a href="#orientacion">Cómo trabajar</a><a href="#conceptos">Conceptos</a><a href="#predice">Predice</a><a href="#experimenta">Experimenta</a><a href="#ejemplo">Ejemplo</a><a href="#resuelto">Ejercicio resuelto</a><a href="#practica">Practica</a><a href="#caso">Caso profesional</a><a href="#comprueba">Comprueba</a><a href="#reflexiona">Reflexión</a>
+  </nav></div>
+  <a class="top-link" href="index.html">← Curso</a>
+</div>
+</header>
+
+<main id="contenido">
+<section class="hero" id="inicio">
+<div class="hero-grid">
+  <div>
+    <div class="eyebrow">Bloque 2 · Tema 2.1 · Subtema 2.1.4</div>
+    <h1>Códigos de estado HTTP</h1>
+    <p>Interpreta cómo un servidor comunica el resultado de una solicitud: éxito, redirección, error del cliente, error del servidor u otra condición informativa.</p>
+
+    <div class="hero-actions">
+      <a class="btn" href="#orientacion">Comenzar recorrido</a>
+      <a class="btn secondary" href="tema-2-1-fundamentos-servicios-web-protocolo-http.html">Volver al Tema 2.1</a>
+    </div>
+  </div>
+
+  <div class="hero-board" role="img" aria-label="Familias de códigos de estado HTTP">
+    <h3>Primero identifica la familia</h3>
+    <div class="family-flow">
+      <div class="family-row"><b>1xx</b><small>Información provisional sobre la solicitud.</small></div>
+      <div class="family-row"><b>2xx</b><small>La solicitud fue procesada satisfactoriamente.</small></div>
+      <div class="family-row"><b>3xx</b><small>Se requiere una acción adicional o existe otra representación/ubicación relevante.</small></div>
+      <div class="family-row"><b>4xx</b><small>La solicitud presenta un problema atribuible al lado del cliente.</small></div>
+      <div class="family-row"><b>5xx</b><small>El servidor o una dependencia no pudo completar correctamente la solicitud.</small></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="orientacion">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Cómo trabajar este tema</div>
+    <div>
+      <h2>El método expresa intención; el código expresa resultado</h2>
+      <p class="lead">Una solicitud GET, POST o PATCH puede terminar con distintos códigos. El cliente debe interpretar el código antes de asumir que la operación funcionó.</p>
+    </div>
+  </div>
+
+  <div class="outcomes">
+    <div class="outcome"><b>1. Reconocer</b> las cinco familias de códigos HTTP.</div>
+    <div class="outcome"><b>2. Interpretar</b> códigos frecuentes en APIs.</div>
+    <div class="outcome"><b>3. Diferenciar</b> problemas del cliente y del servidor.</div>
+    <div class="outcome"><b>4. Seleccionar</b> respuestas coherentes para escenarios de Telecomunicaciones.</div>
+  </div>
+
+  <div class="scope-note"><strong>Alcance.</strong> Trabajaremos códigos frecuentes y su semántica general. Cabeceras, parámetros y metadatos adicionales se desarrollarán en 2.1.5.</div>
+</div>
+</section>
+
+<section id="conceptos">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Explora</div>
+    <div>
+      <h2>Cinco familias para orientarse rápidamente</h2>
+      <p class="lead">El primer dígito permite anticipar el tipo general de resultado.</p>
+    </div>
+  </div>
+
+  <div class="family-grid">
+    <article class="family-card">
+      <span class="family">1xx</span>
+      <h3>Informativos</h3>
+      <p>Indican que la comunicación continúa o que se ha recibido una etapa provisional.</p>
+    </article>
+
+    <article class="family-card">
+      <span class="family">2xx</span>
+      <h3>Éxito</h3>
+      <p>La solicitud fue aceptada y procesada de forma satisfactoria según el código concreto.</p>
+    </article>
+
+    <article class="family-card">
+      <span class="family">3xx</span>
+      <h3>Redirección</h3>
+      <p>El cliente puede necesitar seguir otra ubicación, reutilizar una representación o realizar una acción adicional.</p>
+    </article>
+
+    <article class="family-card">
+      <span class="family">4xx</span>
+      <h3>Error del cliente</h3>
+      <p>La solicitud tiene un problema como sintaxis, autenticación, autorización, recurso inexistente o exceso de solicitudes.</p>
+    </article>
+
+    <article class="family-card">
+      <span class="family">5xx</span>
+      <h3>Error del servidor</h3>
+      <p>El servidor recibió la solicitud pero no pudo completar correctamente la operación.</p>
+    </article>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Código</th><th>Nombre habitual</th><th>Interpretación básica</th><th>Ejemplo en una API</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>200</td><td>OK</td><td>Solicitud procesada correctamente.</td><td>Consulta de un enlace realizada con éxito.</td></tr>
+        <tr><td>201</td><td>Created</td><td>Se creó un nuevo recurso.</td><td>Incidencia registrada correctamente.</td></tr>
+        <tr><td>204</td><td>No Content</td><td>Operación exitosa sin contenido en la respuesta.</td><td>Actualización aceptada sin cuerpo de respuesta.</td></tr>
+        <tr><td>400</td><td>Bad Request</td><td>La solicitud es inválida o no puede interpretarse como se esperaba.</td><td>JSON mal formado o campo requerido incorrecto.</td></tr>
+        <tr><td>401</td><td>Unauthorized</td><td>Falta autenticación válida para acceder al recurso.</td><td>Token ausente o no válido.</td></tr>
+        <tr><td>403</td><td>Forbidden</td><td>El servidor entiende la solicitud pero rechaza autorizarla.</td><td>Usuario sin permiso para modificar un enlace.</td></tr>
+        <tr><td>404</td><td>Not Found</td><td>No se encontró el recurso solicitado.</td><td>No existe el enlace 99.</td></tr>
+        <tr><td>409</td><td>Conflict</td><td>La solicitud entra en conflicto con el estado actual del recurso.</td><td>Intento de crear un identificador ya existente.</td></tr>
+        <tr><td>429</td><td>Too Many Requests</td><td>Se excedió una política o límite de solicitudes.</td><td>Cliente consulta demasiado rápido.</td></tr>
+        <tr><td>500</td><td>Internal Server Error</td><td>Fallo interno inesperado.</td><td>Excepción no controlada en la aplicación.</td></tr>
+        <tr><td>502</td><td>Bad Gateway</td><td>Un intermediario recibió una respuesta inválida de un servidor aguas arriba.</td><td>Gateway no obtiene respuesta válida del backend.</td></tr>
+        <tr><td>503</td><td>Service Unavailable</td><td>Servicio temporalmente no disponible.</td><td>Mantenimiento o sobrecarga temporal.</td></tr>
+        <tr><td>504</td><td>Gateway Timeout</td><td>Un intermediario agotó el tiempo esperando una respuesta aguas arriba.</td><td>Proxy espera demasiado al backend.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout"><strong>401 vs 403.</strong> 401 se relaciona con la necesidad de autenticación válida. 403 indica que el servidor rechaza autorizar la operación, incluso aunque haya entendido la solicitud.</div>
+</div>
+</section>
+
+<section id="predice">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Predice</div>
+    <div>
+      <h2>Recurso inexistente</h2>
+      <p class="lead">El cliente solicita <code>/api/enlaces/99</code>, pero ese enlace no existe en el sistema.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="prediction">
+      <label><input type="radio" name="prediction" value="a"> 201 Created</label>
+      <label><input type="radio" name="prediction" value="b"> 404 Not Found</label>
+      <label><input type="radio" name="prediction" value="c"> 503 Service Unavailable</label>
+    </div>
+
+    <div class="action-row">
+      <button class="btn" id="checkPrediction" type="button">Comprobar</button>
+      <button class="btn light" id="resetPrediction" type="button">Reintentar</button>
+    </div>
+
+    <div class="feedback" id="predictionFeedback" aria-live="polite">El servidor respondió, pero el recurso solicitado no existe.</div>
+  </div>
+</div>
+</section>
+
+<section id="experimenta">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Experimenta</div>
+    <div>
+      <h2>Asocia escenario y código</h2>
+      <p class="lead">Selecciona una situación y el código que consideras más coherente.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="lab-grid">
+      <div class="lab-panel">
+        <label for="scenario">Escenario</label>
+        <select id="scenario">
+          <option value="ok">Consulta correcta de un enlace</option>
+          <option value="created">Nueva incidencia creada</option>
+          <option value="bad">JSON inválido en la solicitud</option>
+          <option value="auth">Token ausente o inválido</option>
+          <option value="forbidden">Usuario sin permiso de modificación</option>
+          <option value="missing">Recurso inexistente</option>
+          <option value="rate">Demasiadas solicitudes</option>
+          <option value="server">Fallo interno inesperado</option>
+          <option value="unavailable">Servicio temporalmente no disponible</option>
+        </select>
+
+        <label for="chosenCode">Código elegido</label>
+        <select id="chosenCode">
+          <option value="200">200</option>
+          <option value="201">201</option>
+          <option value="400">400</option>
+          <option value="401">401</option>
+          <option value="403">403</option>
+          <option value="404">404</option>
+          <option value="429">429</option>
+          <option value="500">500</option>
+          <option value="503">503</option>
+        </select>
+
+        <button class="btn" id="evaluateCode" type="button" style="margin-top:1rem">Evaluar código</button>
+        <div class="feedback" id="codeFeedback" aria-live="polite">Selecciona escenario y código.</div>
+      </div>
+
+      <div class="lab-panel">
+        <h3>Interpretación</h3>
+
+        <div class="result-grid">
+          <div class="result-card"><b>Código esperado</b><span id="expectedCode">200</span></div>
+          <div class="result-card"><b>Familia</b><span id="codeFamily">2xx · Éxito</span></div>
+          <div class="result-card"><b>Lectura</b><span id="codeMeaning">Solicitud correcta</span></div>
+        </div>
+
+        <div class="terminal">
+          <pre id="responsePreview">HTTP/1.1 200 OK</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="ejemplo">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Observa y explica</div>
+    <div>
+      <h2>Mismo recurso, resultados distintos</h2>
+      <p class="lead">El método no determina por sí solo el código de respuesta.</p>
+    </div>
+  </div>
+
+  <div class="request-grid">
+    <article class="request-card">
+      <h3>Consulta exitosa</h3>
+      <code>GET /api/enlaces/15
+→ 200 OK</code>
+      <p>El recurso existe y la operación puede completarse.</p>
+    </article>
+
+    <article class="request-card">
+      <h3>Recurso inexistente</h3>
+      <code>GET /api/enlaces/99
+→ 404 Not Found</code>
+      <p>La estructura de la solicitud puede ser correcta, pero el recurso solicitado no existe.</p>
+    </article>
+
+    <article class="request-card">
+      <h3>Falta autenticación</h3>
+      <code>GET /api/enlaces/15
+→ 401 Unauthorized</code>
+      <p>El recurso puede existir, pero el cliente no presentó autenticación válida.</p>
+    </article>
+
+    <article class="request-card">
+      <h3>Fallo temporal del servicio</h3>
+      <code>GET /api/enlaces/15
+→ 503 Service Unavailable</code>
+      <p>El servidor indica que el servicio no puede atender temporalmente la solicitud.</p>
+    </article>
+  </div>
+</div>
+</section>
+
+<section id="resuelto">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Ejercicio resuelto</div>
+    <div>
+      <h2>Interpretar respuestas de una API de monitoreo</h2>
+      <p class="lead">Un script consulta varios recursos y recibe códigos diferentes.</p>
+    </div>
+  </div>
+
+  <div class="exercise-box">
+    <div class="exercise-head">
+      <span>Problema</span>
+      <h3>Decidir qué significa cada respuesta</h3>
+    </div>
+
+    <div class="exercise-body">
+      <div class="solution-steps">
+        <div class="solution-step"><b>1</b><div><strong>200.</strong><br>La consulta fue procesada correctamente; el cliente puede interpretar el contenido recibido.</div></div>
+        <div class="solution-step"><b>2</b><div><strong>401.</strong><br>El cliente debe revisar el mecanismo de autenticación o credenciales utilizadas.</div></div>
+        <div class="solution-step"><b>3</b><div><strong>404.</strong><br>El recurso no fue encontrado; conviene revisar identificador o ruta.</div></div>
+        <div class="solution-step"><b>4</b><div><strong>429.</strong><br>El cliente debe respetar la política de frecuencia y evitar insistir de forma agresiva.</div></div>
+        <div class="solution-step"><b>5</b><div><strong>503.</strong><br>El servicio está temporalmente indisponible; una estrategia de reintento controlado puede ser apropiada según la aplicación.</div></div>
+      </div>
+
+      <div class="callout"><strong>Conclusión:</strong> el cliente no debe tratar todos los códigos distintos de 200 como el mismo error. Cada familia y código aporta contexto para decidir el siguiente paso.</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="practica">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Practica</div>
+    <div>
+      <h2>Interpreta el resultado</h2>
+      <p class="lead">Relaciona cada escenario con el código más adecuado.</p>
+    </div>
+  </div>
+
+  <div class="practice-grid">
+    <article class="practice-card">
+      <h3>Ejercicio 1</h3>
+      <p>Se creó correctamente una nueva incidencia.</p>
+      <select id="p1">
+        <option value="">Selecciona…</option>
+        <option value="a">201</option>
+        <option value="b">404</option>
+        <option value="c">500</option>
+      </select>
+      <button class="btn" id="checkP1" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p1Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 2</h3>
+      <p>El cliente envía un JSON inválido.</p>
+      <select id="p2">
+        <option value="">Selecciona…</option>
+        <option value="a">400</option>
+        <option value="b">200</option>
+        <option value="c">503</option>
+      </select>
+      <button class="btn" id="checkP2" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p2Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 3</h3>
+      <p>El usuario está identificado, pero no tiene permiso para borrar el recurso.</p>
+      <select id="p3">
+        <option value="">Selecciona…</option>
+        <option value="a">403</option>
+        <option value="b">201</option>
+        <option value="c">302</option>
+      </select>
+      <button class="btn" id="checkP3" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p3Feedback">Selecciona una respuesta.</div>
+    </article>
+  </div>
+</div>
+</section>
+
+<section id="caso">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Caso profesional</div>
+    <div>
+      <h2>Cliente de una API de alarmas</h2>
+      <p class="lead">El software del NOC debe reaccionar de forma distinta según el resultado recibido.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="case-grid">
+      <label>Alarma encontrada
+        <select id="caseOk">
+          <option value="">Selecciona…</option>
+          <option value="200">200</option>
+          <option value="404">404</option>
+        </select>
+      </label>
+
+      <label>Demasiadas consultas
+        <select id="caseRate">
+          <option value="">Selecciona…</option>
+          <option value="429">429</option>
+          <option value="201">201</option>
+        </select>
+      </label>
+
+      <label>Backend temporalmente fuera de servicio
+        <select id="caseUnavailable">
+          <option value="">Selecciona…</option>
+          <option value="503">503</option>
+          <option value="400">400</option>
+        </select>
+      </label>
+    </div>
+
+    <button class="btn" id="checkCase" type="button" style="margin-top:1rem">Evaluar diseño</button>
+    <div class="feedback" id="caseFeedback" aria-live="polite">El código debe describir con precisión el resultado de la operación.</div>
+  </div>
+</div>
+</section>
+
+<section id="comprueba">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Comprueba</div>
+    <div>
+      <h2>Integra lo aprendido</h2>
+      <p class="lead">Responde las cinco preguntas.</p>
+    </div>
+  </div>
+
+  <div class="quiz" id="quiz">
+    <article class="quiz-card"><fieldset><legend>1. ¿Qué familia representa éxito?</legend><label><input type="radio" name="q1" value="a"> 2xx.</label><label><input type="radio" name="q1" value="b"> 4xx.</label><label><input type="radio" name="q1" value="c"> 5xx.</label></fieldset><div class="mini-feedback" id="q1Feedback">Selecciona una respuesta.</div></article>
+
+    <article class="quiz-card"><fieldset><legend>2. ¿Qué indica normalmente 404?</legend><label><input type="radio" name="q2" value="a"> El recurso solicitado no fue encontrado.</label><label><input type="radio" name="q2" value="b"> Se creó un recurso nuevo.</label><label><input type="radio" name="q2" value="c"> El servicio está temporalmente fuera de servicio.</label></fieldset><div class="mini-feedback" id="q2Feedback">Selecciona una respuesta.</div></article>
+
+    <article class="quiz-card"><fieldset><legend>3. ¿Qué diferencia básica existe entre 401 y 403?</legend><label><input type="radio" name="q3" value="a"> 401 apunta a autenticación válida requerida; 403 a autorización rechazada.</label><label><input type="radio" name="q3" value="b"> Son siempre exactamente iguales.</label><label><input type="radio" name="q3" value="c"> 403 significa creación exitosa.</label></fieldset><div class="mini-feedback" id="q3Feedback">Selecciona una respuesta.</div></article>
+
+    <article class="quiz-card"><fieldset><legend>4. ¿Qué código indica demasiadas solicitudes?</legend><label><input type="radio" name="q4" value="a"> 429.</label><label><input type="radio" name="q4" value="b"> 201.</label><label><input type="radio" name="q4" value="c"> 204.</label></fieldset><div class="mini-feedback" id="q4Feedback">Selecciona una respuesta.</div></article>
+
+    <article class="quiz-card"><fieldset><legend>5. ¿Qué se estudiará en 2.1.5?</legend><label><input type="radio" name="q5" value="a"> Cabeceras y parámetros en HTTP.</label><label><input type="radio" name="q5" value="b"> Modulación AM.</label><label><input type="radio" name="q5" value="c"> Álgebra booleana.</label></fieldset><div class="mini-feedback" id="q5Feedback">Selecciona una respuesta.</div></article>
+  </div>
+
+  <div class="action-row" style="margin-top:1rem">
+    <button class="btn" id="checkQuiz" type="button">Comprobar todo</button>
+    <button class="btn light" id="resetQuiz" type="button">Reintentar</button>
+  </div>
+
+  <div class="score" id="scoreBox" aria-live="polite">Aún no has comprobado la actividad.</div>
+</div>
+</section>
+
+<section id="reflexiona">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Reflexión</div>
+    <div>
+      <h2>¿Cómo debería reaccionar un cliente ante distintos códigos?</h2>
+      <p class="lead">Describe qué harías ante 200, 401, 404, 429 y 503 en una aplicación de monitoreo.</p>
+    </div>
+  </div>
+
+  <div class="reflection-box">
+    <textarea id="reflectionText" aria-label="Reflexión del estudiante" placeholder="Ejemplo: con 200 proceso los datos; con 401 reviso autenticación; con 404 verifico el recurso; con 429 reduzco frecuencia; con 503 considero reintento controlado..."></textarea>
+    <div class="action-row">
+      <button class="btn" id="saveReflection" type="button">Guardar en este navegador</button>
+      <button class="btn light" id="clearReflection" type="button">Borrar</button>
+    </div>
+    <p id="reflectionStatus" aria-live="polite">El texto no se transmite; si lo guardas, permanece únicamente en el almacenamiento local de este navegador.</p>
+  </div>
+
+  <div class="references" style="margin-top:2rem">
+    <article class="ref-card">
+      <h3>Ideas clave</h3>
+      <p>El primer dígito identifica la familia general; el código completo especifica el resultado concreto de la solicitud.</p>
+    </article>
+
+    <article class="ref-card">
+      <h3>Delimitación</h3>
+      <p>En 2.1.5 se estudiará la información adicional transportada mediante cabeceras y parámetros HTTP.</p>
+    </article>
+  </div>
+
+  <div class="bottom-nav">
+    <a class="btn light" href="tema-2-1-3-metodos-http.html">← 2.1.3 Métodos HTTP</a>
+    <a class="btn light" href="tema-2-1-5-cabeceras-parametros-http.html">2.1.5 Cabeceras y parámetros →</a>
+  </div>
+</div>
+</section>
+</main>
+
+<footer>
+<div class="footer-inner">
+  <div><strong>Programación de Redes: Protocolos y APIs</strong><br><span>Subtema 2.1.4 · Códigos de estado HTTP</span></div>
+  <div>Material interactivo · uso local</div>
+</div>
+</footer>
+
+<div class="progress-wrap" aria-hidden="true">Recorrido <b id="progressValue">0%</b></div>
+
+<script>
+(() => {
+"use strict";
+
+const $=id=>document.getElementById(id);
+
+const setFeedback=(el,text,type="")=>{
+  el.textContent=text;
+  el.className="feedback"+(type?" "+type:"");
+};
+
+const setMini=(el,text,ok=null)=>{
+  el.textContent=text;
+  el.style.borderLeftColor=ok===true?"var(--green)":ok===false?"var(--red)":"var(--cyan)";
+  el.style.background=ok===true?"var(--green-soft)":ok===false?"var(--red-soft)":"var(--soft)";
+};
+
+$("checkPrediction").addEventListener("click",()=>{
+  const s=document.querySelector('input[name="prediction"]:checked');
+
+  if(!s){
+    return setFeedback(
+      $("predictionFeedback"),
+      "Selecciona primero una opción.",
+      "warn"
+    );
+  }
+
+  if(s.value==="b"){
+    setFeedback(
+      $("predictionFeedback"),
+      "Correcto. 404 indica que el recurso solicitado no fue encontrado.",
+      "success"
+    );
+  }else{
+    setFeedback(
+      $("predictionFeedback"),
+      "Revisa la situación: el servidor responde, pero no encuentra el recurso.",
+      "error"
+    );
+  }
+});
+
+$("resetPrediction").addEventListener("click",()=>{
+  document.querySelectorAll('input[name="prediction"]').forEach(r=>r.checked=false);
+
+  setFeedback(
+    $("predictionFeedback"),
+    "El servidor respondió, pero el recurso solicitado no existe."
+  );
+});
+
+const scenarios={
+  ok:{code:"200",family:"2xx · Éxito",meaning:"Solicitud correcta",status:"200 OK"},
+  created:{code:"201",family:"2xx · Éxito",meaning:"Recurso creado",status:"201 Created"},
+  bad:{code:"400",family:"4xx · Error del cliente",meaning:"Solicitud inválida",status:"400 Bad Request"},
+  auth:{code:"401",family:"4xx · Error del cliente",meaning:"Autenticación válida requerida",status:"401 Unauthorized"},
+  forbidden:{code:"403",family:"4xx · Error del cliente",meaning:"Operación no autorizada",status:"403 Forbidden"},
+  missing:{code:"404",family:"4xx · Error del cliente",meaning:"Recurso no encontrado",status:"404 Not Found"},
+  rate:{code:"429",family:"4xx · Error del cliente",meaning:"Demasiadas solicitudes",status:"429 Too Many Requests"},
+  server:{code:"500",family:"5xx · Error del servidor",meaning:"Fallo interno",status:"500 Internal Server Error"},
+  unavailable:{code:"503",family:"5xx · Error del servidor",meaning:"Servicio temporalmente no disponible",status:"503 Service Unavailable"}
+};
+
+$("evaluateCode").addEventListener("click",()=>{
+  const data=scenarios[$("scenario").value];
+  const chosen=$("chosenCode").value;
+
+  $("expectedCode").textContent=data.code;
+  $("codeFamily").textContent=data.family;
+  $("codeMeaning").textContent=data.meaning;
+  $("responsePreview").textContent=`HTTP/1.1 ${data.status}`;
+
+  const ok=chosen===data.code;
+
+  setFeedback(
+    $("codeFeedback"),
+    ok
+      ? `Elección coherente: ${data.code} representa este escenario.`
+      : `Para este escenario, el código esperado es ${data.code}.`,
+    ok?"success":"error"
+  );
+});
+
+const practices=[
+  {
+    s:"p1",b:"checkP1",f:"p1Feedback",a:"a",
+    ok:"Correcto. 201 indica que se creó un recurso.",
+    bad:"La operación terminó creando un nuevo recurso."
+  },
+  {
+    s:"p2",b:"checkP2",f:"p2Feedback",a:"a",
+    ok:"Correcto. 400 corresponde a una solicitud inválida.",
+    bad:"El problema está en la solicitud enviada por el cliente."
+  },
+  {
+    s:"p3",b:"checkP3",f:"p3Feedback",a:"a",
+    ok:"Correcto. 403 expresa que la operación no está autorizada.",
+    bad:"El usuario no tiene permiso para realizar esa acción."
+  }
+];
+
+practices.forEach(p=>{
+  $(p.b).addEventListener("click",()=>{
+    const v=$(p.s).value;
+
+    if(!v){
+      return setMini(
+        $(p.f),
+        "Selecciona primero una respuesta."
+      );
+    }
+
+    setMini(
+      $(p.f),
+      v===p.a?p.ok:p.bad,
+      v===p.a
+    );
+  });
+});
+
+$("checkCase").addEventListener("click",()=>{
+  const ok=
+    $("caseOk").value==="200" &&
+    $("caseRate").value==="429" &&
+    $("caseUnavailable").value==="503";
+
+  setFeedback(
+    $("caseFeedback"),
+    ok
+      ? "Diseño coherente. Cada código describe de forma precisa el resultado correspondiente."
+      : "Revisa la familia y el significado concreto de cada código.",
+    ok?"success":"error"
+  );
+});
+
+const answers={
+  q1:"a",
+  q2:"a",
+  q3:"a",
+  q4:"a",
+  q5:"a"
+};
+
+const explanations={
+  q1:"La familia 2xx representa resultados satisfactorios.",
+  q2:"404 indica que el recurso solicitado no fue encontrado.",
+  q3:"401 se relaciona con autenticación válida requerida; 403 con autorización rechazada.",
+  q4:"429 indica demasiadas solicitudes.",
+  q5:"El siguiente subtema estudia cabeceras y parámetros HTTP."
+};
+
+$("checkQuiz").addEventListener("click",()=>{
+  let score=0;
+
+  Object.keys(answers).forEach(q=>{
+    const s=document.querySelector(`input[name="${q}"]:checked`);
+    const ok=s&&s.value===answers[q];
+
+    if(ok){
+      score++;
+    }
+
+    setMini(
+      $(`${q}Feedback`),
+      s?((ok?"Correcto. ":"Revisa. ")+explanations[q]):"Falta responder esta pregunta.",
+      ok
+    );
+  });
+
+  $("scoreBox").textContent=
+    `Resultado: ${score}/5. ${
+      score===5
+        ? "Dominio sólido de los códigos de estado HTTP fundamentales."
+        : "Revisa las explicaciones y vuelve a intentarlo."
+    }`;
+});
+
+$("resetQuiz").addEventListener("click",()=>{
+  document.querySelectorAll('#quiz input[type="radio"]').forEach(r=>r.checked=false);
+
+  Object.keys(answers).forEach(q=>{
+    setMini(
+      $(`${q}Feedback`),
+      "Selecciona una respuesta."
+    );
+  });
+
+  $("scoreBox").textContent=
+    "Aún no has comprobado la actividad.";
+});
+
+const key="pr-redes-2-1-4-reflexion";
+
+try{
+  const saved=localStorage.getItem(key);
+  if(saved){
+    $("reflectionText").value=saved;
+  }
+}catch(_){}
+
+$("saveReflection").addEventListener("click",()=>{
+  try{
+    localStorage.setItem(
+      key,
+      $("reflectionText").value
+    );
+
+    $("reflectionStatus").textContent=
+      "Reflexión guardada únicamente en este navegador.";
+  }catch(_){
+    $("reflectionStatus").textContent=
+      "Este navegador no permitió guardar la reflexión localmente.";
+  }
+});
+
+$("clearReflection").addEventListener("click",()=>{
+  $("reflectionText").value="";
+
+  try{
+    localStorage.removeItem(key);
+  }catch(_){}
+
+  $("reflectionStatus").textContent=
+    "Reflexión borrada del almacenamiento local.";
+});
+
+const sections=[...document.querySelectorAll("main section")];
+
+function updateProgress(){
+  const total=document.documentElement.scrollHeight-window.innerHeight;
+
+  const pct=
+    total>0
+      ? Math.max(0,Math.min(100,Math.round((window.scrollY/total)*100)))
+      : 100;
+
+  $("progressValue").textContent=pct+"%";
+
+  const marker=window.scrollY+window.innerHeight*.36;
+  let current=sections[0];
+
+  sections.forEach(s=>{
+    if(s.offsetTop<=marker){
+      current=s;
+    }
+  });
+
+  document.querySelectorAll("nav a").forEach(
+    a=>a.removeAttribute("aria-current")
+  );
+
+  if(current&&current.id){
+    const link=document.querySelector(`nav a[href="#${current.id}"]`);
+
+    if(link){
+      link.setAttribute("aria-current","location");
+    }
+  }
+}
+
+window.addEventListener("scroll",updateProgress,{passive:true});
+window.addEventListener("resize",updateProgress);
+updateProgress();
+})();
+</script>
+</body>
+</html>
