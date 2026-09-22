@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Subtema 1.4.2: procesamiento de respuestas y salidas de comandos.">
+<meta name="theme-color" content="#10212a">
+<title>1.4.2 | Procesamiento de respuestas y salidas de comandos</title>
+<style>
+:root{
+  --ink:#18212a;--muted:#586775;--line:#cbd5dc;--soft:#f3f6f8;--paper:#fff;
+  --cyan:#007c91;--cyan-dark:#005b6a;--cyan-light:#6ed2e2;
+  --green:#16734a;--green-soft:#e8f5ee;--amber:#8a5600;--amber-soft:#fff3d8;
+  --red:#9b2c2c;--red-soft:#fdecec;--focus:#005fcc;
+  --navy:#10212a;--navy-deep:#07141a;--max:1180px;--radius:8px;
+  --shadow:0 16px 38px rgba(24,33,42,.08)
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-width:280px;color:var(--ink);background:var(--paper);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55;overflow-x:hidden}
+button,input,select,textarea{font:inherit;max-width:100%}
+a{color:var(--cyan-dark)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}.skip-link:focus{top:1rem}
+header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.header-inner{width:min(100%,var(--max));min-height:66px;margin:0 auto;padding:.55rem 1.25rem;display:flex;gap:1rem;align-items:center;min-width:0}
+.brand{min-width:190px}.brand strong{display:block;font-size:.95rem}.brand span{display:block;color:var(--muted);font-size:.78rem}
+.nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}
+nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+nav a{color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;border-bottom:2px solid transparent;font-size:.84rem}
+nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+.top-link{flex:0 0 auto;text-decoration:none;border:1px solid var(--line);border-radius:5px;padding:.48rem .72rem;color:var(--ink);font-weight:750;white-space:nowrap;background:#fff}
+main{overflow:hidden}
+section{scroll-margin-top:84px;border-bottom:1px solid var(--line)}
+.band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+.hero{min-height:calc(100svh - 66px);display:grid;align-items:center;background:var(--navy);color:#fff}
+.hero-grid{width:min(100%,var(--max));margin:0 auto;padding:3.4rem 1.25rem;display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:3rem;align-items:center}
+.hero-grid>*{min-width:0}.eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+h1{font-size:clamp(2rem,5vw,4.05rem);line-height:1.02;margin:.65rem 0 1.15rem;max-width:19ch;overflow-wrap:normal;word-break:normal;hyphens:none}
+h2{font-size:clamp(1.75rem,3.3vw,2.8rem);line-height:1.12;margin:0 0 .8rem;overflow-wrap:normal;word-break:normal;hyphens:none}
+h3{font-size:1.22rem;margin:0 0 .55rem}
+p{max-width:72ch}.hero p{color:#d7e5ea;font-size:1.08rem}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}.hero-actions{margin-top:1.45rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cyan-dark);background:var(--cyan);color:#fff;text-decoration:none;padding:.72rem 1rem;border-radius:5px;font-weight:750}
+.btn:hover{background:var(--cyan-dark)}.btn.secondary{background:transparent;color:inherit;border-color:currentColor}.btn.secondary:hover{background:rgba(255,255,255,.1)}
+.btn.light{background:#fff;color:var(--ink);border-color:var(--line)}.btn.light:hover{background:var(--soft);color:var(--cyan-dark)}
+.hero-board{background:var(--navy-deep);border:1px solid #3b5965;border-radius:8px;padding:1.25rem}
+.parse-flow{display:grid;gap:.55rem;margin-top:1rem}.parse-step{display:grid;grid-template-columns:40px minmax(0,1fr);gap:.65rem;align-items:start;padding:.7rem;border:1px solid #3b5965;border-radius:6px;background:#0d2630}.parse-step b{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:#153d4a;color:var(--cyan-light)}.parse-step small{display:block;color:#b8cbd2;margin-top:.1rem}
+.section-head{display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem}.section-head>*{min-width:0}
+.section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}.lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+.outcomes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}.outcome:last-child{border-right:0}.outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+.scope-note,.callout{margin-top:1.4rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}
+.concept-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+.concept-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.15rem;background:#fff;box-shadow:var(--shadow)}
+.tag{display:inline-block;font-size:.76rem;font-weight:850;color:var(--cyan-dark);background:#d9eef2;padding:.2rem .45rem;border-radius:999px;margin-bottom:.55rem}
+.concept-card p{color:var(--muted);font-size:.94rem}
+.activity{margin-top:1.5rem;padding:1.35rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--soft);min-width:0}
+.prediction{display:grid;gap:.6rem;margin:.85rem 0 1rem}.prediction label{display:block;padding:.75rem .8rem;background:#fff;border:1px solid var(--line);border-radius:5px}
+.feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}
+.feedback.success{background:var(--green-soft);border-color:var(--green)}.feedback.warn{background:var(--amber-soft);border-color:var(--amber)}.feedback.error{background:var(--red-soft);border-color:var(--red)}
+.lab-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:1rem}.lab-grid>*{min-width:0}
+.lab-panel{border:1px solid var(--line);border-radius:7px;background:#fff;padding:1rem}.lab-panel label{display:block;font-weight:750;margin:.75rem 0 .3rem}.lab-panel select,.lab-panel textarea{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+.lab-panel textarea{min-height:180px;resize:vertical}
+.output-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem;margin-top:1rem}.output-card{padding:.8rem;border:1px solid var(--line);border-radius:6px;background:#fff;min-width:0}.output-card b{display:block;color:var(--cyan-dark);font-size:.78rem;text-transform:uppercase}.output-card span{display:block;margin-top:.25rem;overflow-wrap:anywhere}
+.terminal{margin-top:1rem;background:#07141a;color:#dce9ed;border-radius:7px;padding:1rem;border:1px solid #314b56;overflow-x:auto}.terminal pre{margin:0;white-space:pre-wrap;word-break:break-word}
+.code-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.code-card{min-width:0;background:#09161d;color:#dce9ed;border:1px solid #314b56;border-radius:7px;padding:1rem}.code-card h3{color:#fff}
+.code-block{overflow-x:auto;margin:.75rem 0;background:#061016;border:1px solid #253c47;border-radius:6px;padding:1rem}.code-block code{white-space:pre}.code-note{color:#bfd1d7}
+.exercise-box{border:1px solid var(--line);border-radius:8px;overflow:hidden}.exercise-head{padding:1rem 1.1rem;background:var(--navy);color:#fff}.exercise-head span{display:block;color:var(--cyan-light);font-size:.78rem;font-weight:850;text-transform:uppercase}
+.exercise-body{padding:1.1rem}.solution-steps{display:grid;gap:.75rem}.solution-step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:.8rem;align-items:start}.solution-step>b{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#d9eef2;color:var(--cyan-dark)}
+.practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.practice-card{border:1px solid var(--line);border-radius:7px;padding:1rem;min-width:0}.practice-card select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.mini-feedback{margin-top:.75rem;padding:.75rem;border-left:4px solid var(--cyan);background:var(--soft);min-height:4rem}
+.case-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}.case-grid label{display:block;font-weight:750}.case-grid select{width:100%;margin-top:.3rem;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.quiz{display:grid;gap:1rem}.quiz-card{border:1px solid var(--line);border-radius:7px;padding:1rem}.quiz-card fieldset{border:0;padding:0;margin:0}.quiz-card legend{font-weight:800;margin-bottom:.7rem}.quiz-card label{display:block;padding:.5rem .55rem;border-radius:4px}.quiz-card label:hover{background:var(--soft)}
+.score{margin-top:1rem;padding:1rem;border:1px solid var(--line);border-radius:6px;background:var(--soft);font-weight:800}
+.reflection-box textarea{width:100%;min-height:145px;resize:vertical;padding:.8rem;border:1px solid var(--line);border-radius:6px}
+.references{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.ref-card{border-top:4px solid var(--cyan);padding:1rem;background:var(--soft)}
+.bottom-nav{margin-top:2rem;display:flex;justify-content:space-between;gap:.7rem;flex-wrap:wrap}
+footer{background:var(--navy-deep);color:#c7d8de}.footer-inner{width:min(100%,var(--max));margin:0 auto;padding:1.4rem 1.25rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.progress-wrap{position:fixed;right:1rem;bottom:1rem;z-index:20;background:rgba(7,20,26,.93);color:#fff;padding:.45rem .7rem;border-radius:999px;font-size:.78rem;border:1px solid #3b5965}
+@media(max-width:900px){
+  .hero-grid,.section-head,.lab-grid,.code-grid{grid-template-columns:1fr}
+  .concept-grid,.outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .outcome:nth-child(2){border-right:0}.outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .practice-grid,.case-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .header-inner{padding-inline:.8rem}.brand{min-width:145px}.top-link{padding:.45rem .6rem}
+  .band,.hero-grid{padding-left:.9rem;padding-right:.9rem}
+  h1{font-size:clamp(2rem,10vw,2.75rem);max-width:none}
+  .concept-grid,.outcomes,.references,.output-grid{grid-template-columns:1fr}
+  .outcome{border-right:0;border-bottom:1px solid var(--line)}.outcome:last-child{border-bottom:0}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+<header>
+<div class="header-inner">
+  <div class="brand"><strong>Programación de Redes</strong><span>Protocolos y APIs</span></div>
+  <div class="nav-scroll" aria-label="Navegación del subtema"><nav>
+    <a href="#inicio">Inicio</a><a href="#orientacion">Cómo trabajar</a><a href="#conceptos">Conceptos</a><a href="#predice">Predice</a><a href="#experimenta">Experimenta</a><a href="#codigo">Código</a><a href="#resuelto">Ejercicio resuelto</a><a href="#practica">Practica</a><a href="#caso">Caso profesional</a><a href="#comprueba">Comprueba</a><a href="#reflexiona">Reflexión</a>
+  </nav></div>
+  <a class="top-link" href="index.html">← Curso</a>
+</div>
+</header>
+
+<main id="contenido">
+<section class="hero" id="inicio">
+<div class="hero-grid">
+  <div>
+    <div class="eyebrow">Bloque 1 · Tema 1.4 · Subtema 1.4.2</div>
+    <h1>Procesamiento de respuestas y salidas de comandos</h1>
+    <p>Convierte texto técnico en información útil: limpia la respuesta, separa líneas, busca patrones, extrae valores y conserva el contexto necesario para las siguientes etapas.</p>
+    <div class="hero-actions">
+      <a class="btn" href="#orientacion">Comenzar recorrido</a>
+      <a class="btn secondary" href="tema-1-4-obtencion-procesamiento-informacion-red.html">Volver al Tema 1.4</a>
+    </div>
+  </div>
+
+  <div class="hero-board" role="img" aria-label="Flujo de procesamiento desde una salida de comando hasta valores extraídos">
+    <h3>De salida cruda a valor útil</h3>
+    <div class="parse-flow">
+      <div class="parse-step"><b>1</b><div><strong>Limpiar</strong><small>espacios · líneas vacías · caracteres innecesarios</small></div></div>
+      <div class="parse-step"><b>2</b><div><strong>Separar</strong><small>líneas · campos · tokens</small></div></div>
+      <div class="parse-step"><b>3</b><div><strong>Buscar</strong><small>palabras clave · prefijos · patrones</small></div></div>
+      <div class="parse-step"><b>4</b><div><strong>Extraer</strong><small>estado · dirección · métrica · valor</small></div></div>
+      <div class="parse-step"><b>5</b><div><strong>Validar</strong><small>confirmar que el dato encontrado tenga sentido</small></div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="orientacion">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Cómo trabajar este tema</div>
+    <div><h2>Procesar es reducir ruido sin perder significado</h2><p class="lead">Una salida de consola puede contener decenas de líneas. El programa debe quedarse con los datos relevantes y saber qué hacer si el patrón esperado no aparece.</p></div>
+  </div>
+
+  <div class="outcomes">
+    <div class="outcome"><b>1. Limpiar</b> respuestas textuales con métodos básicos de cadenas.</div>
+    <div class="outcome"><b>2. Recorrer</b> líneas y localizar información relevante.</div>
+    <div class="outcome"><b>3. Extraer</b> valores mediante patrones simples y expresiones regulares básicas.</div>
+    <div class="outcome"><b>4. Validar</b> el resultado antes de utilizarlo.</div>
+  </div>
+
+  <div class="scope-note"><strong>Alcance.</strong> Usaremos procesamiento textual sencillo y expresiones regulares solo cuando aporten valor. Los datos ya estructurados, como JSON, se desarrollarán en 1.4.3.</div>
+</div>
+</section>
+
+<section id="conceptos">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Explora</div>
+    <div><h2>Cuatro herramientas básicas de parsing</h2><p class="lead">Antes de recurrir a expresiones complejas, conviene aprovechar operaciones simples y legibles.</p></div>
+  </div>
+
+  <div class="concept-grid">
+    <article class="concept-card"><span class="tag">strip()</span><h3>Limpiar extremos</h3><p>Elimina espacios y saltos de línea sobrantes al inicio y al final de una cadena.</p></article>
+    <article class="concept-card"><span class="tag">splitlines()</span><h3>Separar líneas</h3><p>Convierte una salida multilínea en una colección fácil de recorrer.</p></article>
+    <article class="concept-card"><span class="tag">in / startswith()</span><h3>Buscar patrones simples</h3><p>Permiten localizar líneas que contengan una palabra clave o comiencen con un prefijo conocido.</p></article>
+    <article class="concept-card"><span class="tag">re</span><h3>Patrones más precisos</h3><p>Las expresiones regulares ayudan cuando el dato cambia de posición pero mantiene una estructura reconocible.</p></article>
+  </div>
+
+  <div class="callout"><strong>Principio didáctico:</strong> usa la herramienta más simple que resuelva el problema. Un parser claro suele ser más mantenible que una expresión regular innecesariamente compleja.</div>
+</div>
+</section>
+
+<section id="predice">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Predice</div>
+    <div><h2>La línea esperada no aparece</h2><p class="lead">Tu script busca una línea que contenga <code>Estado:</code>, pero el dispositivo responde con un formato diferente.</p></div>
+  </div>
+
+  <div class="activity">
+    <div class="prediction">
+      <label><input type="radio" name="prediction" value="a"> Asumir que el estado es “UP” aunque no se haya encontrado.</label>
+      <label><input type="radio" name="prediction" value="b"> Detectar que el patrón no apareció y devolver un resultado de procesamiento no válido.</label>
+      <label><input type="radio" name="prediction" value="c"> Tomar cualquier línea al azar como estado.</label>
+    </div>
+    <div class="action-row">
+      <button class="btn" id="checkPrediction" type="button">Comprobar</button>
+      <button class="btn light" id="resetPrediction" type="button">Reintentar</button>
+    </div>
+    <div class="feedback" id="predictionFeedback" aria-live="polite">Un parser también debe reconocer cuándo no pudo obtener el dato.</div>
+  </div>
+</div>
+</section>
+
+<section id="experimenta">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Experimenta</div>
+    <div><h2>Procesa una salida simulada</h2><p class="lead">Selecciona el tipo de salida y el método de extracción. Observa qué dato obtiene el parser.</p></div>
+  </div>
+
+  <div class="activity">
+    <div class="lab-grid">
+      <div class="lab-panel">
+        <label for="sampleType">Salida de ejemplo</label>
+        <select id="sampleType">
+          <option value="interface">Estado de interfaz</option>
+          <option value="latency">Latencia de ping</option>
+          <option value="hostname">Nombre de equipo</option>
+          <option value="missing">Formato inesperado</option>
+        </select>
+
+        <label for="parseMethod">Método</label>
+        <select id="parseMethod">
+          <option value="line">Buscar línea por palabra clave</option>
+          <option value="regex">Usar patrón regular simple</option>
+        </select>
+
+        <button class="btn" id="runParser" type="button" style="margin-top:1rem">Procesar</button>
+        <div class="feedback" id="parserFeedback" aria-live="polite">Selecciona una salida y procesa.</div>
+      </div>
+
+      <div class="lab-panel">
+        <h3>Salida cruda</h3>
+        <div class="terminal"><pre id="rawOutput">Interface: Gi0/1
+Estado: UP
+Velocidad: 1000 Mbps</pre></div>
+
+        <div class="output-grid">
+          <div class="output-card"><b>Dato buscado</b><span id="parsedField">—</span></div>
+          <div class="output-card"><b>Valor extraído</b><span id="parsedValue">—</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="codigo">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Explica</div>
+    <div><h2>Procesamiento paso a paso</h2><p class="lead">Primero operaciones simples; después patrones más específicos.</p></div>
+  </div>
+
+  <div class="code-grid">
+    <article class="code-card">
+      <h3>Buscar una línea</h3>
+      <div class="code-block"><code>salida = """
+Interface: Gi0/1
+Estado: UP
+Velocidad: 1000 Mbps
+"""
+
+estado = None
+
+for linea in salida.splitlines():
+    linea = linea.strip()
+
+    if linea.startswith("Estado:"):
+        estado = linea.split(":", 1)[1].strip()
+
+print(estado)</code></div>
+      <p class="code-note">El segundo argumento de <code>split()</code> limita la división a una sola vez.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Extraer un número con regex</h3>
+      <div class="code-block"><code>import re
+
+salida = "tiempo=18 ms"
+
+m = re.search(
+    r"tiempo=(\d+)\s*ms",
+    salida
+)
+
+if m:
+    latencia = int(m.group(1))
+else:
+    latencia = None</code></div>
+      <p class="code-note">El grupo <code>(\d+)</code> captura uno o más dígitos.</p>
+    </article>
+  </div>
+
+  <div class="code-grid" style="margin-top:1rem">
+    <article class="code-card">
+      <h3>Normalizar mayúsculas</h3>
+      <div class="code-block"><code>texto = "Interface is UP"
+
+if "up" in texto.lower():
+    estado = "up"</code></div>
+      <p class="code-note">Normalizar ayuda cuando la herramienta cambia mayúsculas y minúsculas.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Validar el resultado</h3>
+      <div class="code-block"><code>if estado not in {"up", "down"}:
+    resultado = {
+        "estado": "error",
+        "error": "Formato inesperado"
+    }</code></div>
+      <p class="code-note">Encontrar texto no significa que el valor sea válido.</p>
+    </article>
+  </div>
+</div>
+</section>
+
+<section id="resuelto">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Ejercicio resuelto</div>
+    <div><h2>Extraer estado y velocidad de una interfaz</h2><p class="lead">La respuesta contiene más texto del necesario. Queremos obtener dos valores concretos.</p></div>
+  </div>
+
+  <div class="exercise-box">
+    <div class="exercise-head"><span>Problema</span><h3>Convertir tres líneas en dos campos útiles</h3></div>
+    <div class="exercise-body">
+      <div class="solution-steps">
+        <div class="solution-step"><b>1</b><div><strong>Separar líneas.</strong><br>Aplicar <code>splitlines()</code>.</div></div>
+        <div class="solution-step"><b>2</b><div><strong>Limpiar cada línea.</strong><br>Usar <code>strip()</code>.</div></div>
+        <div class="solution-step"><b>3</b><div><strong>Identificar prefijos.</strong><br>Buscar <code>Estado:</code> y <code>Velocidad:</code>.</div></div>
+        <div class="solution-step"><b>4</b><div><strong>Extraer el valor.</strong><br>Dividir por <code>:</code> una sola vez.</div></div>
+        <div class="solution-step"><b>5</b><div><strong>Validar.</strong><br>Comprobar que ambos campos fueron encontrados.</div></div>
+      </div>
+
+      <div class="code-block" style="margin-top:1rem"><code>def procesar_interfaz(salida):
+    datos = {
+        "estado": None,
+        "velocidad": None
+    }
+
+    for linea in salida.splitlines():
+        linea = linea.strip()
+
+        if linea.startswith("Estado:"):
+            datos["estado"] = (
+                linea.split(":", 1)[1].strip()
+            )
+
+        elif linea.startswith("Velocidad:"):
+            datos["velocidad"] = (
+                linea.split(":", 1)[1].strip()
+            )
+
+    if None in datos.values():
+        return {
+            "estado_procesamiento": "error",
+            "error": "Faltan campos esperados"
+        }
+
+    return {
+        "estado_procesamiento": "ok",
+        "datos": datos
+    }</code></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="practica">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Practica</div>
+    <div><h2>Elige la estrategia de procesamiento</h2><p class="lead">Piensa primero en claridad y robustez.</p></div>
+  </div>
+
+  <div class="practice-grid">
+    <article class="practice-card">
+      <h3>Ejercicio 1</h3>
+      <p>Necesitas recorrer una salida multilínea.</p>
+      <select id="p1">
+        <option value="">Selecciona…</option>
+        <option value="a">Usar splitlines() y un bucle</option>
+        <option value="b">Tratar todo como un único carácter</option>
+        <option value="c">Eliminar la salida</option>
+      </select>
+      <button class="btn" id="checkP1" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p1Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 2</h3>
+      <p>El dato aparece siempre después del prefijo <code>Estado:</code>.</p>
+      <select id="p2">
+        <option value="">Selecciona…</option>
+        <option value="a">Usar startswith() y split()</option>
+        <option value="b">Crear una regex compleja sin necesidad</option>
+        <option value="c">Tomar la primera palabra de cualquier línea</option>
+      </select>
+      <button class="btn" id="checkP2" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p2Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 3</h3>
+      <p>El patrón esperado no aparece.</p>
+      <select id="p3">
+        <option value="">Selecciona…</option>
+        <option value="a">Devolver error de procesamiento</option>
+        <option value="b">Inventar el valor</option>
+        <option value="c">Reutilizar el valor anterior sin avisar</option>
+      </select>
+      <button class="btn" id="checkP3" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p3Feedback">Selecciona una respuesta.</div>
+    </article>
+  </div>
+</div>
+</section>
+
+<section id="caso">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Caso profesional</div>
+    <div><h2>Procesar estado de enlaces desde un NOC</h2><p class="lead">Cada radio devuelve texto con estado, nivel recibido y tiempo de actividad. El reporte necesita solo esos tres campos.</p></div>
+  </div>
+
+  <div class="activity">
+    <div class="case-grid">
+      <label>Preparación
+        <select id="caseClean">
+          <option value="">Selecciona…</option>
+          <option value="clean">Limpiar y separar líneas</option>
+          <option value="raw">Trabajar sin ningún control</option>
+        </select>
+      </label>
+
+      <label>Extracción
+        <select id="caseExtract">
+          <option value="">Selecciona…</option>
+          <option value="patterns">Buscar prefijos o patrones conocidos</option>
+          <option value="random">Seleccionar líneas al azar</option>
+        </select>
+      </label>
+
+      <label>Validación
+        <select id="caseValidate">
+          <option value="">Selecciona…</option>
+          <option value="required">Comprobar campos requeridos</option>
+          <option value="assume">Asumir que siempre existen</option>
+        </select>
+      </label>
+    </div>
+
+    <button class="btn" id="checkCase" type="button" style="margin-top:1rem">Evaluar diseño</button>
+    <div class="feedback" id="caseFeedback" aria-live="polite">Un parser profesional debe ser explícito sobre lo que espera encontrar.</div>
+  </div>
+</div>
+</section>
+
+<section id="comprueba">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Comprueba</div>
+    <div><h2>Integra lo aprendido</h2><p class="lead">Responde las cinco preguntas.</p></div>
+  </div>
+
+  <div class="quiz" id="quiz">
+    <article class="quiz-card"><fieldset><legend>1. ¿Para qué sirve splitlines()?</legend><label><input type="radio" name="q1" value="a"> Para separar una cadena multilínea en líneas.</label><label><input type="radio" name="q1" value="b"> Para abrir un socket.</label><label><input type="radio" name="q1" value="c"> Para cifrar texto.</label></fieldset><div class="mini-feedback" id="q1Feedback">Selecciona una respuesta.</div></article>
+
+    <article class="quiz-card"><fieldset><legend>2. ¿Qué ventaja ofrece startswith()?</legend><label><input type="radio" name="q2" value="a"> Permite identificar líneas por un prefijo conocido.</label><label><input type="radio" name="q2" value="b"> Convierte texto en JSON automáticamente.</label><label><input type="radio" name="q2" value="c"> Ejecuta comandos remotos.</label></fieldset><div class="mini-feedback" id="q2Feedback">Selecciona una respuesta.</div></article>
+
+    <article class="quiz-card"><fieldset><legend>3. ¿Cuándo tiene sentido usar una regex?</legend><label><input type="radio" name="q3" value="a"> Cuando el valor mantiene un patrón pero no una posición fija.</label><label><input type="radio" name="q3" value="b"> Siempre, aunque un split simple sea suficiente.</label><label><input type="radio" name="q3" value="c"> Solo para abrir archivos.</label></fieldset><div class="mini-feedback" id="q3Feedback">Selecciona una respuesta.</div></article>
+
+    <article class="quiz-card"><fieldset><legend>4. ¿Qué debe hacer el parser si no encuentra el dato esperado?</legend><label><input type="radio" name="q4" value="a"> Indicar que el procesamiento falló o quedó incompleto.</label><label><input type="radio" name="q4" value="b"> Inventar un valor.</label><label><input type="radio" name="q4" value="c"> Copiar el dato anterior.</label></fieldset><div class="mini-feedback" id="q4Feedback">Selecciona una respuesta.</div></article>
+
+    <article class="quiz-card"><fieldset><legend>5. ¿Qué se estudiará en 1.4.3?</legend><label><input type="radio" name="q5" value="a"> Manejo de datos estructurados como JSON.</label><label><input type="radio" name="q5" value="b"> Instalaciones eléctricas.</label><label><input type="radio" name="q5" value="c"> Antenas físicas.</label></fieldset><div class="mini-feedback" id="q5Feedback">Selecciona una respuesta.</div></article>
+  </div>
+
+  <div class="action-row" style="margin-top:1rem">
+    <button class="btn" id="checkQuiz" type="button">Comprobar todo</button>
+    <button class="btn light" id="resetQuiz" type="button">Reintentar</button>
+  </div>
+  <div class="score" id="scoreBox" aria-live="polite">Aún no has comprobado la actividad.</div>
+</div>
+</section>
+
+<section id="reflexiona">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Reflexión</div>
+    <div><h2>¿Qué haría robusto a un parser de red?</h2><p class="lead">Piensa en cambios de formato, datos faltantes, mayúsculas/minúsculas, unidades y validación de valores.</p></div>
+  </div>
+
+  <div class="reflection-box">
+    <textarea id="reflectionText" aria-label="Reflexión del estudiante" placeholder="Describe qué controles añadirías para que el parser detecte formatos inesperados sin inventar resultados..."></textarea>
+    <div class="action-row">
+      <button class="btn" id="saveReflection" type="button">Guardar en este navegador</button>
+      <button class="btn light" id="clearReflection" type="button">Borrar</button>
+    </div>
+    <p id="reflectionStatus" aria-live="polite">El texto no se transmite; si lo guardas, permanece únicamente en el almacenamiento local de este navegador.</p>
+  </div>
+
+  <div class="references" style="margin-top:2rem">
+    <article class="ref-card"><h3>Referencias conceptuales</h3><p>Python: métodos de cadenas, estructuras de control y módulo <code>re</code>. Los patrones mostrados son deliberadamente simples para fines docentes.</p></article>
+    <article class="ref-card"><h3>Delimitación</h3><p>Este subtema procesa texto. Cuando la fuente ya entrega información estructurada, como JSON, conviene aprovechar esa estructura en lugar de analizar texto manualmente.</p></article>
+  </div>
+
+  <div class="bottom-nav">
+    <a class="btn light" href="tema-1-4-1-recoleccion-programatica-informacion-dispositivos-servicios.html">← 1.4.1 Recolección programática</a>
+    <a class="btn light" href="tema-1-4-3-datos-estructurados-json-formatos-basicos.html">1.4.3 Datos estructurados y JSON →</a>
+  </div>
+</div>
+</section>
+</main>
+
+<footer>
+<div class="footer-inner">
+  <div><strong>Programación de Redes: Protocolos y APIs</strong><br><span>Subtema 1.4.2 · Procesamiento de respuestas y salidas</span></div>
+  <div>Material interactivo · uso local</div>
+</div>
+</footer>
+
+<div class="progress-wrap" aria-hidden="true">Recorrido <b id="progressValue">0%</b></div>
+
+<script>
+(() => {
+"use strict";
+const $=id=>document.getElementById(id);
+const setFeedback=(el,text,type="")=>{el.textContent=text;el.className="feedback"+(type?" "+type:"");};
+const setMini=(el,text,ok=null)=>{el.textContent=text;el.style.borderLeftColor=ok===true?"var(--green)":ok===false?"var(--red)":"var(--cyan)";el.style.background=ok===true?"var(--green-soft)":ok===false?"var(--red-soft)":"var(--soft)";};
+
+$("checkPrediction").addEventListener("click",()=>{
+  const s=document.querySelector('input[name="prediction"]:checked');
+  if(!s)return setFeedback($("predictionFeedback"),"Selecciona primero una opción.","warn");
+  if(s.value==="b"){
+    setFeedback($("predictionFeedback"),"Correcto. El parser debe poder indicar que no obtuvo el dato esperado en lugar de inventarlo.","success");
+  }else{
+    setFeedback($("predictionFeedback"),"Revisa la función de validación: un dato no encontrado no debe convertirse silenciosamente en un valor válido.","error");
+  }
+});
+
+$("resetPrediction").addEventListener("click",()=>{
+  document.querySelectorAll('input[name="prediction"]').forEach(r=>r.checked=false);
+  setFeedback($("predictionFeedback"),"Un parser también debe reconocer cuándo no pudo obtener el dato.");
+});
+
+const samples={
+  interface:{
+    raw:"Interface: Gi0/1\nEstado: UP\nVelocidad: 1000 Mbps",
+    field:"estado",
+    line:"UP",
+    regex:"UP"
+  },
+  latency:{
+    raw:"64 bytes desde 192.0.2.10: tiempo=18 ms TTL=57",
+    field:"latencia",
+    line:"18 ms",
+    regex:"18"
+  },
+  hostname:{
+    raw:"Hostname: srv-noc-01\nOS: Linux",
+    field:"hostname",
+    line:"srv-noc-01",
+    regex:"srv-noc-01"
+  },
+  missing:{
+    raw:"Interfaz Gi0/1 activa\nVelocidad nominal 1000",
+    field:"estado",
+    line:null,
+    regex:null
+  }
+};
+
+$("runParser").addEventListener("click",()=>{
+  const type=$("sampleType").value;
+  const method=$("parseMethod").value;
+  const sample=samples[type];
+
+  $("rawOutput").textContent=sample.raw;
+  $("parsedField").textContent=sample.field;
+
+  const value=sample[method];
+
+  if(value===null){
+    $("parsedValue").textContent="No encontrado";
+    setFeedback($("parserFeedback"),"El patrón esperado no aparece. El resultado debe marcarse como procesamiento incompleto o error.","warn");
+  }else{
+    $("parsedValue").textContent=value;
+    setFeedback($("parserFeedback"),`Dato extraído correctamente mediante ${method==="line"?"búsqueda por línea":"patrón regular"}.`,"success");
+  }
+});
+
+const practices=[
+  {s:"p1",b:"checkP1",f:"p1Feedback",a:"a",ok:"Correcto. splitlines() convierte una salida multilínea en una colección fácil de recorrer.",bad:"Para procesar líneas conviene separarlas explícitamente."},
+  {s:"p2",b:"checkP2",f:"p2Feedback",a:"a",ok:"Correcto. startswith() y split() resuelven el caso de forma clara y simple.",bad:"No necesitas una herramienta más compleja cuando el prefijo es estable y conocido."},
+  {s:"p3",b:"checkP3",f:"p3Feedback",a:"a",ok:"Correcto. Si el patrón falta, el parser debe informarlo.",bad:"Inventar o reutilizar silenciosamente valores destruye la confiabilidad del procesamiento."}
+];
+
+practices.forEach(p=>$(p.b).addEventListener("click",()=>{
+  const v=$(p.s).value;
+  if(!v)return setMini($(p.f),"Selecciona primero una respuesta.");
+  setMini($(p.f),v===p.a?p.ok:p.bad,v===p.a);
+}));
+
+$("checkCase").addEventListener("click",()=>{
+  const ok=$("caseClean").value==="clean" &&
+           $("caseExtract").value==="patterns" &&
+           $("caseValidate").value==="required";
+
+  setFeedback(
+    $("caseFeedback"),
+    ok
+      ? "Diseño coherente. Limpias, extraes con reglas conocidas y validas que los campos requeridos existan."
+      : "Revisa el flujo: preparar la salida, aplicar reglas conocidas y validar los campos son etapas distintas.",
+    ok?"success":"error"
+  );
+});
+
+const answers={q1:"a",q2:"a",q3:"a",q4:"a",q5:"a"};
+const explanations={
+  q1:"splitlines() separa una cadena multilínea en líneas individuales.",
+  q2:"startswith() permite reconocer líneas con un prefijo estable.",
+  q3:"Una regex resulta útil cuando existe un patrón estable pero el valor puede variar de posición.",
+  q4:"La ausencia de un dato esperado debe representarse explícitamente como fallo o resultado incompleto.",
+  q5:"1.4.3 trabajará formatos estructurados como JSON."
+};
+
+$("checkQuiz").addEventListener("click",()=>{
+  let score=0;
+  Object.keys(answers).forEach(q=>{
+    const s=document.querySelector(`input[name="${q}"]:checked`);
+    const ok=s&&s.value===answers[q];
+    if(ok)score++;
+
+    setMini(
+      $(`${q}Feedback`),
+      s?((ok?"Correcto. ":"Revisa. ")+explanations[q]):"Falta responder esta pregunta.",
+      ok
+    );
+  });
+
+  $("scoreBox").textContent=`Resultado: ${score}/5. ${score===5?"Dominio sólido del procesamiento textual básico.":"Revisa las explicaciones y vuelve a intentarlo."}`;
+});
+
+$("resetQuiz").addEventListener("click",()=>{
+  document.querySelectorAll('#quiz input[type="radio"]').forEach(r=>r.checked=false);
+  Object.keys(answers).forEach(q=>setMini($(`${q}Feedback`),"Selecciona una respuesta."));
+  $("scoreBox").textContent="Aún no has comprobado la actividad.";
+});
+
+const key="pr-redes-1-4-2-reflexion";
+
+try{
+  const saved=localStorage.getItem(key);
+  if(saved)$("reflectionText").value=saved;
+}catch(_){}
+
+$("saveReflection").addEventListener("click",()=>{
+  try{
+    localStorage.setItem(key,$("reflectionText").value);
+    $("reflectionStatus").textContent="Reflexión guardada únicamente en este navegador.";
+  }catch(_){
+    $("reflectionStatus").textContent="Este navegador no permitió guardar la reflexión localmente.";
+  }
+});
+
+$("clearReflection").addEventListener("click",()=>{
+  $("reflectionText").value="";
+  try{localStorage.removeItem(key);}catch(_){}
+  $("reflectionStatus").textContent="Reflexión borrada del almacenamiento local.";
+});
+
+const sections=[...document.querySelectorAll("main section")];
+
+function updateProgress(){
+  const total=document.documentElement.scrollHeight-window.innerHeight;
+  const pct=total>0?Math.max(0,Math.min(100,Math.round((window.scrollY/total)*100))):100;
+  $("progressValue").textContent=pct+"%";
+
+  const marker=window.scrollY+window.innerHeight*.36;
+  let current=sections[0];
+
+  sections.forEach(s=>{
+    if(s.offsetTop<=marker)current=s;
+  });
+
+  document.querySelectorAll("nav a").forEach(a=>a.removeAttribute("aria-current"));
+
+  if(current&&current.id){
+    const link=document.querySelector(`nav a[href="#${current.id}"]`);
+    if(link)link.setAttribute("aria-current","location");
+  }
+}
+
+window.addEventListener("scroll",updateProgress,{passive:true});
+window.addEventListener("resize",updateProgress);
+updateProgress();
+})();
+</script>
+</body>
+</html>

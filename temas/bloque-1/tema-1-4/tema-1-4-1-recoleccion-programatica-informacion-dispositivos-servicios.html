@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Subtema 1.4.1: recolección programática de información de dispositivos y servicios.">
+<meta name="theme-color" content="#10212a">
+<title>1.4.1 | Recolección programática de información</title>
+<style>
+:root{
+  --ink:#18212a;--muted:#586775;--line:#cbd5dc;--soft:#f3f6f8;--paper:#fff;
+  --cyan:#007c91;--cyan-dark:#005b6a;--cyan-light:#6ed2e2;
+  --green:#16734a;--green-soft:#e8f5ee;--amber:#8a5600;--amber-soft:#fff3d8;
+  --red:#9b2c2c;--red-soft:#fdecec;--focus:#005fcc;
+  --navy:#10212a;--navy-deep:#07141a;--max:1180px;--radius:8px;
+  --shadow:0 16px 38px rgba(24,33,42,.08)
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-width:280px;color:var(--ink);background:var(--paper);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55;overflow-x:hidden}
+button,input,select,textarea{font:inherit;max-width:100%}
+a{color:var(--cyan-dark)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}.skip-link:focus{top:1rem}
+header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.header-inner{width:min(100%,var(--max));min-height:66px;margin:0 auto;padding:.55rem 1.25rem;display:flex;gap:1rem;align-items:center;min-width:0}
+.brand{min-width:190px}.brand strong{display:block;font-size:.95rem}.brand span{display:block;color:var(--muted);font-size:.78rem}
+.nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}
+nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+nav a{color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;border-bottom:2px solid transparent;font-size:.84rem}
+nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+.top-link{flex:0 0 auto;text-decoration:none;border:1px solid var(--line);border-radius:5px;padding:.48rem .72rem;color:var(--ink);font-weight:750;white-space:nowrap;background:#fff}
+main{overflow:hidden}
+section{scroll-margin-top:84px;border-bottom:1px solid var(--line)}
+.band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+.hero{min-height:calc(100svh - 66px);display:grid;align-items:center;background:var(--navy);color:#fff}
+.hero-grid{width:min(100%,var(--max));margin:0 auto;padding:3.4rem 1.25rem;display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:3rem;align-items:center}
+.hero-grid>*{min-width:0}.eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+h1{font-size:clamp(2rem,5vw,4.05rem);line-height:1.02;margin:.65rem 0 1.15rem;max-width:20ch;overflow-wrap:normal;word-break:normal;hyphens:none}
+h2{font-size:clamp(1.75rem,3.3vw,2.8rem);line-height:1.12;margin:0 0 .8rem;overflow-wrap:normal;word-break:normal;hyphens:none}
+h3{font-size:1.22rem;margin:0 0 .55rem}
+p{max-width:72ch}.hero p{color:#d7e5ea;font-size:1.08rem}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}.hero-actions{margin-top:1.45rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cyan-dark);background:var(--cyan);color:#fff;text-decoration:none;padding:.72rem 1rem;border-radius:5px;font-weight:750}
+.btn:hover{background:var(--cyan-dark)}.btn.secondary{background:transparent;color:inherit;border-color:currentColor}.btn.secondary:hover{background:rgba(255,255,255,.1)}
+.btn.light{background:#fff;color:var(--ink);border-color:var(--line)}.btn.light:hover{background:var(--soft);color:var(--cyan-dark)}
+.hero-board{background:var(--navy-deep);border:1px solid #3b5965;border-radius:8px;padding:1.25rem}
+.collect-flow{display:grid;gap:.55rem;margin-top:1rem}.collect-step{display:grid;grid-template-columns:40px minmax(0,1fr);gap:.65rem;align-items:start;padding:.7rem;border:1px solid #3b5965;border-radius:6px;background:#0d2630}.collect-step b{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:#153d4a;color:var(--cyan-light)}.collect-step small{display:block;color:#b8cbd2;margin-top:.1rem}
+.section-head{display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem}.section-head>*{min-width:0}
+.section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}.lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+.outcomes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}.outcome:last-child{border-right:0}.outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+.scope-note,.callout{margin-top:1.4rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}
+.concept-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+.concept-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.15rem;background:#fff;box-shadow:var(--shadow)}
+.tag{display:inline-block;font-size:.76rem;font-weight:850;color:var(--cyan-dark);background:#d9eef2;padding:.2rem .45rem;border-radius:999px;margin-bottom:.55rem}
+.concept-card p{color:var(--muted);font-size:.94rem}
+.activity{margin-top:1.5rem;padding:1.35rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--soft);min-width:0}
+.prediction{display:grid;gap:.6rem;margin:.85rem 0 1rem}.prediction label{display:block;padding:.75rem .8rem;background:#fff;border:1px solid var(--line);border-radius:5px}
+.feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}
+.feedback.success{background:var(--green-soft);border-color:var(--green)}.feedback.warn{background:var(--amber-soft);border-color:var(--amber)}.feedback.error{background:var(--red-soft);border-color:var(--red)}
+.lab-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:1rem}.lab-grid>*{min-width:0}
+.lab-panel{border:1px solid var(--line);border-radius:7px;background:#fff;padding:1rem}.lab-panel label{display:block;font-weight:750;margin:.75rem 0 .3rem}.lab-panel select,.lab-panel input{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+.output-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem;margin-top:1rem}.output-card{padding:.8rem;border:1px solid var(--line);border-radius:6px;background:#fff;min-width:0}.output-card b{display:block;color:var(--cyan-dark);font-size:.78rem;text-transform:uppercase}.output-card span{display:block;margin-top:.25rem;overflow-wrap:anywhere}
+.code-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.code-card{min-width:0;background:#09161d;color:#dce9ed;border:1px solid #314b56;border-radius:7px;padding:1rem}.code-card h3{color:#fff}
+.code-block{overflow-x:auto;margin:.75rem 0;background:#061016;border:1px solid #253c47;border-radius:6px;padding:1rem}.code-block code{white-space:pre}.code-note{color:#bfd1d7}
+.table-wrap{overflow-x:auto;margin-top:1.2rem;border:1px solid var(--line);border-radius:7px}table{border-collapse:collapse;width:100%;min-width:760px}th,td{padding:.8rem;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}th{background:var(--soft)}
+.exercise-box{border:1px solid var(--line);border-radius:8px;overflow:hidden}.exercise-head{padding:1rem 1.1rem;background:var(--navy);color:#fff}.exercise-head span{display:block;color:var(--cyan-light);font-size:.78rem;font-weight:850;text-transform:uppercase}
+.exercise-body{padding:1.1rem}.solution-steps{display:grid;gap:.75rem}.solution-step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:.8rem;align-items:start}.solution-step>b{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#d9eef2;color:var(--cyan-dark)}
+.practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.practice-card{border:1px solid var(--line);border-radius:7px;padding:1rem;min-width:0}.practice-card select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.mini-feedback{margin-top:.75rem;padding:.75rem;border-left:4px solid var(--cyan);background:var(--soft);min-height:4rem}
+.case-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}.case-grid label{display:block;font-weight:750}.case-grid select{width:100%;margin-top:.3rem;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.quiz{display:grid;gap:1rem}.quiz-card{border:1px solid var(--line);border-radius:7px;padding:1rem}.quiz-card fieldset{border:0;padding:0;margin:0}.quiz-card legend{font-weight:800;margin-bottom:.7rem}.quiz-card label{display:block;padding:.5rem .55rem;border-radius:4px}.quiz-card label:hover{background:var(--soft)}
+.score{margin-top:1rem;padding:1rem;border:1px solid var(--line);border-radius:6px;background:var(--soft);font-weight:800}
+.reflection-box textarea{width:100%;min-height:145px;resize:vertical;padding:.8rem;border:1px solid var(--line);border-radius:6px}
+.references{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.ref-card{border-top:4px solid var(--cyan);padding:1rem;background:var(--soft)}
+.bottom-nav{margin-top:2rem;display:flex;justify-content:space-between;gap:.7rem;flex-wrap:wrap}
+footer{background:var(--navy-deep);color:#c7d8de}.footer-inner{width:min(100%,var(--max));margin:0 auto;padding:1.4rem 1.25rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.progress-wrap{position:fixed;right:1rem;bottom:1rem;z-index:20;background:rgba(7,20,26,.93);color:#fff;padding:.45rem .7rem;border-radius:999px;font-size:.78rem;border:1px solid #3b5965}
+@media(max-width:900px){
+  .hero-grid,.section-head,.lab-grid,.code-grid{grid-template-columns:1fr}
+  .concept-grid,.outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .outcome:nth-child(2){border-right:0}.outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .practice-grid,.case-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .header-inner{padding-inline:.8rem}.brand{min-width:145px}.top-link{padding:.45rem .6rem}
+  .band,.hero-grid{padding-left:.9rem;padding-right:.9rem}
+  h1{font-size:clamp(2rem,10vw,2.75rem);max-width:none}
+  .concept-grid,.outcomes,.references,.output-grid{grid-template-columns:1fr}
+  .outcome{border-right:0;border-bottom:1px solid var(--line)}.outcome:last-child{border-bottom:0}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+<header>
+<div class="header-inner">
+  <div class="brand"><strong>Programación de Redes</strong><span>Protocolos y APIs</span></div>
+  <div class="nav-scroll" aria-label="Navegación del subtema"><nav>
+    <a href="#inicio">Inicio</a><a href="#orientacion">Cómo trabajar</a><a href="#conceptos">Conceptos</a><a href="#predice">Predice</a><a href="#experimenta">Experimenta</a><a href="#codigo">Código</a><a href="#resuelto">Ejercicio resuelto</a><a href="#practica">Practica</a><a href="#caso">Caso profesional</a><a href="#comprueba">Comprueba</a><a href="#reflexiona">Reflexión</a>
+  </nav></div>
+  <a class="top-link" href="index.html">← Curso</a>
+</div>
+</header>
+
+<main id="contenido">
+<section class="hero" id="inicio">
+<div class="hero-grid">
+  <div>
+    <div class="eyebrow">Bloque 1 · Tema 1.4 · Subtema 1.4.1</div>
+    <h1>Recolección programática de información de dispositivos y servicios</h1>
+    <p>Diseña recolectores que consulten equipos y servicios de forma controlada, con timeout, manejo de errores y una salida uniforme que pueda procesarse después.</p>
+    <div class="hero-actions">
+      <a class="btn" href="#orientacion">Comenzar recorrido</a>
+      <a class="btn secondary" href="tema-1-4-obtencion-procesamiento-informacion-red.html">Volver al Tema 1.4</a>
+    </div>
+  </div>
+  <div class="hero-board" role="img" aria-label="Flujo de un recolector programático desde una fuente hasta un resultado estructurado">
+    <h3>Un recolector debe responder cuatro preguntas</h3>
+    <div class="collect-flow">
+      <div class="collect-step"><b>1</b><div><strong>¿Qué consulto?</strong><small>host · servicio · dispositivo · dato operativo</small></div></div>
+      <div class="collect-step"><b>2</b><div><strong>¿Cómo consulto?</strong><small>DNS · socket TCP · comando local · SSH autorizado</small></div></div>
+      <div class="collect-step"><b>3</b><div><strong>¿Qué puede fallar?</strong><small>timeout · resolución · conexión · autenticación</small></div></div>
+      <div class="collect-step"><b>4</b><div><strong>¿Qué devuelvo?</strong><small>origen · estado · valor · error · contexto</small></div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="orientacion">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Cómo trabajar este tema</div>
+    <div><h2>Recolectar no es copiar texto</h2><p class="lead">Una buena función de recolección devuelve información predecible incluso cuando el dispositivo no responde.</p></div>
+  </div>
+  <div class="outcomes">
+    <div class="outcome"><b>1. Seleccionar</b> una fuente adecuada de información.</div>
+    <div class="outcome"><b>2. Implementar</b> consultas básicas con control de tiempo.</div>
+    <div class="outcome"><b>3. Diferenciar</b> dato, estado y error.</div>
+    <div class="outcome"><b>4. Normalizar</b> resultados para procesamiento posterior.</div>
+  </div>
+  <div class="scope-note"><strong>Alcance.</strong> Este subtema se concentra en obtener datos. La limpieza y extracción detallada de valores desde respuestas complejas corresponde a 1.4.2.</div>
+</div>
+</section>
+
+<section id="conceptos">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Explora</div>
+    <div><h2>Cuatro fuentes frecuentes de información</h2><p class="lead">No todas las consultas se resuelven con el mismo mecanismo.</p></div>
+  </div>
+
+  <div class="concept-grid">
+    <article class="concept-card"><span class="tag">DNS</span><h3>Resolución de nombres</h3><p>Permite obtener información de direccionamiento asociada a un nombre mediante funciones como <code>socket.getaddrinfo()</code>.</p></article>
+    <article class="concept-card"><span class="tag">TCP</span><h3>Disponibilidad de servicio</h3><p>Un intento de conexión controlado puede indicar si un servicio TCP acepta conexiones en una dirección y puerto.</p></article>
+    <article class="concept-card"><span class="tag">Sistema</span><h3>Herramientas locales</h3><p>Comandos del sistema pueden aportar rutas, configuración IP u otros datos, siempre que se ejecuten de forma controlada.</p></article>
+    <article class="concept-card"><span class="tag">SSH</span><h3>Consulta remota autorizada</h3><p>Permite obtener información directamente desde un servidor o equipo autorizado sin intervención manual.</p></article>
+  </div>
+
+  <div class="callout"><strong>Diseño recomendado:</strong> todas las funciones de recolección deberían devolver una estructura semejante, aunque utilicen mecanismos distintos. Eso simplifica el resto del programa.</div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Fuente</th><th>Entrada típica</th><th>Resultado</th><th>Error frecuente</th></tr></thead>
+      <tbody>
+        <tr><td>DNS</td><td>Nombre de host</td><td>Direcciones / familia</td><td>Nombre no resoluble</td></tr>
+        <tr><td>Servicio TCP</td><td>IP + puerto</td><td>Disponible / no disponible</td><td>Timeout o conexión rechazada</td></tr>
+        <tr><td>Comando local</td><td>Argumentos</td><td>stdout / returncode</td><td>Herramienta ausente o timeout</td></tr>
+        <tr><td>SSH</td><td>Host + usuario + operación</td><td>Salida remota</td><td>Host desconocido, autenticación o timeout</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<section id="predice">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Predice</div>
+    <div><h2>¿Qué debe devolver una función si falla?</h2><p class="lead">Una consulta TCP expira por timeout mientras recorres 50 dispositivos.</p></div>
+  </div>
+
+  <div class="activity">
+    <div class="prediction">
+      <label><input type="radio" name="prediction" value="a"> No devolver nada y perder el contexto del equipo.</label>
+      <label><input type="radio" name="prediction" value="b"> Devolver un resultado estructurado con estado de error y su causa.</label>
+      <label><input type="radio" name="prediction" value="c"> Inventar que el servicio está disponible para continuar.</label>
+    </div>
+    <div class="action-row">
+      <button class="btn" id="checkPrediction" type="button">Comprobar</button>
+      <button class="btn light" id="resetPrediction" type="button">Reintentar</button>
+    </div>
+    <div class="feedback" id="predictionFeedback" aria-live="polite">Piensa en qué necesitará el procesamiento posterior para distinguir éxito y fallo.</div>
+  </div>
+</div>
+</section>
+
+<section id="experimenta">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Experimenta</div>
+    <div><h2>Construye un recolector</h2><p class="lead">Selecciona fuente y escenario. La actividad simula la estructura de salida que debería producir la función.</p></div>
+  </div>
+
+  <div class="activity">
+    <div class="lab-grid">
+      <div class="lab-panel">
+        <label for="sourceType">Fuente</label>
+        <select id="sourceType">
+          <option value="dns">Resolución DNS</option>
+          <option value="tcp">Servicio TCP</option>
+          <option value="local">Comando local</option>
+          <option value="ssh">Consulta SSH</option>
+        </select>
+
+        <label for="scenario">Escenario</label>
+        <select id="scenario">
+          <option value="ok">Consulta correcta</option>
+          <option value="timeout">Timeout</option>
+          <option value="error">Error de consulta</option>
+        </select>
+
+        <button class="btn" id="simulateCollector" type="button" style="margin-top:1rem">Simular recolección</button>
+        <div class="feedback" id="collectorFeedback" aria-live="polite">Configura el recolector y simula.</div>
+      </div>
+
+      <div class="lab-panel">
+        <h3>Resultado normalizado</h3>
+        <div class="output-grid">
+          <div class="output-card"><b>Fuente</b><span id="outSource">—</span></div>
+          <div class="output-card"><b>Estado</b><span id="outStatus">—</span></div>
+          <div class="output-card"><b>Valor</b><span id="outValue">—</span></div>
+          <div class="output-card"><b>Error</b><span id="outError">—</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="codigo">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Explica</div>
+    <div><h2>Ejemplos de recolección básica</h2><p class="lead">Cada función responde una pregunta concreta y convierte el resultado en una estructura uniforme.</p></div>
+  </div>
+
+  <div class="code-grid">
+    <article class="code-card">
+      <h3>Resolver un nombre</h3>
+      <div class="code-block"><code>import socket
+
+def recolectar_dns(nombre):
+    try:
+        info = socket.getaddrinfo(
+            nombre,
+            None
+        )
+
+        direcciones = sorted({
+            item[4][0] for item in info
+        })
+
+        return {
+            "fuente": "dns",
+            "estado": "ok",
+            "valor": direcciones,
+            "error": ""
+        }
+
+    except socket.gaierror as exc:
+        return {
+            "fuente": "dns",
+            "estado": "error",
+            "valor": [],
+            "error": str(exc)
+        }</code></div>
+    </article>
+
+    <article class="code-card">
+      <h3>Comprobar un servicio TCP</h3>
+      <div class="code-block"><code>import socket
+
+def recolectar_tcp(host, puerto):
+    try:
+        with socket.create_connection(
+            (host, puerto),
+            timeout=2
+        ):
+            return {
+                "fuente": "tcp",
+                "estado": "ok",
+                "valor": "disponible",
+                "error": ""
+            }
+
+    except (TimeoutError, OSError) as exc:
+        return {
+            "fuente": "tcp",
+            "estado": "error",
+            "valor": "no disponible",
+            "error": str(exc)
+        }</code></div>
+    </article>
+  </div>
+
+  <div class="code-grid" style="margin-top:1rem">
+    <article class="code-card">
+      <h3>Recolector genérico</h3>
+      <div class="code-block"><code>def resultado(fuente, estado,
+              valor=None, error=""):
+    return {
+        "fuente": fuente,
+        "estado": estado,
+        "valor": valor,
+        "error": error
+    }</code></div>
+      <p class="code-note">La estructura común facilita almacenar y procesar resultados heterogéneos.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Agregar contexto del equipo</h3>
+      <div class="code-block"><code>r = recolectar_tcp(
+    "192.0.2.10",
+    22
+)
+
+r["equipo"] = "srv-noc-01"
+r["operacion"] = "ssh-disponible"</code></div>
+      <p class="code-note">La dirección de ejemplo pertenece a un rango reservado para documentación.</p>
+    </article>
+  </div>
+</div>
+</section>
+
+<section id="resuelto">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Ejercicio resuelto</div>
+    <div><h2>Recolectar disponibilidad SSH de tres servidores</h2><p class="lead">Queremos comprobar el puerto TCP 22 y conservar un resultado por equipo.</p></div>
+  </div>
+
+  <div class="exercise-box">
+    <div class="exercise-head"><span>Problema</span><h3>Un fallo no debe detener todo el inventario</h3></div>
+    <div class="exercise-body">
+      <div class="solution-steps">
+        <div class="solution-step"><b>1</b><div><strong>Definir inventario.</strong><br>Cada servidor tiene nombre y host.</div></div>
+        <div class="solution-step"><b>2</b><div><strong>Aplicar el mismo recolector.</strong><br>La función recibe host y puerto.</div></div>
+        <div class="solution-step"><b>3</b><div><strong>Agregar contexto.</strong><br>El resultado se asocia al nombre del equipo.</div></div>
+        <div class="solution-step"><b>4</b><div><strong>Conservar todos los resultados.</strong><br>Los éxitos y errores forman parte de la misma lista.</div></div>
+      </div>
+
+      <div class="code-block" style="margin-top:1rem"><code>servidores = [
+    {"nombre": "srv-01", "host": "192.0.2.10"},
+    {"nombre": "srv-02", "host": "192.0.2.11"},
+    {"nombre": "srv-03", "host": "192.0.2.12"}
+]
+
+resultados = []
+
+for servidor in servidores:
+    r = recolectar_tcp(
+        servidor["host"],
+        22
+    )
+
+    r["equipo"] = servidor["nombre"]
+    resultados.append(r)</code></div>
+
+      <div class="callout"><strong>Interpretación:</strong> aquí solo comprobamos disponibilidad TCP del servicio. No demostramos que la autenticación SSH sea válida ni que un comando remoto pueda ejecutarse.</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="practica">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Practica</div>
+    <div><h2>Elige el recolector adecuado</h2><p class="lead">Relaciona cada necesidad con la fuente y el control apropiados.</p></div>
+  </div>
+
+  <div class="practice-grid">
+    <article class="practice-card">
+      <h3>Ejercicio 1</h3>
+      <p>Necesitas saber qué direcciones resuelve un nombre.</p>
+      <select id="p1"><option value="">Selecciona…</option><option value="a">Usar resolución DNS con getaddrinfo()</option><option value="b">Abrir siempre SSH</option><option value="c">Inventar una IP fija</option></select>
+      <button class="btn" id="checkP1" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p1Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 2</h3>
+      <p>Quieres saber si un puerto TCP acepta conexiones.</p>
+      <select id="p2"><option value="">Selecciona…</option><option value="a">Intento de conexión con timeout</option><option value="b">Solo resolver el nombre</option><option value="c">Leer un archivo local sin relación</option></select>
+      <button class="btn" id="checkP2" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p2Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 3</h3>
+      <p>Una consulta remota falla por autenticación.</p>
+      <select id="p3"><option value="">Selecciona…</option><option value="a">Registrar estado de error y causa</option><option value="b">Marcarla como exitosa</option><option value="c">Eliminar el equipo del inventario</option></select>
+      <button class="btn" id="checkP3" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p3Feedback">Selecciona una respuesta.</div>
+    </article>
+  </div>
+</div>
+</section>
+
+<section id="caso">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Caso profesional</div>
+    <div><h2>Recolector previo al turno de operación</h2><p class="lead">Un NOC desea reunir información básica de servidores y radios antes de comenzar la revisión manual.</p></div>
+  </div>
+
+  <div class="activity">
+    <div class="case-grid">
+      <label>Identidad
+        <select id="caseIdentity"><option value="">Selecciona…</option><option value="dns">Resolver nombres y conservar direcciones</option><option value="none">No identificar el origen</option></select>
+      </label>
+      <label>Servicios
+        <select id="caseService"><option value="">Selecciona…</option><option value="timeout">Comprobar puertos con timeout</option><option value="wait">Esperar indefinidamente</option></select>
+      </label>
+      <label>Salida
+        <select id="caseOutput"><option value="">Selecciona…</option><option value="normalized">Resultado uniforme con estado y error</option><option value="mixed">Cada función devuelve algo distinto sin contexto</option></select>
+      </label>
+    </div>
+
+    <button class="btn" id="checkCase" type="button" style="margin-top:1rem">Evaluar diseño</button>
+    <div class="feedback" id="caseFeedback" aria-live="polite">Busca una recolección que pueda escalar a varios equipos y procesarse después.</div>
+  </div>
+</div>
+</section>
+
+<section id="comprueba">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Comprueba</div>
+    <div><h2>Integra lo aprendido</h2><p class="lead">Responde las cinco preguntas.</p></div>
+  </div>
+
+  <div class="quiz" id="quiz">
+    <article class="quiz-card"><fieldset><legend>1. ¿Qué característica debe tener una buena función de recolección?</legend><label><input type="radio" name="q1" value="a"> Devolver una estructura predecible en éxito y error.</label><label><input type="radio" name="q1" value="b"> Cambiar de formato aleatoriamente.</label><label><input type="radio" name="q1" value="c"> Ocultar cualquier fallo.</label></fieldset><div class="mini-feedback" id="q1Feedback">Selecciona una respuesta.</div></article>
+
+    <article class="quiz-card"><fieldset><legend>2. ¿Qué ayuda a evitar bloqueos prolongados?</legend><label><input type="radio" name="q2" value="a"> Definir timeout.</label><label><input type="radio" name="q2" value="b"> Esperar indefinidamente.</label><label><input type="radio" name="q2" value="c"> Duplicar el inventario.</label></fieldset><div class="mini-feedback" id="q2Feedback">Selecciona una respuesta.</div></article>
+
+    <article class="quiz-card"><fieldset><legend>3. ¿Qué indica un intento TCP exitoso al puerto 22?</legend><label><input type="radio" name="q3" value="a"> Que existe un servicio aceptando la conexión TCP en ese puerto.</label><label><input type="radio" name="q3" value="b"> Que cualquier contraseña SSH será válida.</label><label><input type="radio" name="q3" value="c"> Que el servidor nunca fallará.</label></fieldset><div class="mini-feedback" id="q3Feedback">Selecciona una respuesta.</div></article>
+
+    <article class="quiz-card"><fieldset><legend>4. ¿Por qué añadir el nombre del equipo al resultado?</legend><label><input type="radio" name="q4" value="a"> Para conservar contexto y trazabilidad.</label><label><input type="radio" name="q4" value="b"> Para reemplazar el estado.</label><label><input type="radio" name="q4" value="c"> Para evitar cualquier excepción.</label></fieldset><div class="mini-feedback" id="q4Feedback">Selecciona una respuesta.</div></article>
+
+    <article class="quiz-card"><fieldset><legend>5. ¿Qué corresponde a 1.4.2?</legend><label><input type="radio" name="q5" value="a"> Procesar y extraer información desde respuestas y salidas.</label><label><input type="radio" name="q5" value="b"> Crear un nuevo protocolo de transporte.</label><label><input type="radio" name="q5" value="c"> Diseñar una red física completa.</label></fieldset><div class="mini-feedback" id="q5Feedback">Selecciona una respuesta.</div></article>
+  </div>
+
+  <div class="action-row" style="margin-top:1rem">
+    <button class="btn" id="checkQuiz" type="button">Comprobar todo</button>
+    <button class="btn light" id="resetQuiz" type="button">Reintentar</button>
+  </div>
+  <div class="score" id="scoreBox" aria-live="polite">Aún no has comprobado la actividad.</div>
+</div>
+</section>
+
+<section id="reflexiona">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Reflexión</div>
+    <div><h2>¿Qué recolectarías antes de diagnosticar una incidencia?</h2><p class="lead">Diseña una lista mínima de datos y explica qué mecanismo utilizarías para obtener cada uno.</p></div>
+  </div>
+
+  <div class="reflection-box">
+    <textarea id="reflectionText" aria-label="Reflexión del estudiante" placeholder="Ejemplo: resolver nombre, comprobar puerto del servicio, consultar estado remoto, registrar timeout y conservar contexto del equipo..."></textarea>
+    <div class="action-row">
+      <button class="btn" id="saveReflection" type="button">Guardar en este navegador</button>
+      <button class="btn light" id="clearReflection" type="button">Borrar</button>
+    </div>
+    <p id="reflectionStatus" aria-live="polite">El texto no se transmite; si lo guardas, permanece únicamente en el almacenamiento local de este navegador.</p>
+  </div>
+
+  <div class="references" style="margin-top:2rem">
+    <article class="ref-card"><h3>Referencias conceptuales</h3><p>Biblioteca estándar de Python: <code>socket</code> y manejo de excepciones. Para consultas SSH pueden reutilizarse los principios estudiados con Paramiko.</p></article>
+    <article class="ref-card"><h3>Delimitación</h3><p>La recolección termina cuando obtenemos un resultado con contexto. El procesamiento profundo de texto y respuestas se aborda en 1.4.2.</p></article>
+  </div>
+
+  <div class="bottom-nav">
+    <a class="btn light" href="tema-1-4-obtencion-procesamiento-informacion-red.html">← Tema 1.4</a>
+    <a class="btn light" href="tema-1-4-2-procesamiento-respuestas-salidas-comandos.html">1.4.2 Procesamiento de respuestas →</a>
+  </div>
+</div>
+</section>
+</main>
+
+<footer>
+<div class="footer-inner">
+  <div><strong>Programación de Redes: Protocolos y APIs</strong><br><span>Subtema 1.4.1 · Recolección programática de información</span></div>
+  <div>Material interactivo · uso local</div>
+</div>
+</footer>
+
+<div class="progress-wrap" aria-hidden="true">Recorrido <b id="progressValue">0%</b></div>
+
+<script>
+(() => {
+"use strict";
+const $=id=>document.getElementById(id);
+const setFeedback=(el,text,type="")=>{el.textContent=text;el.className="feedback"+(type?" "+type:"");};
+const setMini=(el,text,ok=null)=>{el.textContent=text;el.style.borderLeftColor=ok===true?"var(--green)":ok===false?"var(--red)":"var(--cyan)";el.style.background=ok===true?"var(--green-soft)":ok===false?"var(--red-soft)":"var(--soft)";};
+
+$("checkPrediction").addEventListener("click",()=>{
+  const s=document.querySelector('input[name="prediction"]:checked');
+  if(!s)return setFeedback($("predictionFeedback"),"Selecciona primero una opción.","warn");
+  if(s.value==="b"){
+    setFeedback($("predictionFeedback"),"Correcto. El error también es información: debe conservarse junto con el origen para que el procesamiento posterior pueda actuar correctamente.","success");
+  }else{
+    setFeedback($("predictionFeedback"),"Revisa el objetivo de un recolector: debe conservar contexto incluso cuando la consulta falla.","error");
+  }
+});
+$("resetPrediction").addEventListener("click",()=>{
+  document.querySelectorAll('input[name="prediction"]').forEach(r=>r.checked=false);
+  setFeedback($("predictionFeedback"),"Piensa en qué necesitará el procesamiento posterior para distinguir éxito y fallo.");
+});
+
+const samples={
+  dns:{ok:["['192.0.2.10', '2001:db8::10']",""],timeout:["[]","Tiempo de espera conceptual"],error:["[]","Nombre no resoluble"]},
+  tcp:{ok:["disponible",""],timeout:["no disponible","Timeout de conexión"],error:["no disponible","Conexión rechazada"]},
+  local:{ok:["ruta obtenida",""],timeout:["sin valor","Proceso excedió el timeout"],error:["sin valor","Herramienta no disponible"]},
+  ssh:{ok:["hostname=srv-noc-01",""],timeout:["sin valor","Timeout SSH"],error:["sin valor","Autenticación rechazada"]}
+};
+const labels={dns:"dns",tcp:"tcp",local:"comando-local",ssh:"ssh"};
+
+$("simulateCollector").addEventListener("click",()=>{
+  const source=$("sourceType").value;
+  const scenario=$("scenario").value;
+  const sample=samples[source][scenario];
+
+  $("outSource").textContent=labels[source];
+  $("outStatus").textContent=scenario==="ok"?"ok":"error";
+  $("outValue").textContent=sample[0];
+  $("outError").textContent=sample[1]||"—";
+
+  if(scenario==="ok"){
+    setFeedback($("collectorFeedback"),"La función produjo un valor útil y lo devolvió dentro de la misma estructura esperada.","success");
+  }else{
+    setFeedback($("collectorFeedback"),"La consulta falló, pero el resultado sigue siendo útil porque conserva fuente, estado y causa.","warn");
+  }
+});
+
+const practices=[
+  {s:"p1",b:"checkP1",f:"p1Feedback",a:"a",ok:"Correcto. getaddrinfo() permite obtener información de direccionamiento asociada al nombre.",bad:"La necesidad es resolver un nombre; no hace falta abrir una sesión remota."},
+  {s:"p2",b:"checkP2",f:"p2Feedback",a:"a",ok:"Correcto. Un intento de conexión con timeout permite comprobar disponibilidad TCP sin esperar indefinidamente.",bad:"Para comprobar un servicio TCP debes interactuar con la dirección y puerto correspondientes."},
+  {s:"p3",b:"checkP3",f:"p3Feedback",a:"a",ok:"Correcto. La causa de autenticación debe conservarse como parte del resultado.",bad:"Ocultar o transformar un fallo en éxito destruye la confiabilidad de la recolección."}
+];
+practices.forEach(p=>$(p.b).addEventListener("click",()=>{
+  const v=$(p.s).value;
+  if(!v)return setMini($(p.f),"Selecciona primero una respuesta.");
+  setMini($(p.f),v===p.a?p.ok:p.bad,v===p.a);
+}));
+
+$("checkCase").addEventListener("click",()=>{
+  const ok=$("caseIdentity").value==="dns" &&
+           $("caseService").value==="timeout" &&
+           $("caseOutput").value==="normalized";
+  setFeedback(
+    $("caseFeedback"),
+    ok
+      ? "Diseño coherente: identificas el origen, controlas el tiempo de espera y normalizas la salida para usarla después."
+      : "Revisa los tres pilares: identificar, limitar el tiempo de consulta y devolver una estructura uniforme.",
+    ok?"success":"error"
+  );
+});
+
+const answers={q1:"a",q2:"a",q3:"a",q4:"a",q5:"a"};
+const explanations={
+  q1:"Una salida predecible permite que otras partes del programa procesen éxito y error de la misma manera.",
+  q2:"El timeout evita que una consulta bloquee indefinidamente el flujo.",
+  q3:"Una conexión TCP aceptada indica disponibilidad del servicio TCP, no validez de credenciales.",
+  q4:"El contexto permite saber a qué equipo corresponde cada valor o error.",
+  q5:"1.4.2 profundiza en limpieza, interpretación y extracción de valores desde las respuestas recolectadas."
+};
+
+$("checkQuiz").addEventListener("click",()=>{
+  let score=0;
+  Object.keys(answers).forEach(q=>{
+    const s=document.querySelector(`input[name="${q}"]:checked`);
+    const ok=s&&s.value===answers[q];
+    if(ok)score++;
+    setMini(
+      $(`${q}Feedback`),
+      s?((ok?"Correcto. ":"Revisa. ")+explanations[q]):"Falta responder esta pregunta.",
+      ok
+    );
+  });
+  $("scoreBox").textContent=`Resultado: ${score}/5. ${score===5?"Dominio sólido de la recolección programática básica.":"Revisa las explicaciones y vuelve a intentarlo."}`;
+});
+
+$("resetQuiz").addEventListener("click",()=>{
+  document.querySelectorAll('#quiz input[type="radio"]').forEach(r=>r.checked=false);
+  Object.keys(answers).forEach(q=>setMini($(`${q}Feedback`),"Selecciona una respuesta."));
+  $("scoreBox").textContent="Aún no has comprobado la actividad.";
+});
+
+const key="pr-redes-1-4-1-reflexion";
+try{
+  const saved=localStorage.getItem(key);
+  if(saved)$("reflectionText").value=saved;
+}catch(_){}
+
+$("saveReflection").addEventListener("click",()=>{
+  try{
+    localStorage.setItem(key,$("reflectionText").value);
+    $("reflectionStatus").textContent="Reflexión guardada únicamente en este navegador.";
+  }catch(_){
+    $("reflectionStatus").textContent="Este navegador no permitió guardar la reflexión localmente.";
+  }
+});
+
+$("clearReflection").addEventListener("click",()=>{
+  $("reflectionText").value="";
+  try{localStorage.removeItem(key);}catch(_){}
+  $("reflectionStatus").textContent="Reflexión borrada del almacenamiento local.";
+});
+
+const sections=[...document.querySelectorAll("main section")];
+function updateProgress(){
+  const total=document.documentElement.scrollHeight-window.innerHeight;
+  const pct=total>0?Math.max(0,Math.min(100,Math.round((window.scrollY/total)*100))):100;
+  $("progressValue").textContent=pct+"%";
+  const marker=window.scrollY+window.innerHeight*.36;
+  let current=sections[0];
+  sections.forEach(s=>{if(s.offsetTop<=marker)current=s;});
+  document.querySelectorAll("nav a").forEach(a=>a.removeAttribute("aria-current"));
+  if(current&&current.id){
+    const link=document.querySelector(`nav a[href="#${current.id}"]`);
+    if(link)link.setAttribute("aria-current","location");
+  }
+}
+window.addEventListener("scroll",updateProgress,{passive:true});
+window.addEventListener("resize",updateProgress);
+updateProgress();
+})();
+</script>
+</body>
+</html>
