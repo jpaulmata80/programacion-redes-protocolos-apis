@@ -1,0 +1,1033 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Subtema 2.4.2: gestión segura de credenciales y variables de entorno.">
+<meta name="theme-color" content="#10212a">
+<title>2.4.2 | Gestión segura de credenciales y variables de entorno</title>
+<style>
+:root{
+  --ink:#18212a;--muted:#586775;--line:#cbd5dc;--soft:#f3f6f8;--paper:#fff;
+  --cyan:#007c91;--cyan-dark:#005b6a;--cyan-light:#6ed2e2;
+  --green:#16734a;--green-soft:#e8f5ee;--amber:#8a5600;--amber-soft:#fff3d8;
+  --red:#9b2c2c;--red-soft:#fdecec;--focus:#005fcc;
+  --navy:#10212a;--navy-deep:#07141a;--max:1180px;--radius:8px;
+  --shadow:0 16px 38px rgba(24,33,42,.08)
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;min-width:280px;color:var(--ink);background:var(--paper);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  line-height:1.55;overflow-x:hidden
+}
+button,input,select,textarea{font:inherit;max-width:100%}
+a{color:var(--cyan-dark)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:3px solid var(--focus);outline-offset:3px
+}
+.skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}
+.skip-link:focus{top:1rem}
+header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.header-inner{
+  width:min(100%,var(--max));min-height:66px;margin:0 auto;padding:.55rem 1.25rem;
+  display:flex;gap:1rem;align-items:center;min-width:0
+}
+.brand{min-width:190px}.brand strong{display:block;font-size:.95rem}.brand span{display:block;color:var(--muted);font-size:.78rem}
+.nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}
+nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+nav a{color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;border-bottom:2px solid transparent;font-size:.84rem}
+nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+.top-link{
+  flex:0 0 auto;text-decoration:none;border:1px solid var(--line);border-radius:5px;
+  padding:.48rem .72rem;color:var(--ink);font-weight:750;white-space:nowrap;background:#fff
+}
+main{overflow:hidden}
+section{scroll-margin-top:84px;border-bottom:1px solid var(--line)}
+.band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+.hero{min-height:calc(100svh - 66px);display:grid;align-items:center;background:var(--navy);color:#fff}
+.hero-grid{
+  width:min(100%,var(--max));margin:0 auto;padding:3.4rem 1.25rem;
+  display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:3rem;align-items:center
+}
+.hero-grid>*{min-width:0}
+.eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+h1{
+  font-size:clamp(2rem,5vw,4rem);line-height:1.02;margin:.65rem 0 1.15rem;
+  max-width:20ch;overflow-wrap:normal;word-break:normal;hyphens:none
+}
+h2{
+  font-size:clamp(1.75rem,3.3vw,2.8rem);line-height:1.12;margin:0 0 .8rem;
+  overflow-wrap:normal;word-break:normal;hyphens:none
+}
+h3{font-size:1.22rem;margin:0 0 .55rem}
+p{max-width:72ch}.hero p{color:#d7e5ea;font-size:1.08rem}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}.hero-actions{margin-top:1.45rem}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cyan-dark);
+  background:var(--cyan);color:#fff;text-decoration:none;padding:.72rem 1rem;border-radius:5px;font-weight:750
+}
+.btn:hover{background:var(--cyan-dark)}
+.btn.secondary{background:transparent;color:inherit;border-color:currentColor}
+.btn.secondary:hover{background:rgba(255,255,255,.1)}
+.btn.light{background:#fff;color:var(--ink);border-color:var(--line)}
+.btn.light:hover{background:var(--soft);color:var(--cyan-dark)}
+.hero-board{background:var(--navy-deep);border:1px solid #3b5965;border-radius:8px;padding:1.25rem}
+.security-flow{display:grid;gap:.55rem;margin-top:1rem}
+.security-step{
+  display:grid;grid-template-columns:42px minmax(0,1fr);gap:.7rem;align-items:start;
+  padding:.7rem;border:1px solid #3b5965;border-radius:6px;background:#0d2630
+}
+.security-step b{
+  display:grid;place-items:center;width:42px;height:42px;border-radius:50%;
+  background:#153d4a;color:var(--cyan-light)
+}
+.security-step small{display:block;color:#b8cbd2;margin-top:.15rem}
+.section-head{
+  display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem
+}
+.section-head>*{min-width:0}
+.section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}
+.lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+.outcomes{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line)
+}
+.outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}
+.outcome:last-child{border-right:0}
+.outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+.scope-note,.callout{margin-top:1.4rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}
+.concept-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+.concept-card{
+  min-width:0;border:1px solid var(--line);border-radius:var(--radius);
+  padding:1.15rem;background:#fff;box-shadow:var(--shadow)
+}
+.tag{
+  display:inline-block;font-size:.76rem;font-weight:850;color:var(--cyan-dark);
+  background:#d9eef2;padding:.2rem .45rem;border-radius:999px;margin-bottom:.55rem
+}
+.concept-card p{color:var(--muted);font-size:.94rem}
+.table-wrap{overflow-x:auto;margin-top:1.2rem;border:1px solid var(--line);border-radius:7px}
+table{border-collapse:collapse;width:100%;min-width:940px}
+th,td{padding:.8rem;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--soft)}
+.activity{
+  margin-top:1.5rem;padding:1.35rem;border:1px solid var(--line);
+  border-radius:var(--radius);background:var(--soft);min-width:0
+}
+.prediction{display:grid;gap:.6rem;margin:.85rem 0 1rem}
+.prediction label{display:block;padding:.75rem .8rem;background:#fff;border:1px solid var(--line);border-radius:5px}
+.feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}
+.feedback.success{background:var(--green-soft);border-color:var(--green)}
+.feedback.warn{background:var(--amber-soft);border-color:var(--amber)}
+.feedback.error{background:var(--red-soft);border-color:var(--red)}
+.lab-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:1rem}
+.lab-grid>*{min-width:0}
+.lab-panel{border:1px solid var(--line);border-radius:7px;background:#fff;padding:1rem}
+.lab-panel label{display:block;font-weight:750;margin:.75rem 0 .3rem}
+.lab-panel select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+.result-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-top:1rem}
+.result-card{padding:.8rem;border:1px solid var(--line);border-radius:6px;background:#fff;min-width:0}
+.result-card b{display:block;color:var(--cyan-dark);font-size:.78rem;text-transform:uppercase}
+.result-card span{display:block;margin-top:.25rem;overflow-wrap:anywhere}
+.terminal{
+  margin-top:1rem;background:#07141a;color:#dce9ed;border-radius:7px;padding:1rem;
+  border:1px solid #314b56;overflow-x:auto
+}
+.terminal pre{margin:0;white-space:pre-wrap;word-break:break-word}
+.code-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.code-card{min-width:0;background:#09161d;color:#dce9ed;border:1px solid #314b56;border-radius:7px;padding:1rem}
+.code-card h3{color:#fff}
+.code-block{overflow-x:auto;margin:.75rem 0;background:#061016;border:1px solid #253c47;border-radius:6px;padding:1rem}
+.code-block code{white-space:pre}
+.code-note{color:#bfd1d7}
+.exercise-box{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.exercise-head{padding:1rem 1.1rem;background:var(--navy);color:#fff}
+.exercise-head span{display:block;color:var(--cyan-light);font-size:.78rem;font-weight:850;text-transform:uppercase}
+.exercise-body{padding:1.1rem}
+.solution-steps{display:grid;gap:.75rem}
+.solution-step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:.8rem;align-items:start}
+.solution-step>b{
+  display:grid;place-items:center;width:34px;height:34px;border-radius:50%;
+  background:#d9eef2;color:var(--cyan-dark)
+}
+.practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+.practice-card{border:1px solid var(--line);border-radius:7px;padding:1rem;min-width:0}
+.practice-card select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.mini-feedback{margin-top:.75rem;padding:.75rem;border-left:4px solid var(--cyan);background:var(--soft);min-height:4rem}
+.case-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}
+.case-grid label{display:block;font-weight:750}
+.case-grid select{width:100%;margin-top:.3rem;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.quiz{display:grid;gap:1rem}
+.quiz-card{border:1px solid var(--line);border-radius:7px;padding:1rem}
+.quiz-card fieldset{border:0;padding:0;margin:0}
+.quiz-card legend{font-weight:800;margin-bottom:.7rem}
+.quiz-card label{display:block;padding:.5rem .55rem;border-radius:4px}
+.quiz-card label:hover{background:var(--soft)}
+.score{margin-top:1rem;padding:1rem;border:1px solid var(--line);border-radius:6px;background:var(--soft);font-weight:800}
+.reflection-box textarea{width:100%;min-height:145px;resize:vertical;padding:.8rem;border:1px solid var(--line);border-radius:6px}
+.references{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.ref-card{border-top:4px solid var(--cyan);padding:1rem;background:var(--soft)}
+.bottom-nav{margin-top:2rem;display:flex;justify-content:space-between;gap:.7rem;flex-wrap:wrap}
+footer{background:var(--navy-deep);color:#c7d8de}
+.footer-inner{
+  width:min(100%,var(--max));margin:0 auto;padding:1.4rem 1.25rem;
+  display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap
+}
+.progress-wrap{
+  position:fixed;right:1rem;bottom:1rem;z-index:20;background:rgba(7,20,26,.93);
+  color:#fff;padding:.45rem .7rem;border-radius:999px;font-size:.78rem;border:1px solid #3b5965
+}
+@media(max-width:900px){
+  .hero-grid,.section-head,.lab-grid,.code-grid{grid-template-columns:1fr}
+  .concept-grid,.outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .outcome:nth-child(2){border-right:0}
+  .outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .practice-grid,.case-grid{grid-template-columns:1fr}
+}
+@media(max-width:650px){.result-grid,.references{grid-template-columns:1fr}}
+@media(max-width:600px){
+  .header-inner{padding-inline:.8rem}.brand{min-width:145px}.top-link{padding:.45rem .6rem}
+  .band,.hero-grid{padding-left:.9rem;padding-right:.9rem}
+  h1{font-size:clamp(2rem,10vw,2.72rem);max-width:none}
+  .concept-grid,.outcomes{grid-template-columns:1fr}
+  .outcome{border-right:0;border-bottom:1px solid var(--line)}
+  .outcome:last-child{border-bottom:0}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+<header>
+<div class="header-inner">
+  <div class="brand"><strong>Programación de Redes</strong><span>Protocolos y APIs</span></div>
+  <div class="nav-scroll" aria-label="Navegación del subtema">
+    <nav>
+      <a href="#inicio">Inicio</a>
+      <a href="#orientacion">Cómo trabajar</a>
+      <a href="#conceptos">Conceptos</a>
+      <a href="#predice">Predice</a>
+      <a href="#experimenta">Experimenta</a>
+      <a href="#codigo">Código</a>
+      <a href="#resuelto">Ejercicio resuelto</a>
+      <a href="#practica">Practica</a>
+      <a href="#caso">Caso profesional</a>
+      <a href="#comprueba">Comprueba</a>
+      <a href="#reflexiona">Reflexión</a>
+    </nav>
+  </div>
+  <a class="top-link" href="index.html">← Curso</a>
+</div>
+</header>
+
+<main id="contenido">
+
+<section class="hero" id="inicio">
+<div class="hero-grid">
+  <div>
+    <div class="eyebrow">Bloque 2 · Tema 2.4 · Subtema 2.4.2</div>
+    <h1>Gestión segura de credenciales y variables de entorno</h1>
+    <p>Separa secretos y configuración del código fuente para reducir exposición accidental de API keys, tokens, usuarios y contraseñas en aplicaciones de red.</p>
+
+    <div class="hero-actions">
+      <a class="btn" href="#orientacion">Comenzar recorrido</a>
+      <a class="btn secondary" href="tema-2-4-integracion-buenas-practicas-aplicaciones-red.html">Volver al Tema 2.4</a>
+    </div>
+  </div>
+
+  <div class="hero-board" role="img" aria-label="Flujo seguro de gestión de credenciales">
+    <h3>El secreto no pertenece al código</h3>
+    <div class="security-flow">
+      <div class="security-step"><b>1</b><div><strong>Separar</strong><small>código ≠ credenciales</small></div></div>
+      <div class="security-step"><b>2</b><div><strong>Configurar</strong><small>variables de entorno o gestor de secretos</small></div></div>
+      <div class="security-step"><b>3</b><div><strong>Leer</strong><small>os.environ / os.getenv</small></div></div>
+      <div class="security-step"><b>4</b><div><strong>Usar</strong><small>headers · conexiones · clientes</small></div></div>
+      <div class="security-step"><b>5</b><div><strong>Proteger</strong><small>no logs · no repositorio · rotación</small></div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="orientacion">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Cómo trabajar este tema</div>
+    <div>
+      <h2>La seguridad empieza evitando exposición innecesaria</h2>
+      <p class="lead">Una credencial hardcodeada puede terminar en Git, capturas, logs, archivos compartidos o copias antiguas del proyecto.</p>
+    </div>
+  </div>
+
+  <div class="outcomes">
+    <div class="outcome"><b>1. Identificar</b> prácticas inseguras de manejo de secretos.</div>
+    <div class="outcome"><b>2. Leer</b> configuración sensible desde variables de entorno.</div>
+    <div class="outcome"><b>3. Evitar</b> exposición en código, logs y repositorios.</div>
+    <div class="outcome"><b>4. Aplicar</b> principios básicos de rotación y mínimo privilegio.</div>
+  </div>
+
+  <div class="scope-note">
+    <strong>Alcance.</strong> Las variables de entorno reducen exposición en el código, pero no son un gestor de secretos completo. En sistemas de mayor criticidad se utilizan soluciones específicas de gestión de secretos.
+  </div>
+</div>
+</section>
+
+<section id="conceptos">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Explora</div>
+    <div>
+      <h2>Configuración y secretos no son código</h2>
+      <p class="lead">La aplicación necesita conocer credenciales para operar, pero eso no implica almacenarlas dentro del repositorio.</p>
+    </div>
+  </div>
+
+  <div class="concept-grid">
+    <article class="concept-card">
+      <span class="tag">Secreto</span>
+      <h3>Credencial</h3>
+      <p>API key, token, contraseña o clave privada que permite acceso a un recurso.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">Entorno</span>
+      <h3>Configuración externa</h3>
+      <p>Valores suministrados al proceso sin modificar el código fuente.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">Principio</span>
+      <h3>Mínimo privilegio</h3>
+      <p>Una credencial debería tener únicamente los permisos necesarios para la tarea que realiza.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">Ciclo de vida</span>
+      <h3>Rotación</h3>
+      <p>Si un secreto se expone o deja de ser apropiado, debe reemplazarse y revocarse cuando corresponda.</p>
+    </article>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Práctica</th><th>Riesgo</th><th>Alternativa más segura</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>TOKEN = "abc123..."</code> en el código</td><td>Puede quedar en Git, copias y revisiones.</td><td>Leer desde una variable de entorno o servicio de secretos.</td></tr>
+        <tr><td>Imprimir headers completos</td><td>Puede exponer Authorization en logs.</td><td>Registrar solo contexto no sensible.</td></tr>
+        <tr><td>Subir <code>.env</code> al repositorio</td><td>Expone secretos aunque el código use variables.</td><td>Excluirlo con <code>.gitignore</code> y usar un archivo de ejemplo sin valores reales.</td></tr>
+        <tr><td>Una misma key para todo</td><td>Mayor impacto si se compromete.</td><td>Separar credenciales y limitar permisos por función.</td></tr>
+        <tr><td>Mantener una key expuesta</td><td>El acceso puede seguir siendo válido.</td><td>Revocar y rotar la credencial.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <strong>HTTPS sigue siendo necesario.</strong> Sacar el token del código no cifra la comunicación. Las credenciales deben transmitirse por canales protegidos y según el mecanismo definido por el servicio.
+  </div>
+</div>
+</section>
+
+<section id="predice">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Predice</div>
+    <div>
+      <h2>¿Cuál implementación reduce mejor el riesgo?</h2>
+      <p class="lead">Una aplicación necesita un token para consultar inventario.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="prediction">
+      <label><input type="radio" name="prediction" value="a"> Leer el token desde <code>os.environ["INVENTARIO_TOKEN"]</code>.</label>
+      <label><input type="radio" name="prediction" value="b"> Escribir el token directamente en <code>main.py</code>.</label>
+      <label><input type="radio" name="prediction" value="c"> Guardar el token en un comentario para que “no se ejecute”.</label>
+    </div>
+
+    <div class="action-row">
+      <button class="btn" id="checkPrediction" type="button">Comprobar</button>
+      <button class="btn light" id="resetPrediction" type="button">Reintentar</button>
+    </div>
+
+    <div class="feedback" id="predictionFeedback" aria-live="polite">
+      Separar el secreto del código reduce la probabilidad de exposición accidental.
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="experimenta">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Experimenta</div>
+    <div>
+      <h2>Evalúa una estrategia de credenciales</h2>
+      <p class="lead">Selecciona dónde se guarda el secreto y qué ocurre con los logs.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="lab-grid">
+      <div class="lab-panel">
+        <label for="secretSource">Ubicación del secreto</label>
+        <select id="secretSource">
+          <option value="env">Variable de entorno</option>
+          <option value="code">Código fuente</option>
+          <option value="repoenv">Archivo .env versionado</option>
+        </select>
+
+        <label for="logMode">Registro</label>
+        <select id="logMode">
+          <option value="safe">No registrar el valor del secreto</option>
+          <option value="full">Imprimir headers y token completos</option>
+        </select>
+
+        <button class="btn" id="evaluateSecurity" type="button" style="margin-top:1rem">
+          Evaluar estrategia
+        </button>
+
+        <div class="feedback" id="securityFeedback" aria-live="polite">
+          Selecciona una estrategia.
+        </div>
+      </div>
+
+      <div class="lab-panel">
+        <h3>Evaluación</h3>
+
+        <div class="result-grid">
+          <div class="result-card"><b>Fuente</b><span id="outSource">entorno</span></div>
+          <div class="result-card"><b>Logs</b><span id="outLogs">sin secreto</span></div>
+          <div class="result-card"><b>Riesgo</b><span id="outRisk">reducido</span></div>
+        </div>
+
+        <div class="terminal">
+          <pre id="securityPreview">TOKEN <- variable de entorno
+
+Authorization: Bearer &lt;token&gt;
+
+log:
+  "consulta inventario equipo=452"
+  [sin credencial]</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="codigo">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Explica</div>
+    <div>
+      <h2>Configuración sensible fuera del código</h2>
+      <p class="lead">Python puede leer variables de entorno sin necesidad de almacenar el secreto dentro del archivo fuente.</p>
+    </div>
+  </div>
+
+  <div class="code-grid">
+    <article class="code-card">
+      <h3>Leer una variable obligatoria</h3>
+      <div class="code-block"><code>import os
+
+TOKEN = os.environ[
+    "INVENTARIO_TOKEN"
+]</code></div>
+      <p class="code-note">Si la variable no existe, se produce un error inmediatamente. Esto puede ser útil para detectar configuración incompleta.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Leer configuración opcional</h3>
+      <div class="code-block"><code>import os
+
+BASE_URL = os.getenv(
+    "INVENTARIO_URL",
+    "https://api.example/v1"
+)</code></div>
+      <p class="code-note"><code>os.getenv()</code> permite definir un valor por defecto cuando tiene sentido hacerlo.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Usar el token sin imprimirlo</h3>
+      <div class="code-block"><code>headers = {
+    "Authorization": f"Bearer {TOKEN}",
+    "Accept": "application/json"
+}
+
+response = requests.get(
+    f"{BASE_URL}/equipos/452",
+    headers=headers,
+    timeout=5
+)</code></div>
+      <p class="code-note">No muestres <code>headers</code> completos en logs si contienen credenciales.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Archivo .env local</h3>
+      <div class="code-block"><code># .env
+INVENTARIO_TOKEN=valor_local
+INVENTARIO_URL=https://api.example/v1
+
+# .gitignore
+.env</code></div>
+      <p class="code-note">Un <code>.env</code> puede ser útil en desarrollo, pero debe permanecer fuera del repositorio cuando contiene secretos.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Archivo de ejemplo</h3>
+      <div class="code-block"><code># .env.example
+INVENTARIO_TOKEN=
+INVENTARIO_URL=https://api.example/v1</code></div>
+      <p class="code-note">El archivo de ejemplo documenta las variables requeridas sin compartir valores reales.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Fallo seguro de configuración</h3>
+      <div class="code-block"><code>import os
+
+token = os.getenv(
+    "INVENTARIO_TOKEN"
+)
+
+if not token:
+    raise RuntimeError(
+        "Falta INVENTARIO_TOKEN"
+    )</code></div>
+      <p class="code-note">Es preferible detectar una configuración incompleta que ejecutar con una credencial vacía o inventada.</p>
+    </article>
+  </div>
+
+  <div class="callout">
+    <strong>Importante:</strong> las variables de entorno no son invisibles ni invulnerables. Procesos con permisos suficientes, volcados de memoria o configuraciones deficientes pueden exponerlas. Son una práctica básica de separación, no una solución total.
+  </div>
+</div>
+</section>
+
+<section id="resuelto">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Ejercicio resuelto</div>
+    <div>
+      <h2>Corregir un cliente de inventario inseguro</h2>
+      <p class="lead">Partimos de una implementación que tiene el token dentro del código.</p>
+    </div>
+  </div>
+
+  <div class="exercise-box">
+    <div class="exercise-head">
+      <span>Problema</span>
+      <h3>Separar credencial, configuración y lógica</h3>
+    </div>
+
+    <div class="exercise-body">
+      <div class="solution-steps">
+        <div class="solution-step"><b>1</b><div><strong>Eliminar secreto del código.</strong><br>No mantener tokens literales en el archivo Python.</div></div>
+        <div class="solution-step"><b>2</b><div><strong>Definir variable externa.</strong><br><code>INVENTARIO_TOKEN</code>.</div></div>
+        <div class="solution-step"><b>3</b><div><strong>Leer al iniciar.</strong><br>Detectar si la configuración falta.</div></div>
+        <div class="solution-step"><b>4</b><div><strong>Usar en Authorization.</strong><br>Sin imprimir el valor.</div></div>
+        <div class="solution-step"><b>5</b><div><strong>Si se expuso.</strong><br>Revocar y reemplazar la credencial; moverla de archivo no invalida una copia ya comprometida.</div></div>
+      </div>
+
+      <div class="code-block" style="margin-top:1rem"><code>import os
+import requests
+
+TOKEN = os.environ[
+    "INVENTARIO_TOKEN"
+]
+
+def obtener_equipo(equipo_id):
+    headers = {
+        "Authorization": (
+            f"Bearer {TOKEN}"
+        )
+    }
+
+    response = requests.get(
+        "https://api.example"
+        f"/v1/equipos/{equipo_id}",
+        headers=headers,
+        timeout=5
+    )
+
+    return response</code></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="practica">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Practica</div>
+    <div>
+      <h2>Protege la configuración sensible</h2>
+      <p class="lead">Selecciona la opción más segura en cada caso.</p>
+    </div>
+  </div>
+
+  <div class="practice-grid">
+    <article class="practice-card">
+      <h3>Ejercicio 1</h3>
+      <p>Necesitas un token para producción.</p>
+      <select id="p1">
+        <option value="">Selecciona…</option>
+        <option value="a">Suministrarlo externamente al proceso</option>
+        <option value="b">Escribirlo dentro de main.py</option>
+        <option value="c">Publicarlo en README</option>
+      </select>
+      <button class="btn" id="checkP1" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p1Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 2</h3>
+      <p>Tu archivo <code>.env</code> contiene credenciales reales.</p>
+      <select id="p2">
+        <option value="">Selecciona…</option>
+        <option value="a">Excluirlo del repositorio</option>
+        <option value="b">Versionarlo para que todos lo tengan</option>
+        <option value="c">Copiarlo al README</option>
+      </select>
+      <button class="btn" id="checkP2" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p2Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 3</h3>
+      <p>Un token apareció públicamente en un commit.</p>
+      <select id="p3">
+        <option value="">Selecciona…</option>
+        <option value="a">Revocarlo y rotarlo</option>
+        <option value="b">Solo borrarlo del último archivo</option>
+        <option value="c">Ignorarlo si la app todavía funciona</option>
+      </select>
+      <button class="btn" id="checkP3" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p3Feedback">Selecciona una respuesta.</div>
+    </article>
+  </div>
+</div>
+</section>
+
+<section id="caso">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Caso profesional</div>
+    <div>
+      <h2>Automatización del NOC con múltiples credenciales</h2>
+      <p class="lead">La aplicación consulta inventario, accede a un servidor y expone una API interna. Cada integración utiliza credenciales distintas.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="case-grid">
+      <label>Separación
+        <select id="caseSeparate">
+          <option value="">Selecciona…</option>
+          <option value="separate">Credenciales distintas por integración</option>
+          <option value="same">Una credencial compartida para todo</option>
+        </select>
+      </label>
+
+      <label>Permisos
+        <select id="casePrivilege">
+          <option value="">Selecciona…</option>
+          <option value="least">Solo permisos necesarios</option>
+          <option value="admin">Administrador para cualquier tarea</option>
+        </select>
+      </label>
+
+      <label>Logs
+        <select id="caseLogs">
+          <option value="">Selecciona…</option>
+          <option value="masked">No registrar valores sensibles</option>
+          <option value="full">Registrar tokens completos</option>
+        </select>
+      </label>
+    </div>
+
+    <button class="btn" id="checkCase" type="button" style="margin-top:1rem">
+      Evaluar seguridad
+    </button>
+
+    <div class="feedback" id="caseFeedback" aria-live="polite">
+      Reducir privilegios y exposición limita el impacto de un posible compromiso.
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="comprueba">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Comprueba</div>
+    <div>
+      <h2>Integra lo aprendido</h2>
+      <p class="lead">Responde las cinco preguntas.</p>
+    </div>
+  </div>
+
+  <div class="quiz" id="quiz">
+    <article class="quiz-card">
+      <fieldset>
+        <legend>1. ¿Qué ventaja aporta una variable de entorno?</legend>
+        <label><input type="radio" name="q1" value="a"> Separa configuración sensible del código fuente.</label>
+        <label><input type="radio" name="q1" value="b"> Cifra automáticamente todo el tráfico.</label>
+        <label><input type="radio" name="q1" value="c"> Hace innecesario HTTPS.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q1Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>2. ¿Conviene subir un .env con secretos a Git?</legend>
+        <label><input type="radio" name="q2" value="a"> No. Debe mantenerse fuera del repositorio.</label>
+        <label><input type="radio" name="q2" value="b"> Sí, siempre.</label>
+        <label><input type="radio" name="q2" value="c"> Solo si contiene tokens.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q2Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>3. ¿Qué significa mínimo privilegio?</legend>
+        <label><input type="radio" name="q3" value="a"> Otorgar únicamente permisos necesarios para la tarea.</label>
+        <label><input type="radio" name="q3" value="b"> Dar permisos de administrador por comodidad.</label>
+        <label><input type="radio" name="q3" value="c"> Compartir una misma cuenta entre todos los servicios.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q3Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>4. ¿Qué hacer con una credencial expuesta?</legend>
+        <label><input type="radio" name="q4" value="a"> Revocarla y reemplazarla según el servicio.</label>
+        <label><input type="radio" name="q4" value="b"> Solo moverla a otra línea del código.</label>
+        <label><input type="radio" name="q4" value="c"> Ignorarla si aún funciona.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q4Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>5. ¿Qué se estudiará en 2.4.3?</legend>
+        <label><input type="radio" name="q5" value="a"> Validación de datos y manejo de errores.</label>
+        <label><input type="radio" name="q5" value="b"> Diseño de antenas.</label>
+        <label><input type="radio" name="q5" value="c"> Electrónica analógica.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q5Feedback">Selecciona una respuesta.</div>
+    </article>
+  </div>
+
+  <div class="action-row" style="margin-top:1rem">
+    <button class="btn" id="checkQuiz" type="button">Comprobar todo</button>
+    <button class="btn light" id="resetQuiz" type="button">Reintentar</button>
+  </div>
+
+  <div class="score" id="scoreBox" aria-live="polite">
+    Aún no has comprobado la actividad.
+  </div>
+</div>
+</section>
+
+<section id="reflexiona">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Reflexión</div>
+    <div>
+      <h2>Diseña la configuración segura de una aplicación de red</h2>
+      <p class="lead">Identifica qué valores de tu aplicación serían secretos, cuáles serían configuración no sensible y cómo evitarías que las credenciales terminen en código o logs.</p>
+    </div>
+  </div>
+
+  <div class="reflection-box">
+    <textarea id="reflectionText" aria-label="Reflexión del estudiante" placeholder="Ejemplo: token de inventario y contraseña SSH como secretos; URL y timeout como configuración; todos suministrados externamente y sin registrar valores sensibles..."></textarea>
+
+    <div class="action-row">
+      <button class="btn" id="saveReflection" type="button">Guardar en este navegador</button>
+      <button class="btn light" id="clearReflection" type="button">Borrar</button>
+    </div>
+
+    <p id="reflectionStatus" aria-live="polite">
+      El texto no se transmite; si lo guardas, permanece únicamente en el almacenamiento local de este navegador.
+    </p>
+  </div>
+
+  <div class="references" style="margin-top:2rem">
+    <article class="ref-card">
+      <h3>Ideas clave</h3>
+      <p>Separar secretos del código, limitar permisos, evitar logs sensibles y rotar credenciales expuestas reduce riesgos operativos.</p>
+    </article>
+
+    <article class="ref-card">
+      <h3>Siguiente etapa</h3>
+      <p>En 2.4.3 se integrarán validación de datos y manejo de errores dentro de la aplicación completa.</p>
+    </article>
+  </div>
+
+  <div class="bottom-nav">
+    <a class="btn light" href="tema-2-4-1-integracion-automatizacion-red-apis.html">← 2.4.1 Integración y APIs</a>
+    <a class="btn light" href="tema-2-4-3-validacion-datos-manejo-errores.html">2.4.3 Validación y errores →</a>
+  </div>
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="footer-inner">
+  <div>
+    <strong>Programación de Redes: Protocolos y APIs</strong><br>
+    <span>Subtema 2.4.2 · Gestión segura de credenciales y variables de entorno</span>
+  </div>
+  <div>Material interactivo · uso local</div>
+</div>
+</footer>
+
+<div class="progress-wrap" aria-hidden="true">
+  Recorrido <b id="progressValue">0%</b>
+</div>
+
+<script>
+(() => {
+"use strict";
+
+const $=id=>document.getElementById(id);
+
+const setFeedback=(el,text,type="")=>{
+  el.textContent=text;
+  el.className="feedback"+(type?" "+type:"");
+};
+
+const setMini=(el,text,ok=null)=>{
+  el.textContent=text;
+  el.style.borderLeftColor=
+    ok===true?"var(--green)":ok===false?"var(--red)":"var(--cyan)";
+  el.style.background=
+    ok===true?"var(--green-soft)":ok===false?"var(--red-soft)":"var(--soft)";
+};
+
+$("checkPrediction").addEventListener("click",()=>{
+  const s=document.querySelector('input[name="prediction"]:checked');
+
+  if(!s){
+    return setFeedback(
+      $("predictionFeedback"),
+      "Selecciona primero una opción.",
+      "warn"
+    );
+  }
+
+  if(s.value==="a"){
+    setFeedback(
+      $("predictionFeedback"),
+      "Correcto. La variable de entorno separa el secreto del código fuente.",
+      "success"
+    );
+  }else{
+    setFeedback(
+      $("predictionFeedback"),
+      "Revisa el riesgo: comentarios y variables literales siguen formando parte del archivo fuente.",
+      "error"
+    );
+  }
+});
+
+$("resetPrediction").addEventListener("click",()=>{
+  document.querySelectorAll('input[name="prediction"]').forEach(r=>r.checked=false);
+
+  setFeedback(
+    $("predictionFeedback"),
+    "Separar el secreto del código reduce la probabilidad de exposición accidental."
+  );
+});
+
+$("evaluateSecurity").addEventListener("click",()=>{
+  const source=$("secretSource").value;
+  const logs=$("logMode").value;
+
+  const safe=source==="env" && logs==="safe";
+
+  const sourceText={
+    env:"entorno",
+    code:"código fuente",
+    repoenv:".env versionado"
+  }[source];
+
+  $("outSource").textContent=sourceText;
+  $("outLogs").textContent=logs==="safe"?"sin secreto":"secretos visibles";
+  $("outRisk").textContent=safe?"reducido":"elevado";
+
+  $("securityPreview").textContent=
+safe
+? `TOKEN <- variable de entorno
+
+Authorization: Bearer <token>
+
+log:
+  "consulta inventario equipo=452"
+  [sin credencial]`
+: `RIESGO DETECTADO
+
+El secreto puede quedar expuesto
+en código, repositorio o logs.
+
+Acción:
+  separar, excluir y rotar si ya
+  fue publicado.`;
+
+  setFeedback(
+    $("securityFeedback"),
+    safe
+      ? "Estrategia básica coherente: secreto fuera del código y fuera de los logs."
+      : "Hay riesgo de exposición. Revisa ubicación del secreto y contenido registrado.",
+    safe?"success":"error"
+  );
+});
+
+const practices=[
+  {
+    s:"p1",b:"checkP1",f:"p1Feedback",a:"a",
+    ok:"Correcto. La credencial debe suministrarse externamente al proceso.",
+    bad:"Publicar o hardcodear un secreto aumenta el riesgo de exposición."
+  },
+  {
+    s:"p2",b:"checkP2",f:"p2Feedback",a:"a",
+    ok:"Correcto. Un .env con secretos reales debe mantenerse fuera del repositorio.",
+    bad:"Versionar el archivo hace que los secretos formen parte del historial."
+  },
+  {
+    s:"p3",b:"checkP3",f:"p3Feedback",a:"a",
+    ok:"Correcto. Si una credencial se expuso, debe revocarse y rotarse.",
+    bad:"Borrarla del archivo actual no elimina necesariamente copias anteriores ni invalida el secreto."
+  }
+];
+
+practices.forEach(p=>{
+  $(p.b).addEventListener("click",()=>{
+    const v=$(p.s).value;
+    if(!v){
+      return setMini($(p.f),"Selecciona primero una respuesta.");
+    }
+    setMini($(p.f),v===p.a?p.ok:p.bad,v===p.a);
+  });
+});
+
+$("checkCase").addEventListener("click",()=>{
+  const ok=
+    $("caseSeparate").value==="separate" &&
+    $("casePrivilege").value==="least" &&
+    $("caseLogs").value==="masked";
+
+  setFeedback(
+    $("caseFeedback"),
+    ok
+      ? "Diseño coherente. Separas credenciales, limitas permisos y evitas registrar secretos."
+      : "Revisa separación de credenciales, mínimo privilegio y exposición en logs.",
+    ok?"success":"error"
+  );
+});
+
+const answers={q1:"a",q2:"a",q3:"a",q4:"a",q5:"a"};
+
+const explanations={
+  q1:"Las variables de entorno separan configuración sensible del código fuente.",
+  q2:"Un .env con secretos reales no debe formar parte del repositorio.",
+  q3:"Mínimo privilegio significa conceder solo los permisos necesarios.",
+  q4:"Una credencial expuesta debe revocarse y reemplazarse.",
+  q5:"El siguiente subtema integra validación de datos y manejo de errores."
+};
+
+$("checkQuiz").addEventListener("click",()=>{
+  let score=0;
+
+  Object.keys(answers).forEach(q=>{
+    const s=document.querySelector(`input[name="${q}"]:checked`);
+    const ok=s&&s.value===answers[q];
+
+    if(ok){score++;}
+
+    setMini(
+      $(`${q}Feedback`),
+      s?((ok?"Correcto. ":"Revisa. ")+explanations[q]):"Falta responder esta pregunta.",
+      ok
+    );
+  });
+
+  $("scoreBox").textContent=
+    `Resultado: ${score}/5. ${
+      score===5
+        ? "Dominio sólido de gestión básica de credenciales y configuración."
+        : "Revisa las explicaciones y vuelve a intentarlo."
+    }`;
+});
+
+$("resetQuiz").addEventListener("click",()=>{
+  document.querySelectorAll('#quiz input[type="radio"]').forEach(r=>r.checked=false);
+
+  Object.keys(answers).forEach(q=>{
+    setMini($(`${q}Feedback`),"Selecciona una respuesta.");
+  });
+
+  $("scoreBox").textContent="Aún no has comprobado la actividad.";
+});
+
+const key="pr-redes-2-4-2-reflexion";
+
+try{
+  const saved=localStorage.getItem(key);
+  if(saved){$("reflectionText").value=saved;}
+}catch(_){}
+
+$("saveReflection").addEventListener("click",()=>{
+  try{
+    localStorage.setItem(key,$("reflectionText").value);
+    $("reflectionStatus").textContent="Reflexión guardada únicamente en este navegador.";
+  }catch(_){
+    $("reflectionStatus").textContent="Este navegador no permitió guardar la reflexión localmente.";
+  }
+});
+
+$("clearReflection").addEventListener("click",()=>{
+  $("reflectionText").value="";
+  try{localStorage.removeItem(key);}catch(_){}
+  $("reflectionStatus").textContent="Reflexión borrada del almacenamiento local.";
+});
+
+const sections=[...document.querySelectorAll("main section")];
+
+function updateProgress(){
+  const total=document.documentElement.scrollHeight-window.innerHeight;
+  const pct=total>0?Math.max(0,Math.min(100,Math.round((window.scrollY/total)*100))):100;
+
+  $("progressValue").textContent=pct+"%";
+
+  const marker=window.scrollY+window.innerHeight*.36;
+  let current=sections[0];
+
+  sections.forEach(s=>{
+    if(s.offsetTop<=marker){current=s;}
+  });
+
+  document.querySelectorAll("nav a").forEach(a=>a.removeAttribute("aria-current"));
+
+  if(current&&current.id){
+    const link=document.querySelector(`nav a[href="#${current.id}"]`);
+    if(link){link.setAttribute("aria-current","location");}
+  }
+}
+
+window.addEventListener("scroll",updateProgress,{passive:true});
+window.addEventListener("resize",updateProgress);
+updateProgress();
+})();
+</script>
+</body>
+</html>

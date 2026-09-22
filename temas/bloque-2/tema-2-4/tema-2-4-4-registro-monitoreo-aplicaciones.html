@@ -1,0 +1,1048 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Subtema 2.4.4: registro y monitoreo básico de aplicaciones de red.">
+<meta name="theme-color" content="#10212a">
+<title>2.4.4 | Registro y monitoreo básico de aplicaciones</title>
+<style>
+:root{
+  --ink:#18212a;--muted:#586775;--line:#cbd5dc;--soft:#f3f6f8;--paper:#fff;
+  --cyan:#007c91;--cyan-dark:#005b6a;--cyan-light:#6ed2e2;
+  --green:#16734a;--green-soft:#e8f5ee;--amber:#8a5600;--amber-soft:#fff3d8;
+  --red:#9b2c2c;--red-soft:#fdecec;--focus:#005fcc;
+  --navy:#10212a;--navy-deep:#07141a;--max:1180px;--radius:8px;
+  --shadow:0 16px 38px rgba(24,33,42,.08)
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;min-width:280px;color:var(--ink);background:var(--paper);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  line-height:1.55;overflow-x:hidden
+}
+button,input,select,textarea{font:inherit;max-width:100%}
+a{color:var(--cyan-dark)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:3px solid var(--focus);outline-offset:3px
+}
+.skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}
+.skip-link:focus{top:1rem}
+header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.header-inner{
+  width:min(100%,var(--max));min-height:66px;margin:0 auto;padding:.55rem 1.25rem;
+  display:flex;gap:1rem;align-items:center;min-width:0
+}
+.brand{min-width:190px}.brand strong{display:block;font-size:.95rem}.brand span{display:block;color:var(--muted);font-size:.78rem}
+.nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}
+nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+nav a{color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;border-bottom:2px solid transparent;font-size:.84rem}
+nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+.top-link{
+  flex:0 0 auto;text-decoration:none;border:1px solid var(--line);border-radius:5px;
+  padding:.48rem .72rem;color:var(--ink);font-weight:750;white-space:nowrap;background:#fff
+}
+main{overflow:hidden}
+section{scroll-margin-top:84px;border-bottom:1px solid var(--line)}
+.band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+.hero{min-height:calc(100svh - 66px);display:grid;align-items:center;background:var(--navy);color:#fff}
+.hero-grid{
+  width:min(100%,var(--max));margin:0 auto;padding:3.4rem 1.25rem;
+  display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:3rem;align-items:center
+}
+.hero-grid>*{min-width:0}
+.eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+h1{
+  font-size:clamp(2rem,5vw,4rem);line-height:1.02;margin:.65rem 0 1.15rem;
+  max-width:20ch;overflow-wrap:normal;word-break:normal;hyphens:none
+}
+h2{
+  font-size:clamp(1.75rem,3.3vw,2.8rem);line-height:1.12;margin:0 0 .8rem;
+  overflow-wrap:normal;word-break:normal;hyphens:none
+}
+h3{font-size:1.22rem;margin:0 0 .55rem}
+p{max-width:72ch}.hero p{color:#d7e5ea;font-size:1.08rem}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}.hero-actions{margin-top:1.45rem}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cyan-dark);
+  background:var(--cyan);color:#fff;text-decoration:none;padding:.72rem 1rem;border-radius:5px;font-weight:750
+}
+.btn:hover{background:var(--cyan-dark)}
+.btn.secondary{background:transparent;color:inherit;border-color:currentColor}
+.btn.secondary:hover{background:rgba(255,255,255,.1)}
+.btn.light{background:#fff;color:var(--ink);border-color:var(--line)}
+.btn.light:hover{background:var(--soft);color:var(--cyan-dark)}
+.hero-board{background:var(--navy-deep);border:1px solid #3b5965;border-radius:8px;padding:1.25rem}
+.observe-flow{display:grid;gap:.55rem;margin-top:1rem}
+.observe-step{
+  display:grid;grid-template-columns:42px minmax(0,1fr);gap:.7rem;align-items:start;
+  padding:.7rem;border:1px solid #3b5965;border-radius:6px;background:#0d2630
+}
+.observe-step b{
+  display:grid;place-items:center;width:42px;height:42px;border-radius:50%;
+  background:#153d4a;color:var(--cyan-light)
+}
+.observe-step small{display:block;color:#b8cbd2;margin-top:.15rem}
+.section-head{
+  display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem
+}
+.section-head>*{min-width:0}
+.section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}
+.lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+.outcomes{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line)
+}
+.outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}
+.outcome:last-child{border-right:0}
+.outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+.scope-note,.callout{margin-top:1.4rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}
+.concept-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+.concept-card{
+  min-width:0;border:1px solid var(--line);border-radius:var(--radius);
+  padding:1.15rem;background:#fff;box-shadow:var(--shadow)
+}
+.tag{
+  display:inline-block;font-size:.76rem;font-weight:850;color:var(--cyan-dark);
+  background:#d9eef2;padding:.2rem .45rem;border-radius:999px;margin-bottom:.55rem
+}
+.concept-card p{color:var(--muted);font-size:.94rem}
+.table-wrap{overflow-x:auto;margin-top:1.2rem;border:1px solid var(--line);border-radius:7px}
+table{border-collapse:collapse;width:100%;min-width:960px}
+th,td{padding:.8rem;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--soft)}
+.activity{
+  margin-top:1.5rem;padding:1.35rem;border:1px solid var(--line);
+  border-radius:var(--radius);background:var(--soft);min-width:0
+}
+.prediction{display:grid;gap:.6rem;margin:.85rem 0 1rem}
+.prediction label{display:block;padding:.75rem .8rem;background:#fff;border:1px solid var(--line);border-radius:5px}
+.feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}
+.feedback.success{background:var(--green-soft);border-color:var(--green)}
+.feedback.warn{background:var(--amber-soft);border-color:var(--amber)}
+.feedback.error{background:var(--red-soft);border-color:var(--red)}
+.lab-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:1rem}
+.lab-grid>*{min-width:0}
+.lab-panel{border:1px solid var(--line);border-radius:7px;background:#fff;padding:1rem}
+.lab-panel label{display:block;font-weight:750;margin:.75rem 0 .3rem}
+.lab-panel select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+.result-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-top:1rem}
+.result-card{padding:.8rem;border:1px solid var(--line);border-radius:6px;background:#fff;min-width:0}
+.result-card b{display:block;color:var(--cyan-dark);font-size:.78rem;text-transform:uppercase}
+.result-card span{display:block;margin-top:.25rem;overflow-wrap:anywhere}
+.terminal{
+  margin-top:1rem;background:#07141a;color:#dce9ed;border-radius:7px;padding:1rem;
+  border:1px solid #314b56;overflow-x:auto
+}
+.terminal pre{margin:0;white-space:pre-wrap;word-break:break-word}
+.code-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.code-card{min-width:0;background:#09161d;color:#dce9ed;border:1px solid #314b56;border-radius:7px;padding:1rem}
+.code-card h3{color:#fff}
+.code-block{overflow-x:auto;margin:.75rem 0;background:#061016;border:1px solid #253c47;border-radius:6px;padding:1rem}
+.code-block code{white-space:pre}
+.code-note{color:#bfd1d7}
+.exercise-box{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.exercise-head{padding:1rem 1.1rem;background:var(--navy);color:#fff}
+.exercise-head span{display:block;color:var(--cyan-light);font-size:.78rem;font-weight:850;text-transform:uppercase}
+.exercise-body{padding:1.1rem}
+.solution-steps{display:grid;gap:.75rem}
+.solution-step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:.8rem;align-items:start}
+.solution-step>b{
+  display:grid;place-items:center;width:34px;height:34px;border-radius:50%;
+  background:#d9eef2;color:var(--cyan-dark)
+}
+.practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+.practice-card{border:1px solid var(--line);border-radius:7px;padding:1rem;min-width:0}
+.practice-card select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.mini-feedback{margin-top:.75rem;padding:.75rem;border-left:4px solid var(--cyan);background:var(--soft);min-height:4rem}
+.case-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}
+.case-grid label{display:block;font-weight:750}
+.case-grid select{width:100%;margin-top:.3rem;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.quiz{display:grid;gap:1rem}
+.quiz-card{border:1px solid var(--line);border-radius:7px;padding:1rem}
+.quiz-card fieldset{border:0;padding:0;margin:0}
+.quiz-card legend{font-weight:800;margin-bottom:.7rem}
+.quiz-card label{display:block;padding:.5rem .55rem;border-radius:4px}
+.quiz-card label:hover{background:var(--soft)}
+.score{margin-top:1rem;padding:1rem;border:1px solid var(--line);border-radius:6px;background:var(--soft);font-weight:800}
+.reflection-box textarea{width:100%;min-height:145px;resize:vertical;padding:.8rem;border:1px solid var(--line);border-radius:6px}
+.references{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.ref-card{border-top:4px solid var(--cyan);padding:1rem;background:var(--soft)}
+.bottom-nav{margin-top:2rem;display:flex;justify-content:space-between;gap:.7rem;flex-wrap:wrap}
+footer{background:var(--navy-deep);color:#c7d8de}
+.footer-inner{
+  width:min(100%,var(--max));margin:0 auto;padding:1.4rem 1.25rem;
+  display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap
+}
+.progress-wrap{
+  position:fixed;right:1rem;bottom:1rem;z-index:20;background:rgba(7,20,26,.93);
+  color:#fff;padding:.45rem .7rem;border-radius:999px;font-size:.78rem;border:1px solid #3b5965
+}
+@media(max-width:900px){
+  .hero-grid,.section-head,.lab-grid,.code-grid{grid-template-columns:1fr}
+  .concept-grid,.outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .outcome:nth-child(2){border-right:0}
+  .outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .practice-grid,.case-grid{grid-template-columns:1fr}
+}
+@media(max-width:650px){.result-grid,.references{grid-template-columns:1fr}}
+@media(max-width:600px){
+  .header-inner{padding-inline:.8rem}.brand{min-width:145px}.top-link{padding:.45rem .6rem}
+  .band,.hero-grid{padding-left:.9rem;padding-right:.9rem}
+  h1{font-size:clamp(2rem,10vw,2.72rem);max-width:none}
+  .concept-grid,.outcomes{grid-template-columns:1fr}
+  .outcome{border-right:0;border-bottom:1px solid var(--line)}
+  .outcome:last-child{border-bottom:0}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+<header>
+<div class="header-inner">
+  <div class="brand"><strong>Programación de Redes</strong><span>Protocolos y APIs</span></div>
+  <div class="nav-scroll" aria-label="Navegación del subtema">
+    <nav>
+      <a href="#inicio">Inicio</a>
+      <a href="#orientacion">Cómo trabajar</a>
+      <a href="#conceptos">Conceptos</a>
+      <a href="#predice">Predice</a>
+      <a href="#experimenta">Experimenta</a>
+      <a href="#codigo">Código</a>
+      <a href="#resuelto">Ejercicio resuelto</a>
+      <a href="#practica">Practica</a>
+      <a href="#caso">Caso profesional</a>
+      <a href="#comprueba">Comprueba</a>
+      <a href="#reflexiona">Reflexión</a>
+    </nav>
+  </div>
+  <a class="top-link" href="index.html">← Curso</a>
+</div>
+</header>
+
+<main id="contenido">
+
+<section class="hero" id="inicio">
+<div class="hero-grid">
+  <div>
+    <div class="eyebrow">Bloque 2 · Tema 2.4 · Subtema 2.4.4</div>
+    <h1>Registro y monitoreo básico de aplicaciones</h1>
+    <p>Genera evidencia útil para operación y diagnóstico: logs con contexto, niveles de severidad, tiempos básicos y estados de dependencias sin exponer secretos.</p>
+
+    <div class="hero-actions">
+      <a class="btn" href="#orientacion">Comenzar recorrido</a>
+      <a class="btn secondary" href="tema-2-4-integracion-buenas-practicas-aplicaciones-red.html">Volver al Tema 2.4</a>
+    </div>
+  </div>
+
+  <div class="hero-board" role="img" aria-label="Flujo básico de observación de una aplicación">
+    <h3>Observar para poder diagnosticar</h3>
+    <div class="observe-flow">
+      <div class="observe-step"><b>1</b><div><strong>Evento</strong><small>solicitud · tarea · dependencia · error</small></div></div>
+      <div class="observe-step"><b>2</b><div><strong>Contexto</strong><small>equipo · operación · duración · resultado</small></div></div>
+      <div class="observe-step"><b>3</b><div><strong>Severidad</strong><small>DEBUG · INFO · WARNING · ERROR</small></div></div>
+      <div class="observe-step"><b>4</b><div><strong>Estado</strong><small>salud básica · dependencia disponible</small></div></div>
+      <div class="observe-step"><b>5</b><div><strong>Diagnóstico</strong><small>qué ocurrió · dónde · cuándo</small></div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="orientacion">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Cómo trabajar este tema</div>
+    <div>
+      <h2>Un log útil debe responder preguntas operativas</h2>
+      <p class="lead">¿Qué operación ocurrió? ¿Sobre qué recurso? ¿Cuál fue el resultado? ¿Cuánto tardó? ¿Qué dependencia falló?</p>
+    </div>
+  </div>
+
+  <div class="outcomes">
+    <div class="outcome"><b>1. Registrar</b> eventos con niveles de severidad coherentes.</div>
+    <div class="outcome"><b>2. Añadir</b> contexto útil sin incluir secretos.</div>
+    <div class="outcome"><b>3. Medir</b> tiempos y estados básicos de operación.</div>
+    <div class="outcome"><b>4. Diferenciar</b> logging, monitoreo y diagnóstico.</div>
+  </div>
+
+  <div class="scope-note">
+    <strong>Alcance.</strong> Trabajaremos observabilidad básica dentro de la aplicación. Plataformas profesionales de métricas, trazas distribuidas, alertamiento y centralización de logs quedan fuera de este subtema.
+  </div>
+</div>
+</section>
+
+<section id="conceptos">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Explora</div>
+    <div>
+      <h2>Logs y monitoreo se complementan, pero no son lo mismo</h2>
+      <p class="lead">Los logs registran eventos concretos; el monitoreo observa el comportamiento del sistema a lo largo del tiempo mediante estados e indicadores.</p>
+    </div>
+  </div>
+
+  <div class="concept-grid">
+    <article class="concept-card">
+      <span class="tag">INFO</span>
+      <h3>Operación normal</h3>
+      <p>Inicio de servicio, tarea completada o consulta realizada correctamente.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">WARNING</span>
+      <h3>Degradación</h3>
+      <p>La operación continúa, pero existe una condición anómala o una dependencia secundaria no disponible.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">ERROR</span>
+      <h3>Fallo relevante</h3>
+      <p>Una operación esperada no pudo completarse y requiere diagnóstico.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">Monitoreo</span>
+      <h3>Estado e indicadores</h3>
+      <p>Disponibilidad básica, duración de operaciones, número de errores u otros indicadores definidos.</p>
+    </article>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Evento</th><th>Nivel sugerido</th><th>Contexto útil</th><th>No registrar</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Servicio iniciado</td><td>INFO</td><td>versión, entorno</td><td>tokens o contraseñas</td></tr>
+        <tr><td>Consulta inventario completada</td><td>INFO</td><td>equipo_id, status, duración</td><td>Authorization completo</td></tr>
+        <tr><td>Inventario temporalmente no disponible</td><td>WARNING</td><td>dependencia, tipo de fallo</td><td>credencial usada</td></tr>
+        <tr><td>Operación no completada</td><td>ERROR</td><td>operación, identificador, excepción relevante</td><td>datos sensibles innecesarios</td></tr>
+        <tr><td>Datos de depuración durante desarrollo</td><td>DEBUG</td><td>estado interno útil</td><td>secretos “porque es solo debug”</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <strong>La severidad representa impacto, no dramatismo.</strong> Un <code>ERROR</code> debe indicar que una operación importante falló; no todo evento inesperado necesita el nivel más alto.
+  </div>
+</div>
+</section>
+
+<section id="predice">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Predice</div>
+    <div>
+      <h2>¿Qué log es más útil?</h2>
+      <p class="lead">La consulta de inventario del equipo 452 termina correctamente en 183 ms.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="prediction">
+      <label><input type="radio" name="prediction" value="a"> <code>INFO inventario equipo_id=452 status=200 duracion_ms=183</code></label>
+      <label><input type="radio" name="prediction" value="b"> <code>INFO todo bien</code></label>
+      <label><input type="radio" name="prediction" value="c"> <code>INFO Authorization=Bearer token-real-secreto</code></label>
+    </div>
+
+    <div class="action-row">
+      <button class="btn" id="checkPrediction" type="button">Comprobar</button>
+      <button class="btn light" id="resetPrediction" type="button">Reintentar</button>
+    </div>
+
+    <div class="feedback" id="predictionFeedback" aria-live="polite">
+      Un log útil aporta contexto suficiente sin exponer información sensible.
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="experimenta">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Experimenta</div>
+    <div>
+      <h2>Diseña un evento de log</h2>
+      <p class="lead">Selecciona el tipo de evento y observa qué severidad y contexto convienen.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="lab-grid">
+      <div class="lab-panel">
+        <label for="logScenario">Evento</label>
+        <select id="logScenario">
+          <option value="success">Consulta exitosa</option>
+          <option value="degraded">API secundaria no disponible</option>
+          <option value="failure">Diagnóstico no pudo completarse</option>
+          <option value="startup">Inicio de aplicación</option>
+        </select>
+
+        <button class="btn" id="buildLog" type="button" style="margin-top:1rem">
+          Diseñar log
+        </button>
+
+        <div class="feedback" id="logFeedback" aria-live="polite">
+          Selecciona un evento.
+        </div>
+      </div>
+
+      <div class="lab-panel">
+        <h3>Registro propuesto</h3>
+
+        <div class="result-grid">
+          <div class="result-card"><b>Nivel</b><span id="outLevel">INFO</span></div>
+          <div class="result-card"><b>Contexto</b><span id="outContext">equipo + duración</span></div>
+          <div class="result-card"><b>Secreto</b><span id="outSecret">no registrar</span></div>
+        </div>
+
+        <div class="terminal">
+          <pre id="logPreview">INFO consulta_inventario
+equipo_id=452
+status=200
+duracion_ms=183</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="codigo">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Explica</div>
+    <div>
+      <h2>Logging y monitoreo básico con Python</h2>
+      <p class="lead">La biblioteca estándar permite comenzar con registros consistentes sin depender de herramientas externas.</p>
+    </div>
+  </div>
+
+  <div class="code-grid">
+    <article class="code-card">
+      <h3>Configurar logging</h3>
+      <div class="code-block"><code>import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format=(
+        "%(asctime)s "
+        "%(levelname)s "
+        "%(name)s "
+        "%(message)s"
+    )
+)
+
+logger = logging.getLogger(
+    "app.red"
+)</code></div>
+      <p class="code-note">El timestamp, nivel y nombre del logger ayudan a interpretar cada evento.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Registrar una operación</h3>
+      <div class="code-block"><code>logger.info(
+    "consulta_inventario "
+    "equipo_id=%s status=%s",
+    equipo_id,
+    response.status_code
+)</code></div>
+      <p class="code-note">Usa parámetros de logging en lugar de construir mensajes sensibles innecesarios.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Medir duración</h3>
+      <div class="code-block"><code>from time import perf_counter
+
+inicio = perf_counter()
+
+resultado = consultar_inventario(
+    equipo_id
+)
+
+duracion_ms = round(
+    (perf_counter() - inicio) * 1000,
+    1
+)
+
+logger.info(
+    "inventario_fin "
+    "equipo_id=%s duracion_ms=%s",
+    equipo_id,
+    duracion_ms
+)</code></div>
+      <p class="code-note"><code>perf_counter()</code> es apropiado para medir duraciones dentro del proceso.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Registrar degradación</h3>
+      <div class="code-block"><code>if inventario is None:
+    logger.warning(
+        "inventario_no_disponible "
+        "equipo_id=%s",
+        equipo_id
+    )
+
+    return {
+        "equipo_id": equipo_id,
+        "inventario": "no disponible"
+    }</code></div>
+      <p class="code-note">WARNING comunica una degradación cuando la aplicación todavía puede entregar un resultado útil.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Registrar una excepción</h3>
+      <div class="code-block"><code>try:
+    ejecutar_diagnostico(
+        equipo_id
+    )
+except ErrorDiagnostico:
+    logger.exception(
+        "diagnostico_fallido "
+        "equipo_id=%s",
+        equipo_id
+    )
+    raise</code></div>
+      <p class="code-note"><code>logger.exception()</code> incluye información de la excepción cuando se usa dentro de un bloque <code>except</code>.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Estado básico de la aplicación</h3>
+      <div class="code-block"><code>@app.get("/health")
+def health():
+    return {
+        "status": "ok"
+    }</code></div>
+      <p class="code-note">Un endpoint de salud básico confirma que la aplicación responde; por sí solo no demuestra que todas sus dependencias estén sanas.</p>
+    </article>
+  </div>
+
+  <div class="callout">
+    <strong>No confundas health con disponibilidad completa.</strong> Que <code>/health</code> responda 200 puede significar únicamente que el proceso está activo. La salud de bases de datos, APIs externas u otros componentes debe evaluarse según el diseño de la aplicación.
+  </div>
+</div>
+</section>
+
+<section id="resuelto">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Ejercicio resuelto</div>
+    <div>
+      <h2>Observar una consulta de inventario</h2>
+      <p class="lead">Queremos saber cuándo se ejecutó, qué equipo consultó, cuánto tardó y si hubo degradación.</p>
+    </div>
+  </div>
+
+  <div class="exercise-box">
+    <div class="exercise-head">
+      <span>Problema</span>
+      <h3>Registrar lo necesario para diagnosticar sin revelar secretos</h3>
+    </div>
+
+    <div class="exercise-body">
+      <div class="solution-steps">
+        <div class="solution-step"><b>1</b><div><strong>Inicio.</strong><br>Registrar identificador de equipo y operación.</div></div>
+        <div class="solution-step"><b>2</b><div><strong>Duración.</strong><br>Medir tiempo con <code>perf_counter()</code>.</div></div>
+        <div class="solution-step"><b>3</b><div><strong>Resultado.</strong><br>Registrar status o tipo de fallo.</div></div>
+        <div class="solution-step"><b>4</b><div><strong>Severidad.</strong><br>INFO para éxito, WARNING para degradación, ERROR para operación fallida.</div></div>
+        <div class="solution-step"><b>5</b><div><strong>Seguridad.</strong><br>No registrar Authorization, contraseñas ni tokens.</div></div>
+      </div>
+
+      <div class="callout">
+        <strong>Ejemplo útil:</strong> <code>WARNING inventario_no_disponible equipo_id=452 duracion_ms=5002</code>. Informa qué falló y cuánto tardó sin revelar la credencial utilizada.
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="practica">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Practica</div>
+    <div>
+      <h2>Decide qué registrar</h2>
+      <p class="lead">Selecciona la opción más útil y segura.</p>
+    </div>
+  </div>
+
+  <div class="practice-grid">
+    <article class="practice-card">
+      <h3>Ejercicio 1</h3>
+      <p>Una dependencia secundaria falla, pero el diagnóstico continúa.</p>
+      <select id="p1">
+        <option value="">Selecciona…</option>
+        <option value="a">WARNING con dependencia y contexto</option>
+        <option value="b">INFO token=secreto</option>
+        <option value="c">No registrar nada</option>
+      </select>
+      <button class="btn" id="checkP1" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p1Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 2</h3>
+      <p>Quieres conocer cuánto tarda una consulta.</p>
+      <select id="p2">
+        <option value="">Selecciona…</option>
+        <option value="a">Medir duración y registrarla como contexto</option>
+        <option value="b">Guardar la contraseña en el log</option>
+        <option value="c">Usar solo el tamaño del JSON</option>
+      </select>
+      <button class="btn" id="checkP2" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p2Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 3</h3>
+      <p><code>/health</code> responde 200 pero la API de inventario está caída.</p>
+      <select id="p3">
+        <option value="">Selecciona…</option>
+        <option value="a">No asumir que todas las dependencias están sanas</option>
+        <option value="b">Declarar todo el sistema perfecto</option>
+        <option value="c">Borrar los warnings</option>
+      </select>
+      <button class="btn" id="checkP3" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p3Feedback">Selecciona una respuesta.</div>
+    </article>
+  </div>
+</div>
+</section>
+
+<section id="caso">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Caso profesional</div>
+    <div>
+      <h2>Diagnóstico operativo para un NOC</h2>
+      <p class="lead">La aplicación procesa alarmas, consulta inventario y expone resultados. El equipo necesita investigar fallos sin revisar el código en tiempo real.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="case-grid">
+      <label>Contexto
+        <select id="caseContext">
+          <option value="">Selecciona…</option>
+          <option value="useful">Equipo, operación, resultado y duración</option>
+          <option value="vague">Solo “error”</option>
+        </select>
+      </label>
+
+      <label>Seguridad
+        <select id="caseSecurity">
+          <option value="">Selecciona…</option>
+          <option value="safe">Excluir tokens y contraseñas</option>
+          <option value="secrets">Registrar headers completos</option>
+        </select>
+      </label>
+
+      <label>Monitoreo
+        <select id="caseMonitoring">
+          <option value="">Selecciona…</option>
+          <option value="signals">Observar errores, duración y dependencias</option>
+          <option value="healthonly">Confiar únicamente en /health</option>
+        </select>
+      </label>
+    </div>
+
+    <button class="btn" id="checkCase" type="button" style="margin-top:1rem">
+      Evaluar observabilidad
+    </button>
+
+    <div class="feedback" id="caseFeedback" aria-live="polite">
+      El objetivo es poder reconstruir lo ocurrido sin exponer secretos.
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="comprueba">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Comprueba</div>
+    <div>
+      <h2>Integra lo aprendido</h2>
+      <p class="lead">Responde las cinco preguntas.</p>
+    </div>
+  </div>
+
+  <div class="quiz" id="quiz">
+    <article class="quiz-card">
+      <fieldset>
+        <legend>1. ¿Qué diferencia principal existe entre logging y monitoreo?</legend>
+        <label><input type="radio" name="q1" value="a"> Logging registra eventos; monitoreo observa comportamiento e indicadores en el tiempo.</label>
+        <label><input type="radio" name="q1" value="b"> Son exactamente lo mismo.</label>
+        <label><input type="radio" name="q1" value="c"> Monitoreo significa imprimir contraseñas.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q1Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>2. ¿Qué nivel es razonable para una degradación donde la aplicación continúa?</legend>
+        <label><input type="radio" name="q2" value="a"> WARNING.</label>
+        <label><input type="radio" name="q2" value="b"> ERROR siempre.</label>
+        <label><input type="radio" name="q2" value="c"> Ningún registro.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q2Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>3. ¿Qué información debe evitarse en los logs?</legend>
+        <label><input type="radio" name="q3" value="a"> Tokens, contraseñas y credenciales sensibles.</label>
+        <label><input type="radio" name="q3" value="b"> Duración de una operación.</label>
+        <label><input type="radio" name="q3" value="c"> Identificador interno no sensible del equipo.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q3Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>4. ¿Qué indica un /health básico con 200?</legend>
+        <label><input type="radio" name="q4" value="a"> Que la aplicación responde según esa comprobación, no que todas las dependencias estén sanas.</label>
+        <label><input type="radio" name="q4" value="b"> Que todas las APIs externas funcionan.</label>
+        <label><input type="radio" name="q4" value="c"> Que no existirán errores futuros.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q4Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>5. ¿Qué se estudiará en 2.4.5?</legend>
+        <label><input type="radio" name="q5" value="a"> Pruebas funcionales de servicios.</label>
+        <label><input type="radio" name="q5" value="b"> Diseño de antenas.</label>
+        <label><input type="radio" name="q5" value="c"> Álgebra booleana.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q5Feedback">Selecciona una respuesta.</div>
+    </article>
+  </div>
+
+  <div class="action-row" style="margin-top:1rem">
+    <button class="btn" id="checkQuiz" type="button">Comprobar todo</button>
+    <button class="btn light" id="resetQuiz" type="button">Reintentar</button>
+  </div>
+
+  <div class="score" id="scoreBox" aria-live="polite">
+    Aún no has comprobado la actividad.
+  </div>
+</div>
+</section>
+
+<section id="reflexiona">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Reflexión</div>
+    <div>
+      <h2>Diseña la observación de una aplicación</h2>
+      <p class="lead">Elige una tarea de red y define qué eventos registrarías, qué contexto incluirías, qué medirías y qué información sensible excluirías.</p>
+    </div>
+  </div>
+
+  <div class="reflection-box">
+    <textarea id="reflectionText" aria-label="Reflexión del estudiante" placeholder="Ejemplo: registrar inicio/fin de diagnóstico, equipo_id, resultado y duración; WARNING si inventario falla; ERROR si no puede completarse; nunca registrar token o contraseña..."></textarea>
+
+    <div class="action-row">
+      <button class="btn" id="saveReflection" type="button">Guardar en este navegador</button>
+      <button class="btn light" id="clearReflection" type="button">Borrar</button>
+    </div>
+
+    <p id="reflectionStatus" aria-live="polite">
+      El texto no se transmite; si lo guardas, permanece únicamente en el almacenamiento local de este navegador.
+    </p>
+  </div>
+
+  <div class="references" style="margin-top:2rem">
+    <article class="ref-card">
+      <h3>Ideas clave</h3>
+      <p>Los logs deben ser útiles, contextuales y seguros; el monitoreo complementa esos eventos con estados e indicadores del comportamiento de la aplicación.</p>
+    </article>
+
+    <article class="ref-card">
+      <h3>Siguiente etapa</h3>
+      <p>En 2.4.5 se comprobarán flujos completos mediante pruebas funcionales de servicios.</p>
+    </article>
+  </div>
+
+  <div class="bottom-nav">
+    <a class="btn light" href="tema-2-4-3-validacion-datos-manejo-errores.html">← 2.4.3 Validación y errores</a>
+    <a class="btn light" href="tema-2-4-5-pruebas-funcionales-servicios.html">2.4.5 Pruebas funcionales →</a>
+  </div>
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="footer-inner">
+  <div>
+    <strong>Programación de Redes: Protocolos y APIs</strong><br>
+    <span>Subtema 2.4.4 · Registro y monitoreo básico de aplicaciones</span>
+  </div>
+  <div>Material interactivo · uso local</div>
+</div>
+</footer>
+
+<div class="progress-wrap" aria-hidden="true">
+  Recorrido <b id="progressValue">0%</b>
+</div>
+
+<script>
+(() => {
+"use strict";
+
+const $=id=>document.getElementById(id);
+
+const setFeedback=(el,text,type="")=>{
+  el.textContent=text;
+  el.className="feedback"+(type?" "+type:"");
+};
+
+const setMini=(el,text,ok=null)=>{
+  el.textContent=text;
+  el.style.borderLeftColor=
+    ok===true?"var(--green)":ok===false?"var(--red)":"var(--cyan)";
+  el.style.background=
+    ok===true?"var(--green-soft)":ok===false?"var(--red-soft)":"var(--soft)";
+};
+
+$("checkPrediction").addEventListener("click",()=>{
+  const s=document.querySelector('input[name="prediction"]:checked');
+
+  if(!s){
+    return setFeedback(
+      $("predictionFeedback"),
+      "Selecciona primero una opción.",
+      "warn"
+    );
+  }
+
+  if(s.value==="a"){
+    setFeedback(
+      $("predictionFeedback"),
+      "Correcto. Incluye operación, identificador, resultado y duración sin exponer secretos.",
+      "success"
+    );
+  }else{
+    setFeedback(
+      $("predictionFeedback"),
+      "Revisa utilidad y seguridad: un log debe aportar contexto y nunca revelar credenciales.",
+      "error"
+    );
+  }
+});
+
+$("resetPrediction").addEventListener("click",()=>{
+  document.querySelectorAll('input[name="prediction"]').forEach(r=>r.checked=false);
+
+  setFeedback(
+    $("predictionFeedback"),
+    "Un log útil aporta contexto suficiente sin exponer información sensible."
+  );
+});
+
+const logScenarios={
+  success:{
+    level:"INFO",
+    context:"equipo + duración",
+    secret:"no registrar",
+    preview:
+`INFO consulta_inventario
+equipo_id=452
+status=200
+duracion_ms=183`
+  },
+  degraded:{
+    level:"WARNING",
+    context:"equipo + dependencia",
+    secret:"no registrar",
+    preview:
+`WARNING inventario_no_disponible
+equipo_id=452
+dependencia=inventario
+accion=degradacion_controlada`
+  },
+  failure:{
+    level:"ERROR",
+    context:"equipo + operación",
+    secret:"no registrar",
+    preview:
+`ERROR diagnostico_fallido
+equipo_id=452
+operacion=diagnostico
+resultado=no_completado`
+  },
+  startup:{
+    level:"INFO",
+    context:"servicio + versión",
+    secret:"no registrar",
+    preview:
+`INFO aplicacion_iniciada
+servicio=diagnostico-red
+version=1.0.0`
+  }
+};
+
+$("buildLog").addEventListener("click",()=>{
+  const data=logScenarios[$("logScenario").value];
+
+  $("outLevel").textContent=data.level;
+  $("outContext").textContent=data.context;
+  $("outSecret").textContent=data.secret;
+  $("logPreview").textContent=data.preview;
+
+  setFeedback(
+    $("logFeedback"),
+    "Evento diseñado con severidad y contexto apropiados.",
+    "success"
+  );
+});
+
+const practices=[
+  {
+    s:"p1",b:"checkP1",f:"p1Feedback",a:"a",
+    ok:"Correcto. WARNING comunica una degradación mientras la aplicación continúa.",
+    bad:"Una degradación relevante debe quedar registrada sin exponer secretos."
+  },
+  {
+    s:"p2",b:"checkP2",f:"p2Feedback",a:"a",
+    ok:"Correcto. La duración es un indicador útil para detectar cambios de comportamiento.",
+    bad:"Las credenciales no aportan valor diagnóstico proporcional al riesgo de registrarlas."
+  },
+  {
+    s:"p3",b:"checkP3",f:"p3Feedback",a:"a",
+    ok:"Correcto. El health básico no garantiza la salud de todas las dependencias.",
+    bad:"Una comprobación parcial no debe interpretarse como salud total del sistema."
+  }
+];
+
+practices.forEach(p=>{
+  $(p.b).addEventListener("click",()=>{
+    const v=$(p.s).value;
+
+    if(!v){
+      return setMini($(p.f),"Selecciona primero una respuesta.");
+    }
+
+    setMini($(p.f),v===p.a?p.ok:p.bad,v===p.a);
+  });
+});
+
+$("checkCase").addEventListener("click",()=>{
+  const ok=
+    $("caseContext").value==="useful" &&
+    $("caseSecurity").value==="safe" &&
+    $("caseMonitoring").value==="signals";
+
+  setFeedback(
+    $("caseFeedback"),
+    ok
+      ? "Diseño coherente. Los eventos tienen contexto, los secretos quedan fuera y el monitoreo observa señales relevantes."
+      : "Revisa contexto útil, seguridad de logs y señales de monitoreo.",
+    ok?"success":"error"
+  );
+});
+
+const answers={q1:"a",q2:"a",q3:"a",q4:"a",q5:"a"};
+
+const explanations={
+  q1:"Logging registra eventos individuales; monitoreo observa estados e indicadores en el tiempo.",
+  q2:"WARNING es apropiado para una condición anómala donde la aplicación aún puede continuar.",
+  q3:"Tokens y contraseñas no deben registrarse.",
+  q4:"Un health básico solo demuestra lo que esa comprobación específica evalúa.",
+  q5:"El siguiente subtema trabaja pruebas funcionales de servicios."
+};
+
+$("checkQuiz").addEventListener("click",()=>{
+  let score=0;
+
+  Object.keys(answers).forEach(q=>{
+    const s=document.querySelector(`input[name="${q}"]:checked`);
+    const ok=s&&s.value===answers[q];
+
+    if(ok){score++;}
+
+    setMini(
+      $(`${q}Feedback`),
+      s?((ok?"Correcto. ":"Revisa. ")+explanations[q]):"Falta responder esta pregunta.",
+      ok
+    );
+  });
+
+  $("scoreBox").textContent=
+    `Resultado: ${score}/5. ${
+      score===5
+        ? "Dominio sólido de registro y monitoreo básico de aplicaciones."
+        : "Revisa las explicaciones y vuelve a intentarlo."
+    }`;
+});
+
+$("resetQuiz").addEventListener("click",()=>{
+  document.querySelectorAll('#quiz input[type="radio"]').forEach(r=>r.checked=false);
+
+  Object.keys(answers).forEach(q=>{
+    setMini($(`${q}Feedback`),"Selecciona una respuesta.");
+  });
+
+  $("scoreBox").textContent="Aún no has comprobado la actividad.";
+});
+
+const key="pr-redes-2-4-4-reflexion";
+
+try{
+  const saved=localStorage.getItem(key);
+  if(saved){$("reflectionText").value=saved;}
+}catch(_){}
+
+$("saveReflection").addEventListener("click",()=>{
+  try{
+    localStorage.setItem(key,$("reflectionText").value);
+    $("reflectionStatus").textContent="Reflexión guardada únicamente en este navegador.";
+  }catch(_){
+    $("reflectionStatus").textContent="Este navegador no permitió guardar la reflexión localmente.";
+  }
+});
+
+$("clearReflection").addEventListener("click",()=>{
+  $("reflectionText").value="";
+  try{localStorage.removeItem(key);}catch(_){}
+  $("reflectionStatus").textContent="Reflexión borrada del almacenamiento local.";
+});
+
+const sections=[...document.querySelectorAll("main section")];
+
+function updateProgress(){
+  const total=document.documentElement.scrollHeight-window.innerHeight;
+  const pct=total>0?Math.max(0,Math.min(100,Math.round((window.scrollY/total)*100))):100;
+
+  $("progressValue").textContent=pct+"%";
+
+  const marker=window.scrollY+window.innerHeight*.36;
+  let current=sections[0];
+
+  sections.forEach(s=>{
+    if(s.offsetTop<=marker){current=s;}
+  });
+
+  document.querySelectorAll("nav a").forEach(a=>a.removeAttribute("aria-current"));
+
+  if(current&&current.id){
+    const link=document.querySelector(`nav a[href="#${current.id}"]`);
+    if(link){link.setAttribute("aria-current","location");}
+  }
+}
+
+window.addEventListener("scroll",updateProgress,{passive:true});
+window.addEventListener("resize",updateProgress);
+updateProgress();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1017 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Subtema 2.4.1: integración entre automatización de red y APIs.">
+<meta name="theme-color" content="#10212a">
+<title>2.4.1 | Integración entre automatización de red y APIs</title>
+<style>
+:root{
+  --ink:#18212a;--muted:#586775;--line:#cbd5dc;--soft:#f3f6f8;--paper:#fff;
+  --cyan:#007c91;--cyan-dark:#005b6a;--cyan-light:#6ed2e2;
+  --green:#16734a;--green-soft:#e8f5ee;--amber:#8a5600;--amber-soft:#fff3d8;
+  --red:#9b2c2c;--red-soft:#fdecec;--focus:#005fcc;
+  --navy:#10212a;--navy-deep:#07141a;--max:1180px;--radius:8px;
+  --shadow:0 16px 38px rgba(24,33,42,.08)
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;min-width:280px;color:var(--ink);background:var(--paper);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  line-height:1.55;overflow-x:hidden
+}
+button,input,select,textarea{font:inherit;max-width:100%}
+a{color:var(--cyan-dark)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:3px solid var(--focus);outline-offset:3px
+}
+.skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}
+.skip-link:focus{top:1rem}
+header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.header-inner{
+  width:min(100%,var(--max));min-height:66px;margin:0 auto;padding:.55rem 1.25rem;
+  display:flex;gap:1rem;align-items:center;min-width:0
+}
+.brand{min-width:190px}.brand strong{display:block;font-size:.95rem}.brand span{display:block;color:var(--muted);font-size:.78rem}
+.nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}
+nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+nav a{color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;border-bottom:2px solid transparent;font-size:.84rem}
+nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+.top-link{
+  flex:0 0 auto;text-decoration:none;border:1px solid var(--line);border-radius:5px;
+  padding:.48rem .72rem;color:var(--ink);font-weight:750;white-space:nowrap;background:#fff
+}
+main{overflow:hidden}
+section{scroll-margin-top:84px;border-bottom:1px solid var(--line)}
+.band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+.hero{min-height:calc(100svh - 66px);display:grid;align-items:center;background:var(--navy);color:#fff}
+.hero-grid{
+  width:min(100%,var(--max));margin:0 auto;padding:3.4rem 1.25rem;
+  display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:3rem;align-items:center
+}
+.hero-grid>*{min-width:0}
+.eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+h1{
+  font-size:clamp(2rem,5vw,4rem);line-height:1.02;margin:.65rem 0 1.15rem;
+  max-width:20ch;overflow-wrap:normal;word-break:normal;hyphens:none
+}
+h2{
+  font-size:clamp(1.75rem,3.3vw,2.8rem);line-height:1.12;margin:0 0 .8rem;
+  overflow-wrap:normal;word-break:normal;hyphens:none
+}
+h3{font-size:1.22rem;margin:0 0 .55rem}
+p{max-width:72ch}.hero p{color:#d7e5ea;font-size:1.08rem}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}.hero-actions{margin-top:1.45rem}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cyan-dark);
+  background:var(--cyan);color:#fff;text-decoration:none;padding:.72rem 1rem;border-radius:5px;font-weight:750
+}
+.btn:hover{background:var(--cyan-dark)}
+.btn.secondary{background:transparent;color:inherit;border-color:currentColor}
+.btn.secondary:hover{background:rgba(255,255,255,.1)}
+.btn.light{background:#fff;color:var(--ink);border-color:var(--line)}
+.btn.light:hover{background:var(--soft);color:var(--cyan-dark)}
+.hero-board{background:var(--navy-deep);border:1px solid #3b5965;border-radius:8px;padding:1.25rem}
+.integration-flow{display:grid;gap:.55rem;margin-top:1rem}
+.integration-step{
+  display:grid;grid-template-columns:42px minmax(0,1fr);gap:.7rem;align-items:start;
+  padding:.7rem;border:1px solid #3b5965;border-radius:6px;background:#0d2630
+}
+.integration-step b{
+  display:grid;place-items:center;width:42px;height:42px;border-radius:50%;
+  background:#153d4a;color:var(--cyan-light)
+}
+.integration-step small{display:block;color:#b8cbd2;margin-top:.15rem}
+.section-head{
+  display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem
+}
+.section-head>*{min-width:0}
+.section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}
+.lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+.outcomes{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line)
+}
+.outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}
+.outcome:last-child{border-right:0}
+.outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+.scope-note,.callout{margin-top:1.4rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}
+.concept-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+.concept-card{
+  min-width:0;border:1px solid var(--line);border-radius:var(--radius);
+  padding:1.15rem;background:#fff;box-shadow:var(--shadow)
+}
+.tag{
+  display:inline-block;font-size:.76rem;font-weight:850;color:var(--cyan-dark);
+  background:#d9eef2;padding:.2rem .45rem;border-radius:999px;margin-bottom:.55rem
+}
+.concept-card p{color:var(--muted);font-size:.94rem}
+.arch-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.8rem;margin-top:1.1rem}
+.arch-card{padding:1rem;border:1px solid var(--line);border-radius:6px;background:#fff;min-width:0}
+.arch-card b{display:block;color:var(--cyan-dark);margin-bottom:.3rem}
+.activity{
+  margin-top:1.5rem;padding:1.35rem;border:1px solid var(--line);
+  border-radius:var(--radius);background:var(--soft);min-width:0
+}
+.prediction{display:grid;gap:.6rem;margin:.85rem 0 1rem}
+.prediction label{display:block;padding:.75rem .8rem;background:#fff;border:1px solid var(--line);border-radius:5px}
+.feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}
+.feedback.success{background:var(--green-soft);border-color:var(--green)}
+.feedback.warn{background:var(--amber-soft);border-color:var(--amber)}
+.feedback.error{background:var(--red-soft);border-color:var(--red)}
+.lab-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:1rem}
+.lab-grid>*{min-width:0}
+.lab-panel{border:1px solid var(--line);border-radius:7px;background:#fff;padding:1rem}
+.lab-panel label{display:block;font-weight:750;margin:.75rem 0 .3rem}
+.lab-panel select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+.result-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-top:1rem}
+.result-card{padding:.8rem;border:1px solid var(--line);border-radius:6px;background:#fff;min-width:0}
+.result-card b{display:block;color:var(--cyan-dark);font-size:.78rem;text-transform:uppercase}
+.result-card span{display:block;margin-top:.25rem;overflow-wrap:anywhere}
+.terminal{
+  margin-top:1rem;background:#07141a;color:#dce9ed;border-radius:7px;padding:1rem;
+  border:1px solid #314b56;overflow-x:auto
+}
+.terminal pre{margin:0;white-space:pre-wrap;word-break:break-word}
+.code-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.code-card{min-width:0;background:#09161d;color:#dce9ed;border:1px solid #314b56;border-radius:7px;padding:1rem}
+.code-card h3{color:#fff}
+.code-block{overflow-x:auto;margin:.75rem 0;background:#061016;border:1px solid #253c47;border-radius:6px;padding:1rem}
+.code-block code{white-space:pre}
+.code-note{color:#bfd1d7}
+.exercise-box{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.exercise-head{padding:1rem 1.1rem;background:var(--navy);color:#fff}
+.exercise-head span{display:block;color:var(--cyan-light);font-size:.78rem;font-weight:850;text-transform:uppercase}
+.exercise-body{padding:1.1rem}
+.solution-steps{display:grid;gap:.75rem}
+.solution-step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:.8rem;align-items:start}
+.solution-step>b{
+  display:grid;place-items:center;width:34px;height:34px;border-radius:50%;
+  background:#d9eef2;color:var(--cyan-dark)
+}
+.practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+.practice-card{border:1px solid var(--line);border-radius:7px;padding:1rem;min-width:0}
+.practice-card select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.mini-feedback{margin-top:.75rem;padding:.75rem;border-left:4px solid var(--cyan);background:var(--soft);min-height:4rem}
+.case-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}
+.case-grid label{display:block;font-weight:750}
+.case-grid select{width:100%;margin-top:.3rem;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.quiz{display:grid;gap:1rem}
+.quiz-card{border:1px solid var(--line);border-radius:7px;padding:1rem}
+.quiz-card fieldset{border:0;padding:0;margin:0}
+.quiz-card legend{font-weight:800;margin-bottom:.7rem}
+.quiz-card label{display:block;padding:.5rem .55rem;border-radius:4px}
+.quiz-card label:hover{background:var(--soft)}
+.score{margin-top:1rem;padding:1rem;border:1px solid var(--line);border-radius:6px;background:var(--soft);font-weight:800}
+.reflection-box textarea{width:100%;min-height:145px;resize:vertical;padding:.8rem;border:1px solid var(--line);border-radius:6px}
+.references{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.ref-card{border-top:4px solid var(--cyan);padding:1rem;background:var(--soft)}
+.bottom-nav{margin-top:2rem;display:flex;justify-content:space-between;gap:.7rem;flex-wrap:wrap}
+footer{background:var(--navy-deep);color:#c7d8de}
+.footer-inner{
+  width:min(100%,var(--max));margin:0 auto;padding:1.4rem 1.25rem;
+  display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap
+}
+.progress-wrap{
+  position:fixed;right:1rem;bottom:1rem;z-index:20;background:rgba(7,20,26,.93);
+  color:#fff;padding:.45rem .7rem;border-radius:999px;font-size:.78rem;border:1px solid #3b5965
+}
+@media(max-width:1050px){.arch-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:900px){
+  .hero-grid,.section-head,.lab-grid,.code-grid{grid-template-columns:1fr}
+  .concept-grid,.outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .outcome:nth-child(2){border-right:0}
+  .outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .practice-grid,.case-grid{grid-template-columns:1fr}
+}
+@media(max-width:650px){.result-grid,.references,.arch-grid{grid-template-columns:1fr}}
+@media(max-width:600px){
+  .header-inner{padding-inline:.8rem}.brand{min-width:145px}.top-link{padding:.45rem .6rem}
+  .band,.hero-grid{padding-left:.9rem;padding-right:.9rem}
+  h1{font-size:clamp(2rem,10vw,2.72rem);max-width:none}
+  .concept-grid,.outcomes{grid-template-columns:1fr}
+  .outcome{border-right:0;border-bottom:1px solid var(--line)}
+  .outcome:last-child{border-bottom:0}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+<header>
+<div class="header-inner">
+  <div class="brand"><strong>Programación de Redes</strong><span>Protocolos y APIs</span></div>
+  <div class="nav-scroll" aria-label="Navegación del subtema">
+    <nav>
+      <a href="#inicio">Inicio</a>
+      <a href="#orientacion">Cómo trabajar</a>
+      <a href="#conceptos">Conceptos</a>
+      <a href="#predice">Predice</a>
+      <a href="#experimenta">Experimenta</a>
+      <a href="#codigo">Código</a>
+      <a href="#resuelto">Ejercicio resuelto</a>
+      <a href="#practica">Practica</a>
+      <a href="#caso">Caso profesional</a>
+      <a href="#comprueba">Comprueba</a>
+      <a href="#reflexiona">Reflexión</a>
+    </nav>
+  </div>
+  <a class="top-link" href="index.html">← Curso</a>
+</div>
+</header>
+
+<main id="contenido">
+
+<section class="hero" id="inicio">
+<div class="hero-grid">
+  <div>
+    <div class="eyebrow">Bloque 2 · Tema 2.4 · Subtema 2.4.1</div>
+    <h1>Integración entre automatización de red y APIs</h1>
+    <p>Conecta scripts de automatización, información de dispositivos, APIs propias y servicios externos para construir flujos operativos completos y reutilizables.</p>
+
+    <div class="hero-actions">
+      <a class="btn" href="#orientacion">Comenzar recorrido</a>
+      <a class="btn secondary" href="tema-2-4-integracion-buenas-practicas-aplicaciones-red.html">Volver al Tema 2.4</a>
+    </div>
+  </div>
+
+  <div class="hero-board" role="img" aria-label="Flujo integrado entre automatización de red y APIs">
+    <h3>Un flujo operativo completo</h3>
+    <div class="integration-flow">
+      <div class="integration-step"><b>1</b><div><strong>Obtener evento</strong><small>alarma · IP · interfaz · métrica</small></div></div>
+      <div class="integration-step"><b>2</b><div><strong>Automatizar consulta</strong><small>socket · SSH · comando · script</small></div></div>
+      <div class="integration-step"><b>3</b><div><strong>Consultar API</strong><small>inventario · CMDB · servicio externo</small></div></div>
+      <div class="integration-step"><b>4</b><div><strong>Validar y combinar</strong><small>datos locales + externos</small></div></div>
+      <div class="integration-step"><b>5</b><div><strong>Exponer resultado</strong><small>API propia · dashboard · reporte</small></div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="orientacion">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Cómo trabajar este tema</div>
+    <div>
+      <h2>Integra componentes sin mezclarlos</h2>
+      <p class="lead">Una aplicación sólida separa la obtención de datos de red, el acceso a APIs, la validación y la presentación del resultado.</p>
+    </div>
+  </div>
+
+  <div class="outcomes">
+    <div class="outcome"><b>1. Diseñar</b> un flujo que combine automatización de red y APIs.</div>
+    <div class="outcome"><b>2. Separar</b> responsabilidades entre adquisición, consulta, integración y salida.</div>
+    <div class="outcome"><b>3. Validar</b> datos de distintas fuentes antes de combinarlos.</div>
+    <div class="outcome"><b>4. Mantener</b> funcionalidad útil ante fallos parciales.</div>
+  </div>
+
+  <div class="scope-note">
+    <strong>Diferencia respecto a 2.2.7:</strong> allí se integraba principalmente el consumo de una API con una aplicación. Aquí se conecta ese consumo con automatización de red y, cuando conviene, con una API propia que expone el resultado.
+  </div>
+</div>
+</section>
+
+<section id="conceptos">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Explora</div>
+    <div>
+      <h2>Una integración es una cadena de responsabilidades</h2>
+      <p class="lead">Cada componente debe saber qué hace y qué entrega al siguiente.</p>
+    </div>
+  </div>
+
+  <div class="concept-grid">
+    <article class="concept-card">
+      <span class="tag">Adquisición</span>
+      <h3>Datos de red</h3>
+      <p>El script puede obtener estado, latencia, interfaz, dirección IP o salida de un dispositivo.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">Automatización</span>
+      <h3>Acción programática</h3>
+      <p>Una tarea repetitiva se encapsula en una función o módulo reutilizable.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">API</span>
+      <h3>Intercambio estructurado</h3>
+      <p>Permite consultar información externa o exponer resultados internos a otras aplicaciones.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">Integración</span>
+      <h3>Dato enriquecido</h3>
+      <p>El resultado combina fuentes distintas sin ocultar cuándo alguna información no estuvo disponible.</p>
+    </article>
+  </div>
+
+  <div class="arch-grid">
+    <article class="arch-card"><b>Evento</b><span>Equipo 452 reporta pérdida de enlace.</span></article>
+    <article class="arch-card"><b>Automatización</b><span>Se consulta reachability y estado de interfaz.</span></article>
+    <article class="arch-card"><b>API inventario</b><span>Se obtiene sitio y responsable.</span></article>
+    <article class="arch-card"><b>Integración</b><span>Se combina estado técnico + inventario.</span></article>
+    <article class="arch-card"><b>Salida</b><span>Dashboard o API interna recibe resumen.</span></article>
+  </div>
+
+  <div class="callout">
+    <strong>Regla clave:</strong> una API externa es una dependencia, no una fuente de verdad absoluta. Sus datos deben validarse y su indisponibilidad debe manejarse explícitamente.
+  </div>
+</div>
+</section>
+
+<section id="predice">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Predice</div>
+    <div>
+      <h2>¿Qué debería ocurrir ante un fallo parcial?</h2>
+      <p class="lead">El script confirma que un equipo no responde, pero la API de inventario está temporalmente fuera de servicio.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="prediction">
+      <label><input type="radio" name="prediction" value="a"> Conservar el resultado de red y marcar inventario como no disponible.</label>
+      <label><input type="radio" name="prediction" value="b"> Descartar el resultado de red porque falló una fuente secundaria.</label>
+      <label><input type="radio" name="prediction" value="c"> Inventar sitio y responsable para completar el reporte.</label>
+    </div>
+
+    <div class="action-row">
+      <button class="btn" id="checkPrediction" type="button">Comprobar</button>
+      <button class="btn light" id="resetPrediction" type="button">Reintentar</button>
+    </div>
+
+    <div class="feedback" id="predictionFeedback" aria-live="polite">
+      Una integración robusta conserva la información válida que sí pudo obtenerse.
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="experimenta">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Experimenta</div>
+    <div>
+      <h2>Construye un flujo de integración</h2>
+      <p class="lead">Selecciona una fuente de red y una API de apoyo.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="lab-grid">
+      <div class="lab-panel">
+        <label for="networkSource">Fuente de red</label>
+        <select id="networkSource">
+          <option value="reachability">Reachability de equipo</option>
+          <option value="interface">Estado de interfaz</option>
+          <option value="latency">Latencia medida</option>
+        </select>
+
+        <label for="apiSource">API complementaria</label>
+        <select id="apiSource">
+          <option value="inventory">Inventario</option>
+          <option value="geo">Ubicación</option>
+          <option value="owner">Responsable técnico</option>
+        </select>
+
+        <button class="btn" id="buildIntegration" type="button" style="margin-top:1rem">
+          Construir flujo
+        </button>
+
+        <div class="feedback" id="integrationFeedback" aria-live="polite">
+          Selecciona las fuentes.
+        </div>
+      </div>
+
+      <div class="lab-panel">
+        <h3>Resultado de la integración</h3>
+
+        <div class="result-grid">
+          <div class="result-card"><b>Red</b><span id="outNetwork">reachability</span></div>
+          <div class="result-card"><b>API</b><span id="outApi">inventario</span></div>
+          <div class="result-card"><b>Salida</b><span id="outOutput">diagnóstico enriquecido</span></div>
+        </div>
+
+        <div class="terminal">
+          <pre id="integrationPreview">1. Consultar estado de red
+2. Consultar API de inventario
+3. Validar ambas respuestas
+4. Combinar datos disponibles
+5. Exponer resumen</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="codigo">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Explica</div>
+    <div>
+      <h2>Separar adquisición, API e integración</h2>
+      <p class="lead">Cada función tiene una responsabilidad y puede probarse de forma independiente.</p>
+    </div>
+  </div>
+
+  <div class="code-grid">
+    <article class="code-card">
+      <h3>1. Obtener dato de red</h3>
+      <div class="code-block"><code>def obtener_estado_red(equipo_id):
+    # En un entorno real:
+    # ping, SSH, SNMP, socket, etc.
+    return {
+        "equipo_id": equipo_id,
+        "alcanzable": False
+    }</code></div>
+      <p class="code-note">El ejemplo simula la adquisición para concentrarse en la arquitectura.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>2. Consultar API</h3>
+      <div class="code-block"><code>import requests
+
+def obtener_inventario(equipo_id):
+    url = (
+        "https://api.example"
+        f"/v1/equipos/{equipo_id}"
+    )
+
+    try:
+        r = requests.get(
+            url,
+            timeout=5
+        )
+        r.raise_for_status()
+        datos = r.json()
+    except requests.RequestException:
+        return None
+
+    if not isinstance(datos, dict):
+        return None
+
+    return datos</code></div>
+      <p class="code-note">La función encapsula la dependencia externa.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>3. Integrar datos</h3>
+      <div class="code-block"><code>def construir_diagnostico(
+    equipo_id
+):
+    red = obtener_estado_red(
+        equipo_id
+    )
+
+    inventario = obtener_inventario(
+        equipo_id
+    )
+
+    resultado = {
+        "equipo_id": equipo_id,
+        "alcanzable": red["alcanzable"]
+    }
+
+    if inventario:
+        resultado["sitio"] = (
+            inventario.get("sitio")
+        )
+    else:
+        resultado["inventario"] = (
+            "no disponible"
+        )
+
+    return resultado</code></div>
+      <p class="code-note">La integración conserva el dato principal aunque falle la fuente secundaria.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>4. Exponer mediante API propia</h3>
+      <div class="code-block"><code>from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get(
+    "/api/diagnostico/{equipo_id}"
+)
+def diagnostico(
+    equipo_id: int
+):
+    return construir_diagnostico(
+        equipo_id
+    )</code></div>
+      <p class="code-note">El resultado de automatización puede convertirse en servicio para otros consumidores.</p>
+    </article>
+  </div>
+
+  <div class="callout">
+    <strong>Evita acoplamiento excesivo:</strong> la función que consulta la red no debería conocer detalles de FastAPI, y el endpoint no debería contener toda la lógica de automatización.
+  </div>
+</div>
+</section>
+
+<section id="resuelto">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Ejercicio resuelto</div>
+    <div>
+      <h2>Diagnóstico enriquecido de un equipo</h2>
+      <p class="lead">Un equipo no responde. La aplicación debe combinar estado técnico e inventario.</p>
+    </div>
+  </div>
+
+  <div class="exercise-box">
+    <div class="exercise-head">
+      <span>Problema</span>
+      <h3>Construir un flujo operativo sin mezclar responsabilidades</h3>
+    </div>
+
+    <div class="exercise-body">
+      <div class="solution-steps">
+        <div class="solution-step"><b>1</b><div><strong>Adquisición.</strong><br>Obtener el estado del equipo desde la red.</div></div>
+        <div class="solution-step"><b>2</b><div><strong>Enriquecimiento.</strong><br>Consultar inventario con el identificador del equipo.</div></div>
+        <div class="solution-step"><b>3</b><div><strong>Validación.</strong><br>Comprobar que la respuesta externa tenga estructura utilizable.</div></div>
+        <div class="solution-step"><b>4</b><div><strong>Integración.</strong><br>Combinar datos disponibles sin inventar campos faltantes.</div></div>
+        <div class="solution-step"><b>5</b><div><strong>Salida.</strong><br>Entregar el resumen al dashboard o mediante una API interna.</div></div>
+      </div>
+
+      <div class="callout">
+        <strong>Resultado esperado:</strong> “Equipo 452 no alcanzable; sitio AZG-01; responsable NOC-Sur”. Si el inventario falla: “Equipo 452 no alcanzable; inventario no disponible”.
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="practica">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Practica</div>
+    <div>
+      <h2>Decide cómo integrar</h2>
+      <p class="lead">Selecciona la opción más coherente en cada caso.</p>
+    </div>
+  </div>
+
+  <div class="practice-grid">
+    <article class="practice-card">
+      <h3>Ejercicio 1</h3>
+      <p>La API de inventario falla, pero ya tienes la latencia medida.</p>
+      <select id="p1">
+        <option value="">Selecciona…</option>
+        <option value="a">Conservar latencia y marcar inventario no disponible</option>
+        <option value="b">Eliminar la medición de latencia</option>
+        <option value="c">Inventar el inventario</option>
+      </select>
+      <button class="btn" id="checkP1" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p1Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 2</h3>
+      <p>Quieres reutilizar la consulta de red desde varios endpoints.</p>
+      <select id="p2">
+        <option value="">Selecciona…</option>
+        <option value="a">Encapsularla en una función o módulo independiente</option>
+        <option value="b">Copiar el mismo código en cada endpoint</option>
+        <option value="c">Mezclar credenciales y lógica en todas las rutas</option>
+      </select>
+      <button class="btn" id="checkP2" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p2Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 3</h3>
+      <p>Una API devuelve 200 pero sin el campo <code>sitio</code>.</p>
+      <select id="p3">
+        <option value="">Selecciona…</option>
+        <option value="a">Tratar el campo como ausente y aplicar el diseño definido</option>
+        <option value="b">Asumir que 200 garantiza cualquier campo</option>
+        <option value="c">Inventar un sitio</option>
+      </select>
+      <button class="btn" id="checkP3" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p3Feedback">Selecciona una respuesta.</div>
+    </article>
+  </div>
+</div>
+</section>
+
+<section id="caso">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Caso profesional</div>
+    <div>
+      <h2>Servicio interno de diagnóstico para el NOC</h2>
+      <p class="lead">El sistema combina reachability, consulta de inventario y una API interna para entregar un diagnóstico rápido a un dashboard.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="case-grid">
+      <label>Automatización
+        <select id="caseAutomation">
+          <option value="">Selecciona…</option>
+          <option value="module">Separar adquisición en un módulo</option>
+          <option value="endpoint">Poner toda la lógica dentro del endpoint</option>
+        </select>
+      </label>
+
+      <label>API externa
+        <select id="caseExternal">
+          <option value="">Selecciona…</option>
+          <option value="validate">Validar respuesta antes de usarla</option>
+          <option value="trust">Confiar en cualquier 200</option>
+        </select>
+      </label>
+
+      <label>Fallo parcial
+        <select id="caseFailure">
+          <option value="">Selecciona…</option>
+          <option value="degrade">Conservar datos válidos y marcar faltantes</option>
+          <option value="invent">Inventar los campos ausentes</option>
+        </select>
+      </label>
+    </div>
+
+    <button class="btn" id="checkCase" type="button" style="margin-top:1rem">
+      Evaluar arquitectura
+    </button>
+
+    <div class="feedback" id="caseFeedback" aria-live="polite">
+      Una buena integración separa responsabilidades y mantiene información confiable.
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="comprueba">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Comprueba</div>
+    <div>
+      <h2>Integra lo aprendido</h2>
+      <p class="lead">Responde las cinco preguntas.</p>
+    </div>
+  </div>
+
+  <div class="quiz" id="quiz">
+    <article class="quiz-card">
+      <fieldset>
+        <legend>1. ¿Qué aporta una API a una automatización de red?</legend>
+        <label><input type="radio" name="q1" value="a"> Un mecanismo estructurado para consumir o exponer información.</label>
+        <label><input type="radio" name="q1" value="b"> Sustituye toda validación.</label>
+        <label><input type="radio" name="q1" value="c"> Elimina la necesidad de lógica de aplicación.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q1Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>2. ¿Por qué separar la adquisición de red del endpoint FastAPI?</legend>
+        <label><input type="radio" name="q2" value="a"> Para reducir acoplamiento y facilitar reutilización y pruebas.</label>
+        <label><input type="radio" name="q2" value="b"> Para impedir el uso de HTTP.</label>
+        <label><input type="radio" name="q2" value="c"> Para duplicar más código.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q2Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>3. ¿Qué hacer si una API secundaria falla?</legend>
+        <label><input type="radio" name="q3" value="a"> Conservar datos válidos y declarar la información faltante.</label>
+        <label><input type="radio" name="q3" value="b"> Inventar valores.</label>
+        <label><input type="radio" name="q3" value="c"> Ocultar toda la información válida.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q3Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>4. ¿Un HTTP 200 garantiza que el JSON tenga todos los campos esperados?</legend>
+        <label><input type="radio" name="q4" value="a"> No. La estructura y los campos también deben validarse.</label>
+        <label><input type="radio" name="q4" value="b"> Sí, siempre.</label>
+        <label><input type="radio" name="q4" value="c"> Solo si usa HTTPS.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q4Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>5. ¿Qué se estudiará en 2.4.2?</legend>
+        <label><input type="radio" name="q5" value="a"> Gestión segura de credenciales y variables de entorno.</label>
+        <label><input type="radio" name="q5" value="b"> Diseño de antenas.</label>
+        <label><input type="radio" name="q5" value="c"> Álgebra booleana.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q5Feedback">Selecciona una respuesta.</div>
+    </article>
+  </div>
+
+  <div class="action-row" style="margin-top:1rem">
+    <button class="btn" id="checkQuiz" type="button">Comprobar todo</button>
+    <button class="btn light" id="resetQuiz" type="button">Reintentar</button>
+  </div>
+
+  <div class="score" id="scoreBox" aria-live="polite">
+    Aún no has comprobado la actividad.
+  </div>
+</div>
+</section>
+
+<section id="reflexiona">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Reflexión</div>
+    <div>
+      <h2>Diseña una automatización integrada</h2>
+      <p class="lead">Propón una tarea de red que obtenga un dato local, consulte una API complementaria y exponga un resultado útil. Indica qué harías si la API falla.</p>
+    </div>
+  </div>
+
+  <div class="reflection-box">
+    <textarea id="reflectionText" aria-label="Reflexión del estudiante" placeholder="Ejemplo: medir latencia de un enlace, consultar inventario por ID, combinar sitio y latencia, exponer el resultado en /api/diagnostico/{id} y marcar inventario no disponible si la API externa falla..."></textarea>
+
+    <div class="action-row">
+      <button class="btn" id="saveReflection" type="button">Guardar en este navegador</button>
+      <button class="btn light" id="clearReflection" type="button">Borrar</button>
+    </div>
+
+    <p id="reflectionStatus" aria-live="polite">
+      El texto no se transmite; si lo guardas, permanece únicamente en el almacenamiento local de este navegador.
+    </p>
+  </div>
+
+  <div class="references" style="margin-top:2rem">
+    <article class="ref-card">
+      <h3>Ideas clave</h3>
+      <p>Una integración profesional separa adquisición, consumo de APIs, validación, lógica de integración y exposición del resultado.</p>
+    </article>
+
+    <article class="ref-card">
+      <h3>Siguiente etapa</h3>
+      <p>En 2.4.2 se trabajará la protección de credenciales y configuración mediante variables de entorno y prácticas básicas de seguridad.</p>
+    </article>
+  </div>
+
+  <div class="bottom-nav">
+    <a class="btn light" href="tema-2-4-integracion-buenas-practicas-aplicaciones-red.html">← Tema 2.4</a>
+    <a class="btn light" href="tema-2-4-2-credenciales-variables-entorno.html">2.4.2 Credenciales y entorno →</a>
+  </div>
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="footer-inner">
+  <div>
+    <strong>Programación de Redes: Protocolos y APIs</strong><br>
+    <span>Subtema 2.4.1 · Integración entre automatización de red y APIs</span>
+  </div>
+  <div>Material interactivo · uso local</div>
+</div>
+</footer>
+
+<div class="progress-wrap" aria-hidden="true">
+  Recorrido <b id="progressValue">0%</b>
+</div>
+
+<script>
+(() => {
+"use strict";
+
+const $=id=>document.getElementById(id);
+
+const setFeedback=(el,text,type="")=>{
+  el.textContent=text;
+  el.className="feedback"+(type?" "+type:"");
+};
+
+const setMini=(el,text,ok=null)=>{
+  el.textContent=text;
+  el.style.borderLeftColor=
+    ok===true?"var(--green)":ok===false?"var(--red)":"var(--cyan)";
+  el.style.background=
+    ok===true?"var(--green-soft)":ok===false?"var(--red-soft)":"var(--soft)";
+};
+
+$("checkPrediction").addEventListener("click",()=>{
+  const s=document.querySelector('input[name="prediction"]:checked');
+
+  if(!s){
+    return setFeedback(
+      $("predictionFeedback"),
+      "Selecciona primero una opción.",
+      "warn"
+    );
+  }
+
+  if(s.value==="a"){
+    setFeedback(
+      $("predictionFeedback"),
+      "Correcto. La información de red sigue siendo válida aunque una fuente complementaria falle.",
+      "success"
+    );
+  }else{
+    setFeedback(
+      $("predictionFeedback"),
+      "Revisa el concepto de degradación: conserva datos válidos y declara explícitamente lo que falta.",
+      "error"
+    );
+  }
+});
+
+$("resetPrediction").addEventListener("click",()=>{
+  document.querySelectorAll('input[name="prediction"]').forEach(r=>r.checked=false);
+
+  setFeedback(
+    $("predictionFeedback"),
+    "Una integración robusta conserva la información válida que sí pudo obtenerse."
+  );
+});
+
+const networkMap={
+  reachability:"reachability",
+  interface:"estado de interfaz",
+  latency:"latencia"
+};
+
+const apiMap={
+  inventory:"inventario",
+  geo:"ubicación",
+  owner:"responsable técnico"
+};
+
+$("buildIntegration").addEventListener("click",()=>{
+  const network=networkMap[$("networkSource").value];
+  const api=apiMap[$("apiSource").value];
+
+  $("outNetwork").textContent=network;
+  $("outApi").textContent=api;
+  $("outOutput").textContent="diagnóstico enriquecido";
+
+  $("integrationPreview").textContent=
+`1. Obtener ${network}
+2. Consultar API de ${api}
+3. Validar ambas respuestas
+4. Combinar datos disponibles
+5. Exponer resumen`;
+
+  setFeedback(
+    $("integrationFeedback"),
+    "Flujo construido. La automatización aporta el dato operativo y la API agrega contexto.",
+    "success"
+  );
+});
+
+const practices=[
+  {
+    s:"p1",b:"checkP1",f:"p1Feedback",a:"a",
+    ok:"Correcto. Conserva la medición válida y declara la ausencia del inventario.",
+    bad:"No descartes ni inventes datos cuando falla una fuente secundaria."
+  },
+  {
+    s:"p2",b:"checkP2",f:"p2Feedback",a:"a",
+    ok:"Correcto. Encapsular la adquisición facilita reutilización, mantenimiento y pruebas.",
+    bad:"Copiar la lógica en cada endpoint aumenta el acoplamiento."
+  },
+  {
+    s:"p3",b:"checkP3",f:"p3Feedback",a:"a",
+    ok:"Correcto. Un 200 no sustituye la validación del esquema esperado.",
+    bad:"La presencia de 200 no garantiza que todos los campos del dominio existan."
+  }
+];
+
+practices.forEach(p=>{
+  $(p.b).addEventListener("click",()=>{
+    const v=$(p.s).value;
+
+    if(!v){
+      return setMini($(p.f),"Selecciona primero una respuesta.");
+    }
+
+    setMini($(p.f),v===p.a?p.ok:p.bad,v===p.a);
+  });
+});
+
+$("checkCase").addEventListener("click",()=>{
+  const ok=
+    $("caseAutomation").value==="module" &&
+    $("caseExternal").value==="validate" &&
+    $("caseFailure").value==="degrade";
+
+  setFeedback(
+    $("caseFeedback"),
+    ok
+      ? "Arquitectura coherente. Separa adquisición, valida dependencias y conserva resultados útiles ante fallos parciales."
+      : "Revisa separación de responsabilidades, validación de la API externa y degradación controlada.",
+    ok?"success":"error"
+  );
+});
+
+const answers={q1:"a",q2:"a",q3:"a",q4:"a",q5:"a"};
+
+const explanations={
+  q1:"Una API permite intercambiar información estructurada entre componentes.",
+  q2:"Separar adquisición y endpoint reduce acoplamiento y mejora reutilización.",
+  q3:"Los datos válidos deben conservarse aunque una dependencia secundaria falle.",
+  q4:"El código 200 no valida la estructura ni la semántica del JSON.",
+  q5:"El siguiente subtema aborda credenciales y variables de entorno."
+};
+
+$("checkQuiz").addEventListener("click",()=>{
+  let score=0;
+
+  Object.keys(answers).forEach(q=>{
+    const s=document.querySelector(`input[name="${q}"]:checked`);
+    const ok=s&&s.value===answers[q];
+
+    if(ok){score++;}
+
+    setMini(
+      $(`${q}Feedback`),
+      s?((ok?"Correcto. ":"Revisa. ")+explanations[q]):"Falta responder esta pregunta.",
+      ok
+    );
+  });
+
+  $("scoreBox").textContent=
+    `Resultado: ${score}/5. ${
+      score===5
+        ? "Dominio sólido de integración entre automatización de red y APIs."
+        : "Revisa las explicaciones y vuelve a intentarlo."
+    }`;
+});
+
+$("resetQuiz").addEventListener("click",()=>{
+  document.querySelectorAll('#quiz input[type="radio"]').forEach(r=>r.checked=false);
+
+  Object.keys(answers).forEach(q=>{
+    setMini($(`${q}Feedback`),"Selecciona una respuesta.");
+  });
+
+  $("scoreBox").textContent="Aún no has comprobado la actividad.";
+});
+
+const key="pr-redes-2-4-1-reflexion";
+
+try{
+  const saved=localStorage.getItem(key);
+  if(saved){$("reflectionText").value=saved;}
+}catch(_){}
+
+$("saveReflection").addEventListener("click",()=>{
+  try{
+    localStorage.setItem(key,$("reflectionText").value);
+    $("reflectionStatus").textContent="Reflexión guardada únicamente en este navegador.";
+  }catch(_){
+    $("reflectionStatus").textContent="Este navegador no permitió guardar la reflexión localmente.";
+  }
+});
+
+$("clearReflection").addEventListener("click",()=>{
+  $("reflectionText").value="";
+  try{localStorage.removeItem(key);}catch(_){}
+  $("reflectionStatus").textContent="Reflexión borrada del almacenamiento local.";
+});
+
+const sections=[...document.querySelectorAll("main section")];
+
+function updateProgress(){
+  const total=document.documentElement.scrollHeight-window.innerHeight;
+  const pct=total>0?Math.max(0,Math.min(100,Math.round((window.scrollY/total)*100))):100;
+
+  $("progressValue").textContent=pct+"%";
+
+  const marker=window.scrollY+window.innerHeight*.36;
+  let current=sections[0];
+
+  sections.forEach(s=>{
+    if(s.offsetTop<=marker){current=s;}
+  });
+
+  document.querySelectorAll("nav a").forEach(a=>a.removeAttribute("aria-current"));
+
+  if(current&&current.id){
+    const link=document.querySelector(`nav a[href="#${current.id}"]`);
+    if(link){link.setAttribute("aria-current","location");}
+  }
+}
+
+window.addEventListener("scroll",updateProgress,{passive:true});
+window.addEventListener("resize",updateProgress);
+updateProgress();
+})();
+</script>
+</body>
+</html>
