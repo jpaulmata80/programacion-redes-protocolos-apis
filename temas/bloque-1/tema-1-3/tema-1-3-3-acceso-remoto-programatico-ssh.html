@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Subtema 1.3.3: acceso remoto programático mediante SSH con Python.">
+<meta name="theme-color" content="#10212a">
+<title>1.3.3 | Acceso remoto programático mediante SSH</title>
+<style>
+:root{
+  --ink:#18212a;--muted:#586775;--line:#cbd5dc;--soft:#f3f6f8;--paper:#fff;
+  --cyan:#007c91;--cyan-dark:#005b6a;--cyan-light:#6ed2e2;
+  --green:#16734a;--green-soft:#e8f5ee;--amber:#8a5600;--amber-soft:#fff3d8;
+  --red:#9b2c2c;--red-soft:#fdecec;--focus:#005fcc;
+  --navy:#10212a;--navy-deep:#07141a;--max:1180px;--radius:8px;
+  --shadow:0 16px 38px rgba(24,33,42,.08)
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-width:280px;color:var(--ink);background:var(--paper);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55;overflow-x:hidden}
+button,input,select,textarea{font:inherit;max-width:100%}
+a{color:var(--cyan-dark)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}.skip-link:focus{top:1rem}
+header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.header-inner{width:min(100%,var(--max));min-height:66px;margin:0 auto;padding:.55rem 1.25rem;display:flex;gap:1rem;align-items:center;min-width:0}
+.brand{min-width:190px}.brand strong{display:block;font-size:.95rem}.brand span{display:block;color:var(--muted);font-size:.78rem}
+.nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}
+nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+nav a{color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;border-bottom:2px solid transparent;font-size:.84rem}
+nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+.top-link{flex:0 0 auto;text-decoration:none;border:1px solid var(--line);border-radius:5px;padding:.48rem .72rem;color:var(--ink);font-weight:750;white-space:nowrap;background:#fff}
+main{overflow:hidden}
+section{scroll-margin-top:84px;border-bottom:1px solid var(--line)}
+.band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+.hero{min-height:calc(100svh - 66px);display:grid;align-items:center;background:var(--navy);color:#fff}
+.hero-grid{width:min(100%,var(--max));margin:0 auto;padding:3.4rem 1.25rem;display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:3rem;align-items:center}
+.hero-grid>*{min-width:0}.eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+h1{font-size:clamp(2rem,5vw,4.1rem);line-height:1.02;margin:.65rem 0 1.15rem;max-width:18ch;overflow-wrap:normal;word-break:normal;hyphens:none}
+h2{font-size:clamp(1.75rem,3.3vw,2.8rem);line-height:1.12;margin:0 0 .8rem;overflow-wrap:normal;word-break:normal;hyphens:none}
+h3{font-size:1.22rem;margin:0 0 .55rem}
+p{max-width:72ch}.hero p{color:#d7e5ea;font-size:1.08rem}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}.hero-actions{margin-top:1.45rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cyan-dark);background:var(--cyan);color:#fff;text-decoration:none;padding:.72rem 1rem;border-radius:5px;font-weight:750}
+.btn:hover{background:var(--cyan-dark)}.btn.secondary{background:transparent;color:inherit;border-color:currentColor}.btn.secondary:hover{background:rgba(255,255,255,.1)}
+.btn.light{background:#fff;color:var(--ink);border-color:var(--line)}.btn.light:hover{background:var(--soft);color:var(--cyan-dark)}
+.hero-board{background:var(--navy-deep);border:1px solid #3b5965;border-radius:8px;padding:1.25rem}
+.ssh-flow{display:grid;grid-template-columns:minmax(0,1fr) 46px minmax(0,1fr);gap:.7rem;align-items:center;margin-top:1rem}
+.endpoint{padding:1rem;border:1px solid #3c5964;border-radius:7px;background:#0d2630;min-width:0}.endpoint strong{display:block;color:#fff}.endpoint small{display:block;color:#b7cbd2;margin-top:.25rem}
+.tunnel{text-align:center;color:var(--cyan-light);font-weight:900}.tunnel small{display:block;font-size:.68rem;font-weight:700}
+.steps-dark{display:grid;gap:.45rem;margin-top:.8rem}.steps-dark span{padding:.5rem .6rem;border:1px solid #38525d;border-radius:5px;color:#dce9ed;background:#0b2029}
+.section-head{display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem}.section-head>*{min-width:0}
+.section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}.lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+.outcomes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}.outcome:last-child{border-right:0}.outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+.scope-note,.callout{margin-top:1.4rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}
+.concept-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+.concept-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.15rem;background:#fff;box-shadow:var(--shadow)}
+.tag{display:inline-block;font-size:.76rem;font-weight:850;color:var(--cyan-dark);background:#d9eef2;padding:.2rem .45rem;border-radius:999px;margin-bottom:.55rem}
+.concept-card p{color:var(--muted);font-size:.94rem}
+.activity{margin-top:1.5rem;padding:1.35rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--soft);min-width:0}
+.prediction{display:grid;gap:.6rem;margin:.85rem 0 1rem}.prediction label{display:block;padding:.75rem .8rem;background:#fff;border:1px solid var(--line);border-radius:5px}
+.feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}
+.feedback.success{background:var(--green-soft);border-color:var(--green)}.feedback.warn{background:var(--amber-soft);border-color:var(--amber)}.feedback.error{background:var(--red-soft);border-color:var(--red)}
+.lab-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:1rem}.lab-grid>*{min-width:0}
+.lab-panel{border:1px solid var(--line);border-radius:7px;background:#fff;padding:1rem}.lab-panel label{display:block;font-weight:750;margin:.75rem 0 .3rem}.lab-panel select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+.session-steps{display:grid;gap:.6rem;margin-top:.7rem}.session-step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:.7rem;align-items:start;padding:.65rem;border:1px solid var(--line);border-radius:6px;background:#fff}.session-step b{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#d9eef2;color:var(--cyan-dark)}.session-step.active{border-color:var(--cyan);background:#eef9fb}
+.code-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.code-card{min-width:0;background:#09161d;color:#dce9ed;border:1px solid #314b56;border-radius:7px;padding:1rem}.code-card h3{color:#fff}
+.code-block{overflow-x:auto;margin:.75rem 0;background:#061016;border:1px solid #253c47;border-radius:6px;padding:1rem}.code-block code{white-space:pre}.code-note{color:#bfd1d7}
+.table-wrap{overflow-x:auto;margin-top:1.2rem;border:1px solid var(--line);border-radius:7px}table{border-collapse:collapse;width:100%;min-width:720px}th,td{padding:.8rem;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}th{background:var(--soft)}
+.exercise-box{border:1px solid var(--line);border-radius:8px;overflow:hidden}.exercise-head{padding:1rem 1.1rem;background:var(--navy);color:#fff}.exercise-head span{display:block;color:var(--cyan-light);font-size:.78rem;font-weight:850;text-transform:uppercase}
+.exercise-body{padding:1.1rem}.solution-steps{display:grid;gap:.75rem}.solution-step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:.8rem;align-items:start}.solution-step>b{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#d9eef2;color:var(--cyan-dark)}
+.practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.practice-card{border:1px solid var(--line);border-radius:7px;padding:1rem;min-width:0}.practice-card select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.mini-feedback{margin-top:.75rem;padding:.75rem;border-left:4px solid var(--cyan);background:var(--soft);min-height:4rem}
+.case-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}.case-grid label{display:block;font-weight:750}.case-grid select{width:100%;margin-top:.3rem;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.quiz{display:grid;gap:1rem}.quiz-card{border:1px solid var(--line);border-radius:7px;padding:1rem}.quiz-card fieldset{border:0;padding:0;margin:0}.quiz-card legend{font-weight:800;margin-bottom:.7rem}.quiz-card label{display:block;padding:.5rem .55rem;border-radius:4px}.quiz-card label:hover{background:var(--soft)}
+.score{margin-top:1rem;padding:1rem;border:1px solid var(--line);border-radius:6px;background:var(--soft);font-weight:800}
+.reflection-box textarea{width:100%;min-height:145px;resize:vertical;padding:.8rem;border:1px solid var(--line);border-radius:6px}
+.references{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.ref-card{border-top:4px solid var(--cyan);padding:1rem;background:var(--soft)}
+.bottom-nav{margin-top:2rem;display:flex;justify-content:space-between;gap:.7rem;flex-wrap:wrap}
+footer{background:var(--navy-deep);color:#c7d8de}.footer-inner{width:min(100%,var(--max));margin:0 auto;padding:1.4rem 1.25rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.progress-wrap{position:fixed;right:1rem;bottom:1rem;z-index:20;background:rgba(7,20,26,.93);color:#fff;padding:.45rem .7rem;border-radius:999px;font-size:.78rem;border:1px solid #3b5965}
+@media(max-width:900px){
+  .hero-grid,.section-head,.lab-grid,.code-grid{grid-template-columns:1fr}
+  .concept-grid,.outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .outcome:nth-child(2){border-right:0}.outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .practice-grid,.case-grid{grid-template-columns:1fr}
+  .ssh-flow{grid-template-columns:1fr}.tunnel{transform:rotate(90deg)}
+}
+@media(max-width:600px){
+  .header-inner{padding-inline:.8rem}.brand{min-width:145px}.top-link{padding:.45rem .6rem}
+  .band,.hero-grid{padding-left:.9rem;padding-right:.9rem}
+  h1{font-size:clamp(2rem,10vw,2.8rem);max-width:none}
+  .concept-grid,.outcomes,.references{grid-template-columns:1fr}
+  .outcome{border-right:0;border-bottom:1px solid var(--line)}.outcome:last-child{border-bottom:0}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+<header>
+<div class="header-inner">
+  <div class="brand"><strong>Programación de Redes</strong><span>Protocolos y APIs</span></div>
+  <div class="nav-scroll" aria-label="Navegación del subtema"><nav>
+    <a href="#inicio">Inicio</a><a href="#orientacion">Cómo trabajar</a><a href="#conceptos">Conceptos</a><a href="#predice">Predice</a><a href="#experimenta">Experimenta</a><a href="#codigo">Código</a><a href="#resuelto">Ejercicio resuelto</a><a href="#practica">Practica</a><a href="#caso">Caso profesional</a><a href="#comprueba">Comprueba</a><a href="#reflexiona">Reflexión</a>
+  </nav></div>
+  <a class="top-link" href="index.html">← Curso</a>
+</div>
+</header>
+
+<main id="contenido">
+<section class="hero" id="inicio">
+<div class="hero-grid">
+  <div>
+    <div class="eyebrow">Bloque 1 · Tema 1.3 · Subtema 1.3.3</div>
+    <h1>Acceso remoto programático mediante SSH</h1>
+    <p>Conecta una aplicación Python con un equipo remoto de forma cifrada, verifica su identidad, autentica al usuario, ejecuta comandos autorizados y procesa la respuesta.</p>
+    <div class="hero-actions"><a class="btn" href="#orientacion">Comenzar recorrido</a><a class="btn secondary" href="tema-1-3-automatizacion-tareas-red.html">Volver al Tema 1.3</a></div>
+  </div>
+  <div class="hero-board" role="img" aria-label="Cliente Python conectado por un túnel SSH a un servidor remoto">
+    <h3>Sesión SSH programática</h3>
+    <div class="ssh-flow">
+      <div class="endpoint"><strong>Cliente Python</strong><small>SSHClient + credencial autorizada</small></div>
+      <div class="tunnel">⇄<small>SSH cifrado</small></div>
+      <div class="endpoint"><strong>Equipo remoto</strong><small>Servidor SSH habilitado</small></div>
+    </div>
+    <div class="steps-dark">
+      <span>1. Verificar identidad del servidor</span>
+      <span>2. Autenticar al usuario</span>
+      <span>3. Ejecutar comando autorizado</span>
+      <span>4. Procesar stdout / stderr</span>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="orientacion">
+<div class="band">
+  <div class="section-head"><div class="section-code">Cómo trabajar este tema</div><div><h2>SSH no es solo “conectarse”</h2><p class="lead">Una automatización segura debe verificar a qué servidor se conecta, usar credenciales protegidas y cerrar la sesión correctamente.</p></div></div>
+  <div class="outcomes">
+    <div class="outcome"><b>1. Explicar</b> el flujo básico de una sesión SSH.</div>
+    <div class="outcome"><b>2. Configurar</b> un cliente SSH en Python con verificación de host.</div>
+    <div class="outcome"><b>3. Ejecutar</b> un comando remoto y leer su salida.</div>
+    <div class="outcome"><b>4. Diferenciar</b> prácticas seguras de prácticas riesgosas.</div>
+  </div>
+  <div class="scope-note"><strong>Alcance.</strong> Usaremos conexiones a equipos propios o expresamente autorizados. No se abordan técnicas de evasión, fuerza bruta ni acceso no autorizado.</div>
+</div>
+</section>
+
+<section id="conceptos">
+<div class="band">
+  <div class="section-head"><div class="section-code">Explora</div><div><h2>Cuatro decisiones antes de ejecutar un comando</h2><p class="lead">La seguridad comienza antes de llamar a <code>exec_command()</code>.</p></div></div>
+  <div class="concept-grid">
+    <article class="concept-card"><span class="tag">Servidor</span><h3>Identidad conocida</h3><p>El cliente debe comprobar la clave del servidor mediante un archivo de hosts conocidos o una política explícita de confianza.</p></article>
+    <article class="concept-card"><span class="tag">Usuario</span><h3>Autenticación</h3><p>Puede usarse una clave privada protegida o un mecanismo autorizado. No conviene incrustar contraseñas en el código.</p></article>
+    <article class="concept-card"><span class="tag">Canal</span><h3>Sesión cifrada</h3><p>SSH protege confidencialidad e integridad del canal entre cliente y servidor.</p></article>
+    <article class="concept-card"><span class="tag">Comando</span><h3>Acción controlada</h3><p>La aplicación debe ejecutar únicamente operaciones previstas y procesar tanto salida normal como errores.</p></article>
+  </div>
+
+  <div class="callout"><strong>Host key ≠ clave del usuario.</strong> La clave del servidor ayuda a verificar la identidad del equipo remoto; la clave del usuario se utiliza para autenticar al cliente ante ese servidor.</div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Práctica</th><th>Recomendación</th><th>Motivo</th></tr></thead>
+      <tbody>
+        <tr><td>Cargar hosts conocidos</td><td><code>load_system_host_keys()</code></td><td>Permite comprobar la identidad previamente confiada del servidor.</td></tr>
+        <tr><td>Host desconocido</td><td>Rechazar por defecto y verificar antes de confiar</td><td>Evita aceptar silenciosamente una identidad no validada.</td></tr>
+        <tr><td>Credenciales</td><td>Claves o mecanismos protegidos</td><td>Evita exponer secretos dentro del código fuente.</td></tr>
+        <tr><td>Cierre</td><td>Usar <code>try/finally</code> o contexto apropiado</td><td>Libera la sesión y recursos aun si ocurre un error.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<section id="predice">
+<div class="band">
+  <div class="section-head"><div class="section-code">Predice</div><div><h2>El servidor cambia de clave</h2><p class="lead">Tu script ya conocía la identidad del servidor, pero ahora la clave del host no coincide con la registrada.</p></div></div>
+  <div class="activity">
+    <div class="prediction">
+      <label><input type="radio" name="prediction" value="a"> Ignorar el cambio y conectarse automáticamente.</label>
+      <label><input type="radio" name="prediction" value="b"> Detener la conexión y verificar por qué cambió la identidad.</label>
+      <label><input type="radio" name="prediction" value="c"> Borrar todas las claves conocidas y aceptar cualquiera.</label>
+    </div>
+    <div class="action-row"><button class="btn" id="checkPrediction" type="button">Comprobar</button><button class="btn light" id="resetPrediction" type="button">Reintentar</button></div>
+    <div class="feedback" id="predictionFeedback" aria-live="polite">La clave del host existe precisamente para ayudar a detectar cambios de identidad.</div>
+  </div>
+</div>
+</section>
+
+<section id="experimenta">
+<div class="band">
+  <div class="section-head"><div class="section-code">Experimenta</div><div><h2>Recorre una sesión SSH</h2><p class="lead">Esta simulación no realiza conexiones reales. Permite observar qué etapa falla según el escenario.</p></div></div>
+  <div class="activity">
+    <div class="lab-grid">
+      <div class="lab-panel">
+        <label for="scenario">Escenario</label>
+        <select id="scenario">
+          <option value="ok">Servidor conocido + clave válida</option>
+          <option value="unknown">Servidor no registrado</option>
+          <option value="auth">Autenticación rechazada</option>
+          <option value="timeout">Servidor no responde a tiempo</option>
+        </select>
+        <button class="btn" id="simulate" type="button" style="margin-top:1rem">Simular sesión</button>
+        <div class="feedback" id="simFeedback" aria-live="polite">Selecciona un escenario y simula.</div>
+      </div>
+      <div class="lab-panel">
+        <h3>Etapas</h3>
+        <div class="session-steps" id="sessionSteps">
+          <div class="session-step" data-step="1"><b>1</b><div><strong>Conectividad</strong><br>Alcanzar el servicio SSH.</div></div>
+          <div class="session-step" data-step="2"><b>2</b><div><strong>Identidad</strong><br>Verificar la clave del servidor.</div></div>
+          <div class="session-step" data-step="3"><b>3</b><div><strong>Autenticación</strong><br>Validar la credencial del usuario.</div></div>
+          <div class="session-step" data-step="4"><b>4</b><div><strong>Ejecución</strong><br>Enviar un comando y leer la salida.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="codigo">
+<div class="band">
+  <div class="section-head"><div class="section-code">Explica</div><div><h2>Conexión básica con Paramiko</h2><p class="lead">Paramiko es una dependencia externa, por lo que debe instalarse dentro del entorno virtual del proyecto.</p></div></div>
+
+  <div class="code-grid">
+    <article class="code-card">
+      <h3>Preparar la dependencia</h3>
+      <div class="code-block"><code>python -m venv .venv
+
+# activar el entorno virtual
+python -m pip install paramiko</code></div>
+      <p class="code-note">No forma parte de la biblioteca estándar de Python.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Crear un cliente seguro</h3>
+      <div class="code-block"><code>import paramiko
+
+cliente = paramiko.SSHClient()
+
+cliente.load_system_host_keys()
+cliente.set_missing_host_key_policy(
+    paramiko.RejectPolicy()
+)</code></div>
+      <p class="code-note">La política de rechazo evita confiar automáticamente en hosts desconocidos.</p>
+    </article>
+  </div>
+
+  <div class="code-grid" style="margin-top:1rem">
+    <article class="code-card">
+      <h3>Conectar con clave</h3>
+      <div class="code-block"><code>cliente.connect(
+    hostname="192.0.2.10",
+    port=22,
+    username="operador",
+    key_filename="/ruta/segura/id_ed25519",
+    timeout=5
+)</code></div>
+      <p class="code-note">La dirección usada pertenece a un rango reservado para documentación.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Ejecutar y leer resultados</h3>
+      <div class="code-block"><code>stdin, stdout, stderr = cliente.exec_command(
+    "show status"
+)
+
+salida = stdout.read().decode()
+errores = stderr.read().decode()
+
+print(salida)
+
+cliente.close()</code></div>
+      <p class="code-note">El comando real dependerá del sistema o dispositivo administrado.</p>
+    </article>
+  </div>
+
+  <div class="callout"><strong>No copies secretos al código.</strong> Evita patrones como <code>password="MiClave123"</code>. Las credenciales deben gestionarse fuera del código fuente y con permisos apropiados.</div>
+</div>
+</section>
+
+<section id="resuelto">
+<div class="band">
+  <div class="section-head"><div class="section-code">Ejercicio resuelto</div><div><h2>Consultar el nombre de un servidor remoto</h2><p class="lead">Diseñamos una función que abre una sesión, ejecuta un comando de lectura y devuelve una salida limpia.</p></div></div>
+
+  <div class="exercise-box">
+    <div class="exercise-head"><span>Problema</span><h3>Conectar, consultar y cerrar de forma controlada</h3></div>
+    <div class="exercise-body">
+      <div class="solution-steps">
+        <div class="solution-step"><b>1</b><div><strong>Preparar el cliente.</strong><br>Cargar claves de hosts conocidas y rechazar identidades desconocidas.</div></div>
+        <div class="solution-step"><b>2</b><div><strong>Autenticar.</strong><br>Usar una clave autorizada almacenada fuera del código.</div></div>
+        <div class="solution-step"><b>3</b><div><strong>Ejecutar.</strong><br>Enviar un comando de solo lectura.</div></div>
+        <div class="solution-step"><b>4</b><div><strong>Procesar.</strong><br>Leer <code>stdout</code> y <code>stderr</code>.</div></div>
+        <div class="solution-step"><b>5</b><div><strong>Cerrar.</strong><br>Garantizar el cierre aunque ocurra una excepción.</div></div>
+      </div>
+
+      <div class="code-block" style="margin-top:1rem"><code>import paramiko
+
+def consultar_hostname(host, usuario, clave):
+    cliente = paramiko.SSHClient()
+    cliente.load_system_host_keys()
+    cliente.set_missing_host_key_policy(
+        paramiko.RejectPolicy()
+    )
+
+    try:
+        cliente.connect(
+            hostname=host,
+            username=usuario,
+            key_filename=clave,
+            timeout=5
+        )
+
+        _, stdout, stderr = cliente.exec_command(
+            "hostname"
+        )
+
+        salida = stdout.read().decode().strip()
+        error = stderr.read().decode().strip()
+
+        return salida, error
+
+    finally:
+        cliente.close()</code></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="practica">
+<div class="band">
+  <div class="section-head"><div class="section-code">Practica</div><div><h2>Elige la práctica más segura</h2><p class="lead">Cada escenario representa una decisión frecuente en automatización SSH.</p></div></div>
+
+  <div class="practice-grid">
+    <article class="practice-card">
+      <h3>Ejercicio 1</h3>
+      <p>El servidor no aparece en los hosts conocidos.</p>
+      <select id="p1"><option value="">Selecciona…</option><option value="a">Detener y verificar la clave antes de confiar</option><option value="b">Aceptar cualquier clave automáticamente</option><option value="c">Desactivar toda verificación</option></select>
+      <button class="btn" id="checkP1" type="button" style="margin-top:.7rem">Comprobar</button><div class="mini-feedback" id="p1Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 2</h3>
+      <p>Necesitas autenticar un script programado.</p>
+      <select id="p2"><option value="">Selecciona…</option><option value="a">Usar una clave protegida y gestionada fuera del código</option><option value="b">Escribir la contraseña directamente en el archivo .py</option><option value="c">Compartir la misma contraseña en todos los scripts</option></select>
+      <button class="btn" id="checkP2" type="button" style="margin-top:.7rem">Comprobar</button><div class="mini-feedback" id="p2Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 3</h3>
+      <p>El comando remoto puede fallar.</p>
+      <select id="p3"><option value="">Selecciona…</option><option value="a">Leer también stderr y manejar excepciones</option><option value="b">Ignorar cualquier error</option><option value="c">Asumir que stdout siempre contiene éxito</option></select>
+      <button class="btn" id="checkP3" type="button" style="margin-top:.7rem">Comprobar</button><div class="mini-feedback" id="p3Feedback">Selecciona una respuesta.</div>
+    </article>
+  </div>
+</div>
+</section>
+
+<section id="caso">
+<div class="band">
+  <div class="section-head"><div class="section-code">Caso profesional</div><div><h2>Consulta remota de equipos desde un NOC</h2><p class="lead">El NOC necesita consultar información de estado en varios servidores Linux autorizados sin almacenar contraseñas dentro del script.</p></div></div>
+
+  <div class="activity">
+    <div class="case-grid">
+      <label>Verificación del servidor
+        <select id="caseHost"><option value="">Selecciona…</option><option value="known">Usar claves de host previamente verificadas</option><option value="accept">Aceptar cualquier host automáticamente</option></select>
+      </label>
+      <label>Autenticación
+        <select id="caseAuth"><option value="">Selecciona…</option><option value="key">Clave autorizada protegida</option><option value="hardcode">Contraseña incrustada</option></select>
+      </label>
+      <label>Operación inicial
+        <select id="caseCmd"><option value="">Selecciona…</option><option value="read">Comandos de lectura y diagnóstico</option><option value="change">Cambios masivos sin validación previa</option></select>
+      </label>
+    </div>
+    <button class="btn" id="checkCase" type="button" style="margin-top:1rem">Evaluar diseño</button>
+    <div class="feedback" id="caseFeedback" aria-live="polite">Busca una solución verificable, autorizada y de bajo riesgo.</div>
+  </div>
+</div>
+</section>
+
+<section id="comprueba">
+<div class="band">
+  <div class="section-head"><div class="section-code">Comprueba</div><div><h2>Integra lo aprendido</h2><p class="lead">Responde las cinco preguntas.</p></div></div>
+
+  <div class="quiz" id="quiz">
+    <article class="quiz-card"><fieldset><legend>1. ¿Qué función cumple la clave del host SSH?</legend><label><input type="radio" name="q1" value="a"> Ayuda a verificar la identidad del servidor.</label><label><input type="radio" name="q1" value="b"> Reemplaza la dirección IP.</label><label><input type="radio" name="q1" value="c"> Codifica el archivo Python.</label></fieldset><div class="mini-feedback" id="q1Feedback">Selecciona una respuesta.</div></article>
+
+    <article class="quiz-card"><fieldset><legend>2. ¿Qué método de Paramiko carga hosts conocidos del sistema?</legend><label><input type="radio" name="q2" value="a"> load_system_host_keys()</label><label><input type="radio" name="q2" value="b"> exec_command()</label><label><input type="radio" name="q2" value="c"> close()</label></fieldset><div class="mini-feedback" id="q2Feedback">Selecciona una respuesta.</div></article>
+
+    <article class="quiz-card"><fieldset><legend>3. ¿Qué método ejecuta un comando remoto?</legend><label><input type="radio" name="q3" value="a"> exec_command()</label><label><input type="radio" name="q3" value="b"> load_system_host_keys()</label><label><input type="radio" name="q3" value="c"> bind()</label></fieldset><div class="mini-feedback" id="q3Feedback">Selecciona una respuesta.</div></article>
+
+    <article class="quiz-card"><fieldset><legend>4. ¿Qué práctica debe evitarse?</legend><label><input type="radio" name="q4" value="a"> Incrustar contraseñas en el código fuente.</label><label><input type="radio" name="q4" value="b"> Usar timeout.</label><label><input type="radio" name="q4" value="c"> Leer stderr.</label></fieldset><div class="mini-feedback" id="q4Feedback">Selecciona una respuesta.</div></article>
+
+    <article class="quiz-card"><fieldset><legend>5. ¿Qué conviene automatizar primero?</legend><label><input type="radio" name="q5" value="a"> Consultas de lectura y diagnóstico sobre equipos autorizados.</label><label><input type="radio" name="q5" value="b"> Cambios masivos sin pruebas.</label><label><input type="radio" name="q5" value="c"> Acceso a equipos sin autorización.</label></fieldset><div class="mini-feedback" id="q5Feedback">Selecciona una respuesta.</div></article>
+  </div>
+
+  <div class="action-row" style="margin-top:1rem"><button class="btn" id="checkQuiz" type="button">Comprobar todo</button><button class="btn light" id="resetQuiz" type="button">Reintentar</button></div>
+  <div class="score" id="scoreBox" aria-live="polite">Aún no has comprobado la actividad.</div>
+</div>
+</section>
+
+<section id="reflexiona">
+<div class="band">
+  <div class="section-head"><div class="section-code">Reflexión</div><div><h2>¿Qué controles pondrías antes de automatizar 50 conexiones SSH?</h2><p class="lead">Considera autorización, identidad de hosts, credenciales, timeouts, errores, registro y tipo de comandos permitidos.</p></div></div>
+
+  <div class="reflection-box">
+    <textarea id="reflectionText" aria-label="Reflexión del estudiante" placeholder="Describe qué validarías antes de abrir conexiones y ejecutar comandos en varios equipos..."></textarea>
+    <div class="action-row"><button class="btn" id="saveReflection" type="button">Guardar en este navegador</button><button class="btn light" id="clearReflection" type="button">Borrar</button></div>
+    <p id="reflectionStatus" aria-live="polite">El texto no se transmite; si lo guardas, permanece únicamente en el almacenamiento local de este navegador.</p>
+  </div>
+
+  <div class="references" style="margin-top:2rem">
+    <article class="ref-card"><h3>Referencias conceptuales</h3><p>Documentación oficial de Paramiko sobre <code>SSHClient</code> y principios generales de SSH: verificación de host, autenticación y ejecución remota controlada.</p></article>
+    <article class="ref-card"><h3>Delimitación</h3><p>Este subtema introduce acceso remoto autorizado. La administración de varios dispositivos y la organización de consultas se desarrollará en 1.3.4.</p></article>
+  </div>
+
+  <div class="bottom-nav">
+    <a class="btn light" href="tema-1-3-2-ejecucion-procesamiento-comandos-red.html">← 1.3.2 Comandos de red</a>
+    <a class="btn light" href="tema-1-3-4-consulta-administracion-dispositivos-servidores.html">1.3.4 Consulta y administración →</a>
+  </div>
+</div>
+</section>
+</main>
+
+<footer><div class="footer-inner"><div><strong>Programación de Redes: Protocolos y APIs</strong><br><span>Subtema 1.3.3 · Acceso remoto programático mediante SSH</span></div><div>Material interactivo · uso local</div></div></footer>
+<div class="progress-wrap" aria-hidden="true">Recorrido <b id="progressValue">0%</b></div>
+
+<script>
+(() => {
+"use strict";
+const $=id=>document.getElementById(id);
+const setFeedback=(el,text,type="")=>{el.textContent=text;el.className="feedback"+(type?" "+type:"");};
+const setMini=(el,text,ok=null)=>{el.textContent=text;el.style.borderLeftColor=ok===true?"var(--green)":ok===false?"var(--red)":"var(--cyan)";el.style.background=ok===true?"var(--green-soft)":ok===false?"var(--red-soft)":"var(--soft)";};
+
+$("checkPrediction").addEventListener("click",()=>{
+ const s=document.querySelector('input[name="prediction"]:checked');
+ if(!s)return setFeedback($("predictionFeedback"),"Selecciona primero una opción.","warn");
+ if(s.value==="b")setFeedback($("predictionFeedback"),"Correcto. Un cambio inesperado de clave debe investigarse antes de establecer confianza nuevamente.","success");
+ else setFeedback($("predictionFeedback"),"Revisa el propósito de la verificación de host: aceptar silenciosamente cualquier cambio elimina una protección importante.","error");
+});
+$("resetPrediction").addEventListener("click",()=>{document.querySelectorAll('input[name="prediction"]').forEach(r=>r.checked=false);setFeedback($("predictionFeedback"),"La clave del host existe precisamente para ayudar a detectar cambios de identidad.");});
+
+$("simulate").addEventListener("click",()=>{
+ const scenario=$("scenario").value;
+ const steps=[...document.querySelectorAll(".session-step")];
+ steps.forEach(s=>s.classList.remove("active"));
+ let upto=4,msg="",type="success";
+ if(scenario==="ok"){upto=4;msg="Sesión completada: conectividad, identidad y autenticación correctas. El comando puede ejecutarse.";}
+ if(scenario==="unknown"){upto=2;msg="La conexión se detiene en la verificación de identidad. El host debe verificarse antes de confiar.";type="warn";}
+ if(scenario==="auth"){upto=3;msg="La identidad del servidor es conocida, pero la credencial del usuario fue rechazada.";type="error";}
+ if(scenario==="timeout"){upto=1;msg="No se logró establecer la sesión dentro del tiempo previsto. Debe registrarse el timeout.";type="warn";}
+ steps.forEach(s=>{if(Number(s.dataset.step)<=upto)s.classList.add("active");});
+ setFeedback($("simFeedback"),msg,type);
+});
+
+const practices=[
+ {s:"p1",b:"checkP1",f:"p1Feedback",a:"a",ok:"Correcto. La identidad debe verificarse por un canal confiable antes de añadirla a los hosts conocidos.",bad:"Aceptar claves desconocidas automáticamente elimina una verificación importante."},
+ {s:"p2",b:"checkP2",f:"p2Feedback",a:"a",ok:"Correcto. La clave autorizada debe gestionarse fuera del código y protegerse con permisos adecuados.",bad:"Una contraseña dentro del código puede terminar expuesta en repositorios, copias o registros."},
+ {s:"p3",b:"checkP3",f:"p3Feedback",a:"a",ok:"Correcto. stdout no basta: también deben revisarse errores y excepciones.",bad:"Una automatización robusta debe distinguir salida normal, error y excepciones de conexión."}
+];
+practices.forEach(p=>$(p.b).addEventListener("click",()=>{const v=$(p.s).value;if(!v)return setMini($(p.f),"Selecciona primero una respuesta.");setMini($(p.f),v===p.a?p.ok:p.bad,v===p.a);}));
+
+$("checkCase").addEventListener("click",()=>{
+ const ok=$("caseHost").value==="known"&&$("caseAuth").value==="key"&&$("caseCmd").value==="read";
+ setFeedback($("caseFeedback"),ok?"Diseño coherente: hosts conocidos, credenciales protegidas y primeras operaciones de lectura/diagnóstico.":"Revisa identidad del servidor, gestión de credenciales y nivel de riesgo de los comandos iniciales.",ok?"success":"error");
+});
+
+const answers={q1:"a",q2:"a",q3:"a",q4:"a",q5:"a"};
+const expl={
+ q1:"La host key permite comprobar que el servidor presenta una identidad previamente conocida.",
+ q2:"load_system_host_keys() carga las claves registradas en el sistema.",
+ q3:"exec_command() abre un canal para ejecutar un comando remoto.",
+ q4:"Los secretos incrustados en el código pueden filtrarse con facilidad.",
+ q5:"Las consultas de lectura permiten validar la automatización con menor riesgo."
+};
+$("checkQuiz").addEventListener("click",()=>{
+ let score=0;
+ Object.keys(answers).forEach(q=>{
+   const s=document.querySelector(`input[name="${q}"]:checked`),ok=s&&s.value===answers[q];
+   if(ok)score++;
+   setMini($(`${q}Feedback`),s?((ok?"Correcto. ":"Revisa. ")+expl[q]):"Falta responder esta pregunta.",ok);
+ });
+ $("scoreBox").textContent=`Resultado: ${score}/5. ${score===5?"Dominio sólido del flujo SSH básico y sus controles de seguridad.":"Revisa las explicaciones y vuelve a intentarlo."}`;
+});
+$("resetQuiz").addEventListener("click",()=>{document.querySelectorAll('#quiz input[type="radio"]').forEach(r=>r.checked=false);Object.keys(answers).forEach(q=>setMini($(`${q}Feedback`),"Selecciona una respuesta."));$("scoreBox").textContent="Aún no has comprobado la actividad.";});
+
+const key="pr-redes-1-3-3-reflexion";
+try{const saved=localStorage.getItem(key);if(saved)$("reflectionText").value=saved;}catch(_){}
+$("saveReflection").addEventListener("click",()=>{try{localStorage.setItem(key,$("reflectionText").value);$("reflectionStatus").textContent="Reflexión guardada únicamente en este navegador.";}catch(_){$("reflectionStatus").textContent="Este navegador no permitió guardar la reflexión localmente.";}}); 
+$("clearReflection").addEventListener("click",()=>{$("reflectionText").value="";try{localStorage.removeItem(key);}catch(_){}$("reflectionStatus").textContent="Reflexión borrada del almacenamiento local.";});
+
+const sections=[...document.querySelectorAll("main section")];
+function updateProgress(){
+ const total=document.documentElement.scrollHeight-window.innerHeight;
+ const pct=total>0?Math.max(0,Math.min(100,Math.round((window.scrollY/total)*100))):100;
+ $("progressValue").textContent=pct+"%";
+ const marker=window.scrollY+window.innerHeight*.36;let current=sections[0];
+ sections.forEach(s=>{if(s.offsetTop<=marker)current=s;});
+ document.querySelectorAll("nav a").forEach(a=>a.removeAttribute("aria-current"));
+ if(current&&current.id){const link=document.querySelector(`nav a[href="#${current.id}"]`);if(link)link.setAttribute("aria-current","location");}
+}
+window.addEventListener("scroll",updateProgress,{passive:true});window.addEventListener("resize",updateProgress);updateProgress();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Tema 1.3: visión general de la automatización de tareas de red aplicada a telecomunicaciones.">
+  <meta name="theme-color" content="#10212a">
+  <title>Tema 1.3 | Automatización de tareas de red</title>
+  <style>
+    :root{
+      --ink:#18212a;--muted:#586775;--line:#cbd5dc;--soft:#f3f6f8;--paper:#ffffff;
+      --cyan:#007c91;--cyan-dark:#005b6a;--cyan-light:#6ed2e2;--green:#16734a;--green-soft:#e8f5ee;
+      --amber:#8a5600;--amber-soft:#fff3d8;--focus:#005fcc;--navy:#10212a;--navy-deep:#07141a;
+      --max:1180px;--radius:8px;--shadow:0 16px 38px rgba(24,33,42,.08)
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;min-width:280px;color:var(--ink);background:var(--paper);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55;overflow-x:hidden}
+    img,svg,canvas,video{display:block;max-width:100%}
+    button,input,select,textarea{font:inherit;max-width:100%}
+    button,input[type="checkbox"],input[type="radio"]{cursor:pointer}
+    a{color:var(--cyan-dark)}
+    a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+    .skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}.skip-link:focus{top:1rem}
+    header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+    .header-inner{width:min(100%,var(--max));min-height:66px;margin:0 auto;padding:.55rem 1.25rem;display:flex;gap:1rem;align-items:center;min-width:0}
+    .brand{min-width:190px}.brand strong{display:block;font-size:.95rem}.brand span{display:block;color:var(--muted);font-size:.78rem}
+    .nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+    nav a{color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;border-bottom:2px solid transparent;font-size:.84rem}
+    nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+    .home-link{flex:0 0 auto;text-decoration:none;border:1px solid var(--line);border-radius:5px;padding:.48rem .72rem;color:var(--ink);font-weight:750;white-space:nowrap;background:#fff}.home-link:hover{border-color:var(--cyan);color:var(--cyan-dark)}
+    main{overflow:hidden}section{scroll-margin-top:84px;border-bottom:1px solid var(--line)}.band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+    .hero{min-height:calc(100svh - 66px);display:grid;align-items:center;background:var(--navy);color:#fff}
+    .hero-grid{width:min(100%,var(--max));margin:0 auto;padding:3.4rem 1.25rem;display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.28fr);gap:3rem;align-items:center}.hero-grid>*{min-width:0}
+    .eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+    h1{font-size:clamp(2rem,5vw,4.6rem);line-height:1.02;margin:.65rem 0 1.15rem;max-width:18ch;overflow-wrap:normal;word-break:normal;hyphens:none}
+    h2{font-size:clamp(1.75rem,3.3vw,2.8rem);line-height:1.12;margin:0 0 .8rem;overflow-wrap:normal;word-break:normal;hyphens:none}
+    h3{font-size:1.22rem;margin:0 0 .55rem}p{max-width:72ch}.hero p{color:#d7e5ea;font-size:1.08rem}
+    .hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}.hero-actions{margin-top:1.45rem}
+    .btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cyan-dark);background:var(--cyan);color:#fff;text-decoration:none;padding:.72rem 1rem;border-radius:5px;font-weight:750}.btn:hover{background:var(--cyan-dark)}
+    .btn.secondary{background:transparent;color:inherit;border-color:currentColor}.btn.secondary:hover{background:rgba(255,255,255,.1)}.btn.light{background:#fff;color:var(--ink);border-color:var(--line)}.btn.light:hover{background:var(--soft);color:var(--cyan-dark)}
+    .socket-board{min-width:0;background:var(--navy-deep);border:1px solid #3b5965;border-radius:8px;padding:1.35rem}
+    .socket-flow{display:grid;grid-template-columns:minmax(0,1fr) 42px minmax(0,.8fr) 42px minmax(0,.8fr) 42px minmax(0,1fr);gap:.45rem;align-items:center}
+    .flow-node{min-width:0;text-align:center;border:1px solid #48616b;border-radius:7px;padding:.9rem .6rem;background:#102a35}.flow-node strong{display:block;color:#fff;margin-bottom:.2rem}.flow-node span{display:block;color:#bfd1d7;font-size:.79rem}
+    .flow-node.socket{border-color:var(--cyan-light);box-shadow:inset 0 0 0 1px rgba(110,210,226,.2)}.flow-arrow{text-align:center;color:var(--cyan-light);font-size:1.45rem;font-weight:900}.hero-caption{margin-top:1rem;color:#b8cbd2;font-size:.82rem}
+    .section-head{display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem}.section-head>*{min-width:0}.section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}.lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+    .outcomes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}.outcome:last-child{border-right:0}.outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+    .scope-note{margin-top:1.4rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}
+    .why-grid{display:grid;grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr);gap:2.4rem;align-items:start}.why-grid>*{min-width:0}
+    .concept-list{margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}.concept-list li{padding:1rem 0;border-bottom:1px solid var(--line)}.concept-list strong{display:block;margin-bottom:.2rem;color:var(--ink)}
+    .scenario-board{background:var(--soft);border:1px solid var(--line);border-radius:var(--radius);padding:1.35rem;min-width:0}
+    .scenario-chain{display:grid;grid-template-columns:minmax(0,1fr) 38px minmax(0,1fr) 38px minmax(0,1fr);gap:.45rem;align-items:center;margin-top:1rem}.scenario-box{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1rem;text-align:center;min-width:0;box-shadow:var(--shadow)}.scenario-box strong{display:block;color:var(--cyan-dark);margin-bottom:.25rem}.scenario-box span{display:block;color:var(--muted);font-size:.85rem}.scenario-arrow{text-align:center;color:var(--cyan-dark);font-size:1.35rem;font-weight:900}
+    .journey{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.journey-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.25rem;background:#fff;box-shadow:var(--shadow);display:flex;flex-direction:column}.journey-card .num{font-weight:850;color:var(--cyan-dark);font-size:.82rem;text-transform:uppercase;letter-spacing:.05em}.journey-card h3{margin:.35rem 0 .55rem}.journey-card p{color:var(--muted);font-size:.94rem;margin:0 0 1rem}.journey-card .question{margin-top:auto;padding-top:.9rem;border-top:1px solid var(--line);font-weight:700;font-size:.9rem}
+    .activity{margin-top:2rem;padding:1.35rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--soft);min-width:0}.activity h3{margin-top:0}.activity-instruction{color:var(--muted);margin-top:0}
+    .prediction{display:grid;gap:.65rem;margin:1rem 0}.prediction label{display:block;padding:.78rem;border:1px solid var(--line);border-radius:5px;background:#fff}.prediction input{margin-right:.5rem}
+    .feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}.feedback.success{background:var(--green-soft);border-color:var(--green)}.feedback.warn{background:var(--amber-soft);border-color:var(--amber)}
+    .steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.7rem;margin-top:1rem}.step{min-width:0;border:1px solid var(--line);border-radius:6px;background:#fff;padding:1rem}.step b{display:grid;place-items:center;width:2rem;height:2rem;border-radius:50%;background:#d9eef2;color:var(--cyan-dark);margin-bottom:.65rem}.step strong{display:block;margin-bottom:.25rem}.step span{display:block;color:var(--muted);font-size:.87rem}
+    .subtopics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.subtopic-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:1.3rem;background:#fff;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.8rem}.subtopic-top{display:flex;gap:1rem;align-items:flex-start;min-width:0}.badge{flex:0 0 auto;display:grid;place-items:center;min-width:64px;height:42px;border-radius:6px;background:#d9eef2;color:var(--cyan-dark);font-weight:850}.subtopic-card h3{margin:.1rem 0 .25rem}.subtopic-card p{margin:0;color:var(--muted)}.subtopic-card .goal{padding:.8rem;background:var(--soft);border-radius:5px;font-size:.91rem}.subtopic-card .btn{align-self:flex-start;margin-top:auto}
+    .reflection-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:2rem;align-items:start}.reflection-grid>*{min-width:0}textarea{width:100%;min-height:150px;resize:vertical;border:1px solid var(--line);border-radius:6px;padding:.8rem;background:#fff}.storage-note{font-size:.83rem;color:var(--muted)}
+    .references{font-size:.94rem;color:var(--muted)}.references ul{padding-left:1.2rem}
+    .bottom-nav{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:2rem;padding-top:1.25rem;border-top:1px solid var(--line)}
+    footer{background:var(--navy);color:#c9d8dd}footer .band{padding-top:2rem;padding-bottom:2rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+    @media(max-width:980px){.steps{grid-template-columns:repeat(3,minmax(0,1fr))}.socket-flow{grid-template-columns:1fr}.flow-arrow{transform:rotate(90deg)}}
+    @media(max-width:900px){.header-inner{flex-wrap:wrap}.nav-scroll{order:3;flex-basis:100%}.hero-grid,.why-grid,.reflection-grid{grid-template-columns:1fr}.outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}.outcome:nth-child(2){border-right:0}.outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}.journey{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:680px){.band{padding:3.2rem 1rem}.hero-grid{padding:2.7rem 1rem}.section-head{grid-template-columns:1fr;gap:.45rem}.outcomes,.journey,.subtopics,.steps{grid-template-columns:1fr}.outcome{border-right:0;border-bottom:1px solid var(--line)}.outcome:last-child{border-bottom:0}.scenario-chain{grid-template-columns:1fr}.scenario-arrow{transform:rotate(90deg)}.home-link{width:100%;text-align:center}}
+    @media(max-width:480px){h1{font-size:clamp(2rem,10vw,2.8rem);max-width:none}.header-inner{padding:.55rem 1rem}.brand{min-width:0;flex:1}.subtopic-top{flex-direction:column}.badge{min-width:0;width:max-content;padding:0 .7rem}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+<header>
+  <div class="header-inner">
+    <div class="brand"><strong>Programación de Redes</strong><span>Protocolos y APIs</span></div>
+    <div class="nav-scroll" aria-label="Navegación del tema">
+      <nav>
+        <a href="#inicio">Inicio</a><a href="#orientacion">Cómo trabajar</a><a href="#mapa">Mapa</a><a href="#telecom">Telecomunicaciones</a><a href="#subtemas">Subtemas</a><a href="#reflexion">Reflexión</a>
+      </nav>
+    </div>
+    <a class="home-link" href="index.html">← Curso</a>
+  </div>
+</header>
+<main id="contenido">
+<section class="hero" id="inicio">
+  <div class="hero-grid">
+    <div>
+      <div class="eyebrow">Bloque 1 · Tema 1.3</div>
+      <h1>Automatización de tareas de red</h1>
+      <p>Pasamos de construir comunicaciones a utilizarlas para resolver trabajo operativo real: ejecutar tareas repetitivas, recopilar información, procesarla y actuar de forma controlada sobre dispositivos y servidores.</p>
+      <div class="hero-actions"><a class="btn" href="#orientacion">Explorar el tema</a><a class="btn secondary" href="tema-1-2-programacion-sockets-tcp-udp.html">← Tema 1.2</a></div>
+    </div>
+    <div class="socket-board" role="img" aria-label="Flujo de automatización desde una tarea repetitiva hasta su ejecución y registro">
+      <div class="socket-flow">
+        <div class="flow-node"><strong>Tarea</strong><span>repetitiva</span></div><div class="flow-arrow">→</div>
+        <div class="flow-node socket"><strong>Script</strong><span>decide y ejecuta</span></div><div class="flow-arrow">→</div>
+        <div class="flow-node socket"><strong>Red</strong><span>comando o sesión</span></div><div class="flow-arrow">→</div>
+        <div class="flow-node"><strong>Resultado</strong><span>procesar · registrar · actuar</span></div>
+      </div>
+      <p class="hero-caption">Idea guía: automatizar no significa solamente “ejecutar comandos”; significa diseñar un proceso reproducible, verificable y seguro.</p>
+    </div>
+  </div>
+</section>
+<section id="orientacion">
+  <div class="band">
+    <div class="section-head"><div class="section-code">Cómo trabajar este tema</div><div><h2>De una tarea manual a un flujo reproducible</h2><p class="lead">Usa esta página como mapa general. Los detalles de programación, ejemplos y ejercicios se desarrollarán en cada subtema.</p></div></div>
+    <div class="outcomes">
+      <div class="outcome"><b>1. Reconocer</b> qué tareas de red son buenas candidatas para automatización.</div>
+      <div class="outcome"><b>2. Organizar</b> una automatización en entrada, ejecución, procesamiento y salida.</div>
+      <div class="outcome"><b>3. Relacionar</b> scripts, comandos, SSH y consulta de dispositivos dentro de un mismo flujo.</div>
+      <div class="outcome"><b>4. Valorar</b> control de errores, trazabilidad y validación antes de automatizar cambios.</div>
+    </div>
+    <div class="scope-note"><strong>Alcance:</strong> este tema se centra en automatización operativa básica con Python. Los subtemas profundizarán la ejecución y procesamiento de comandos, el acceso programático por SSH y la consulta/administración básica de infraestructura.</div>
+  </div>
+</section>
+<section id="mapa">
+  <div class="band">
+    <div class="section-head"><div class="section-code">Mapa</div><div><h2>¿Qué convierte una tarea manual en una automatización?</h2><p class="lead">Una automatización útil no comienza por el código, sino por comprender exactamente qué se repite, qué información necesita y cómo verificaremos el resultado.</p></div></div>
+    <div class="steps" aria-label="Etapas conceptuales de una automatización de red">
+      <div class="step"><b>1</b><strong>Detectar</strong><span>Identificar una tarea repetitiva y bien definida.</span></div>
+      <div class="step"><b>2</b><strong>Obtener</strong><span>Recibir equipos, parámetros o datos de entrada.</span></div>
+      <div class="step"><b>3</b><strong>Ejecutar</strong><span>Realizar comandos, consultas o sesiones remotas.</span></div>
+      <div class="step"><b>4</b><strong>Procesar</strong><span>Interpretar salidas, errores y condiciones.</span></div>
+      <div class="step"><b>5</b><strong>Registrar</strong><span>Guardar evidencia y comunicar el resultado.</span></div>
+    </div>
+    <div class="activity" aria-labelledby="prediction-title">
+      <h3 id="prediction-title">Predice · ¿qué tareas conviene automatizar primero?</h3>
+      <p class="activity-instruction">Marca las situaciones que son buenas candidatas para una primera automatización controlada.</p>
+      <div class="prediction" id="automationPrediction">
+        <label><input type="checkbox" value="inventory"> Consultar periódicamente versión o estado de varios equipos y generar un reporte.</label>
+        <label><input type="checkbox" value="ping"> Ejecutar la misma prueba de conectividad sobre una lista de direcciones y resumir resultados.</label>
+        <label><input type="checkbox" value="critical"> Cambiar automáticamente una configuración crítica en cientos de equipos sin validación previa ni respaldo.</label>
+        <label><input type="checkbox" value="logs"> Recopilar salidas de diagnóstico y clasificarlas según condiciones conocidas.</label>
+      </div>
+      <div class="action-row"><button class="btn" id="checkPrediction" type="button">Comprobar</button><button class="btn light" id="resetPrediction" type="button">Reintentar</button></div>
+      <div class="feedback" id="predictionFeedback" role="status" aria-live="polite">Busca tareas repetitivas, observables y con resultados que puedan verificarse.</div>
+    </div>
+  </div>
+</section>
+<section id="telecom">
+  <div class="band">
+    <div class="section-head"><div class="section-code">Aplicación</div><div><h2>¿Dónde aparece la automatización en Telecomunicaciones?</h2><p class="lead">En operación de redes, una misma acción puede repetirse sobre decenas o cientos de dispositivos. Automatizar reduce trabajo manual, pero exige controles.</p></div></div>
+    <div class="why-grid">
+      <div><ul class="concept-list">
+        <li><strong>Inventario y estado</strong>Consultar versiones, nombres, interfaces o información operativa de múltiples equipos.</li>
+        <li><strong>Diagnóstico repetitivo</strong>Ejecutar pruebas conocidas, recopilar resultados y detectar patrones de fallo.</li>
+        <li><strong>Operación remota</strong>Acceder de forma programática a servidores o dispositivos cuando el flujo lo requiera.</li>
+        <li><strong>Reportes y evidencias</strong>Transformar salidas técnicas en información organizada para seguimiento y toma de decisiones.</li>
+      </ul></div>
+      <div class="scenario-board">
+        <h3>Caso profesional de entrada</h3><p>Un NOC debe revisar cada mañana el estado básico de 40 equipos. Hacerlo manualmente implica conectarse uno por uno, ejecutar comandos, copiar resultados y elaborar un resumen.</p>
+        <div class="scenario-chain" role="img" aria-label="Un script consulta varios equipos y consolida sus resultados">
+          <div class="scenario-box"><strong>Inventario</strong><span>Lista de equipos</span></div><div class="scenario-arrow">→</div>
+          <div class="scenario-box"><strong>Automatización</strong><span>Consulta y procesa</span></div><div class="scenario-arrow">→</div>
+          <div class="scenario-box"><strong>Reporte</strong><span>Resultado verificable</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="activity">
+      <h3>Explora · ¿qué debería hacer el script?</h3>
+      <p class="activity-instruction">Selecciona las funciones que forman parte de una automatización profesional básica.</p>
+      <div class="prediction" id="caseOptions">
+        <label><input type="checkbox" value="input"> Leer una lista controlada de dispositivos y parámetros.</label>
+        <label><input type="checkbox" value="execute"> Ejecutar la consulta o comando correspondiente.</label>
+        <label><input type="checkbox" value="parse"> Interpretar resultado, timeout o error.</label>
+        <label><input type="checkbox" value="record"> Registrar qué ocurrió con cada equipo.</label>
+        <label><input type="checkbox" value="ignore"> Ignorar silenciosamente los fallos para que el reporte parezca completo.</label>
+      </div>
+      <div class="action-row"><button class="btn" id="checkCase" type="button">Comprobar</button><button class="btn light" id="resetCase" type="button">Reintentar</button></div>
+      <div class="feedback" id="caseFeedback" role="status" aria-live="polite">Una automatización útil debe producir resultados trazables, incluso cuando algo falla.</div>
+    </div>
+  </div>
+</section>
+<section id="subtemas">
+  <div class="band">
+    <div class="section-head"><div class="section-code">Recorrido</div><div><h2>Subtemas del Tema 1.3</h2><p class="lead">Avanzaremos desde scripts sencillos hasta flujos de operación y diagnóstico que integran ejecución remota, procesamiento y validación.</p></div></div>
+    <div class="subtopics">
+      <article class="subtopic-card"><div class="subtopic-top"><div class="badge">1.3.1</div><div><h3>Automatización mediante scripts</h3><p>Cómo transformar una tarea repetitiva en un programa organizado, parametrizable y reproducible.</p></div></div><div class="goal"><strong>Pregunta central:</strong> ¿qué estructura mínima debe tener un script para automatizar una tarea de red?</div><a class="btn" href="tema-1-3-1-automatizacion-mediante-scripts.html">Ir al subtema 1.3.1</a></article>
+      <article class="subtopic-card"><div class="subtopic-top"><div class="badge">1.3.2</div><div><h3>Ejecución y procesamiento de comandos de red</h3><p>Cómo ejecutar comandos desde Python y convertir su salida en información que el programa pueda evaluar.</p></div></div><div class="goal"><strong>Pregunta central:</strong> ¿cómo pasamos de ejecutar un comando a interpretar su resultado?</div><a class="btn" href="tema-1-3-2-ejecucion-procesamiento-comandos-red.html">Ir al subtema 1.3.2</a></article>
+      <article class="subtopic-card"><div class="subtopic-top"><div class="badge">1.3.3</div><div><h3>Acceso remoto programático mediante SSH</h3><p>Uso conceptual y práctico de sesiones SSH desde un programa para operar recursos remotos de forma controlada.</p></div></div><div class="goal"><strong>Pregunta central:</strong> ¿cómo puede un script ejecutar una tarea en un sistema remoto sin intervención manual?</div><a class="btn" href="tema-1-3-3-acceso-remoto-programatico-ssh.html">Ir al subtema 1.3.3</a></article>
+      <article class="subtopic-card"><div class="subtopic-top"><div class="badge">1.3.4</div><div><h3>Consulta y administración básica de dispositivos o servidores</h3><p>Aplicación de scripts y acceso remoto para obtener estado, información o realizar operaciones básicas controladas.</p></div></div><div class="goal"><strong>Pregunta central:</strong> ¿cómo organizar consultas sobre varios recursos sin perder control del proceso?</div><a class="btn" href="tema-1-3-4-consulta-administracion-dispositivos-servidores.html">Ir al subtema 1.3.4</a></article>
+      <article class="subtopic-card"><div class="subtopic-top"><div class="badge">1.3.5</div><div><h3>Automatización de tareas repetitivas de operación y diagnóstico</h3><p>Integración de los elementos anteriores para resolver un flujo operativo completo y generar evidencia de resultados.</p></div></div><div class="goal"><strong>Pregunta central:</strong> ¿cómo diseñamos una automatización que pueda ejecutarse, verificarse y repetirse con seguridad?</div><a class="btn" href="tema-1-3-5-automatizacion-tareas-operacion-diagnostico.html">Ir al subtema 1.3.5</a></article>
+    </div>
+    <div class="scope-note"><strong>Delimitación:</strong> esta página presenta la visión general del Tema 1.3. La programación detallada, ejercicios resueltos y actividades interactivas se desarrollarán dentro de cada subtema.</div>
+    <div class="bottom-nav"><a class="btn light" href="tema-1-2-programacion-sockets-tcp-udp.html">← Tema 1.2</a><a class="btn" href="tema-1-3-1-automatizacion-mediante-scripts.html">Comenzar 1.3.1 →</a></div>
+  </div>
+</section>
+<section id="reflexion">
+  <div class="band">
+    <div class="section-head"><div class="section-code">Reflexión</div><div><h2>¿Qué automatizarías primero en una red real?</h2><p class="lead">Elige una tarea que hayas visto en laboratorio o imagines en un NOC. Describe por qué es repetitiva, qué datos necesitaría el script y cómo comprobarías que el resultado es correcto.</p></div></div>
+    <div class="reflection-grid">
+      <div><h3>Piensa como operador y desarrollador</h3><p>No busques solamente ahorrar tiempo. Una automatización bien diseñada debe ser reproducible, registrar fallos y permitir verificar qué ocurrió.</p><p class="storage-note">Puedes guardar tu reflexión en este navegador. No se envía información a ningún servidor.</p></div>
+      <div><textarea id="reflectionText" aria-label="Reflexión del estudiante" placeholder="Ejemplo: automatizaría la verificación de conectividad de una lista de sitios porque..."></textarea><div class="action-row" style="margin-top:.7rem"><button class="btn" id="saveReflection" type="button">Guardar en este navegador</button><button class="btn light" id="clearReflection" type="button">Borrar</button></div><div class="feedback" id="reflectionFeedback" role="status" aria-live="polite">La reflexión todavía no se ha guardado.</div></div>
+    </div>
+    <div class="references"><h3>Referencias y alcance</h3><ul><li>Documentación oficial de Python para los módulos y bibliotecas que se utilicen en cada subtema.</li><li>Buenas prácticas de automatización: entradas controladas, manejo de errores, trazabilidad y verificación antes de aplicar cambios.</li><li>Los mecanismos concretos de SSH y administración se introducirán progresivamente, sin adelantar contenidos del Tema 1.4.</li></ul></div>
+  </div>
+</section>
+</main>
+<footer><div class="band"><span>Programación de Redes: Protocolos y APIs · Aula interactiva</span><span>Tema 1.3 · Automatización de tareas de red</span></div></footer>
+<script>
+(function(){
+  "use strict";
+  const $=id=>document.getElementById(id);
+  function selected(container){return Array.from($(container).querySelectorAll('input[type="checkbox"]:checked')).map(i=>i.value);}
+  function setFeedback(id,text,type){const el=$(id);el.classList.remove('success','warn');if(type)el.classList.add(type);el.textContent=text;}
+  $('checkPrediction').addEventListener('click',function(){const s=selected('automationPrediction');const good=['inventory','ping','logs'];const ok=good.every(v=>s.includes(v))&&!s.includes('critical');if(!s.length){setFeedback('predictionFeedback','Selecciona al menos una opción antes de comprobar.','warn');return;}if(ok){setFeedback('predictionFeedback','Correcto. Son tareas repetitivas, observables y con resultados verificables. Los cambios críticos sin validación requieren controles adicionales antes de automatizarse.','success');}else{setFeedback('predictionFeedback','Revisa la selección. Empieza por tareas repetitivas y verificables. Automatizar cambios críticos sin validación ni respaldo introduce un riesgo innecesario.','warn');}});
+  $('resetPrediction').addEventListener('click',function(){$('automationPrediction').querySelectorAll('input').forEach(i=>i.checked=false);setFeedback('predictionFeedback','Busca tareas repetitivas, observables y con resultados que puedan verificarse.','');});
+  $('checkCase').addEventListener('click',function(){const s=selected('caseOptions');const req=['input','execute','parse','record'];const ok=req.every(v=>s.includes(v))&&!s.includes('ignore');if(!s.length){setFeedback('caseFeedback','Selecciona al menos una opción.','warn');return;}if(ok){setFeedback('caseFeedback','Correcto. La automatización debe controlar entradas, ejecutar, interpretar resultados y registrar tanto éxitos como fallos.','success');}else{setFeedback('caseFeedback','Revisa el flujo. Un fallo también es información útil y debe registrarse; ignorarlo silenciosamente rompe la trazabilidad.','warn');}});
+  $('resetCase').addEventListener('click',function(){$('caseOptions').querySelectorAll('input').forEach(i=>i.checked=false);setFeedback('caseFeedback','Una automatización útil debe producir resultados trazables, incluso cuando algo falla.','');});
+  const key='programacion-redes-tema-1-3-reflexion';
+  try{const saved=localStorage.getItem(key);if(saved){$('reflectionText').value=saved;setFeedback('reflectionFeedback','Se recuperó la reflexión guardada previamente en este navegador.','success');}}catch(e){}
+  $('saveReflection').addEventListener('click',function(){try{localStorage.setItem(key,$('reflectionText').value);setFeedback('reflectionFeedback','Reflexión guardada únicamente en este navegador.','success');}catch(e){setFeedback('reflectionFeedback','El navegador no permitió guardar la reflexión localmente.','warn');}});
+  $('clearReflection').addEventListener('click',function(){$('reflectionText').value='';try{localStorage.removeItem(key);}catch(e){}setFeedback('reflectionFeedback','Reflexión borrada del almacenamiento local.','');});
+  const sections=[...document.querySelectorAll('main section')];
+  function updateNav(){const marker=window.scrollY+window.innerHeight*.35;let current=sections[0];sections.forEach(s=>{if(s.offsetTop<=marker)current=s;});document.querySelectorAll('nav a').forEach(a=>a.removeAttribute('aria-current'));if(current){const a=document.querySelector('nav a[href="#'+current.id+'"]');if(a)a.setAttribute('aria-current','location');}}
+  window.addEventListener('scroll',updateNav,{passive:true});window.addEventListener('resize',updateNav);updateNav();
+})();
+</script>
+</body></html>
