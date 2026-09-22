@@ -1,0 +1,1093 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Subtema 2.2.7: integración de APIs con aplicaciones de red.">
+<meta name="theme-color" content="#10212a">
+<title>2.2.7 | Integración de APIs con aplicaciones de red</title>
+<style>
+:root{
+  --ink:#18212a;--muted:#586775;--line:#cbd5dc;--soft:#f3f6f8;--paper:#fff;
+  --cyan:#007c91;--cyan-dark:#005b6a;--cyan-light:#6ed2e2;
+  --green:#16734a;--green-soft:#e8f5ee;--amber:#8a5600;--amber-soft:#fff3d8;
+  --red:#9b2c2c;--red-soft:#fdecec;--focus:#005fcc;
+  --navy:#10212a;--navy-deep:#07141a;--max:1180px;--radius:8px;
+  --shadow:0 16px 38px rgba(24,33,42,.08)
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;min-width:280px;color:var(--ink);background:var(--paper);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  line-height:1.55;overflow-x:hidden
+}
+button,input,select,textarea{font:inherit;max-width:100%}
+a{color:var(--cyan-dark)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:3px solid var(--focus);outline-offset:3px
+}
+.skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}
+.skip-link:focus{top:1rem}
+header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.header-inner{
+  width:min(100%,var(--max));min-height:66px;margin:0 auto;padding:.55rem 1.25rem;
+  display:flex;gap:1rem;align-items:center;min-width:0
+}
+.brand{min-width:190px}.brand strong{display:block;font-size:.95rem}.brand span{display:block;color:var(--muted);font-size:.78rem}
+.nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}
+nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+nav a{color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;border-bottom:2px solid transparent;font-size:.84rem}
+nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+.top-link{
+  flex:0 0 auto;text-decoration:none;border:1px solid var(--line);border-radius:5px;
+  padding:.48rem .72rem;color:var(--ink);font-weight:750;white-space:nowrap;background:#fff
+}
+main{overflow:hidden}
+section{scroll-margin-top:84px;border-bottom:1px solid var(--line)}
+.band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+.hero{min-height:calc(100svh - 66px);display:grid;align-items:center;background:var(--navy);color:#fff}
+.hero-grid{
+  width:min(100%,var(--max));margin:0 auto;padding:3.4rem 1.25rem;
+  display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:3rem;align-items:center
+}
+.hero-grid>*{min-width:0}
+.eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+h1{
+  font-size:clamp(2rem,5vw,4rem);line-height:1.02;margin:.65rem 0 1.15rem;
+  max-width:20ch;overflow-wrap:normal;word-break:normal;hyphens:none
+}
+h2{
+  font-size:clamp(1.75rem,3.3vw,2.8rem);line-height:1.12;margin:0 0 .8rem;
+  overflow-wrap:normal;word-break:normal;hyphens:none
+}
+h3{font-size:1.22rem;margin:0 0 .55rem}
+p{max-width:72ch}.hero p{color:#d7e5ea;font-size:1.08rem}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}.hero-actions{margin-top:1.45rem}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cyan-dark);
+  background:var(--cyan);color:#fff;text-decoration:none;padding:.72rem 1rem;border-radius:5px;font-weight:750
+}
+.btn:hover{background:var(--cyan-dark)}
+.btn.secondary{background:transparent;color:inherit;border-color:currentColor}
+.btn.secondary:hover{background:rgba(255,255,255,.1)}
+.btn.light{background:#fff;color:var(--ink);border-color:var(--line)}
+.btn.light:hover{background:var(--soft);color:var(--cyan-dark)}
+.hero-board{background:var(--navy-deep);border:1px solid #3b5965;border-radius:8px;padding:1.25rem}
+.integration-flow{display:grid;gap:.55rem;margin-top:1rem}
+.integration-step{
+  display:grid;grid-template-columns:42px minmax(0,1fr);gap:.7rem;align-items:start;
+  padding:.7rem;border:1px solid #3b5965;border-radius:6px;background:#0d2630
+}
+.integration-step b{
+  display:grid;place-items:center;width:42px;height:42px;border-radius:50%;
+  background:#153d4a;color:var(--cyan-light)
+}
+.integration-step small{display:block;color:#b8cbd2;margin-top:.15rem}
+.section-head{
+  display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem
+}
+.section-head>*{min-width:0}
+.section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}
+.lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+.outcomes{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line)
+}
+.outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}
+.outcome:last-child{border-right:0}
+.outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+.scope-note,.callout{margin-top:1.4rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}
+.concept-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+.concept-card{
+  min-width:0;border:1px solid var(--line);border-radius:var(--radius);
+  padding:1.15rem;background:#fff;box-shadow:var(--shadow)
+}
+.tag{
+  display:inline-block;font-size:.76rem;font-weight:850;color:var(--cyan-dark);
+  background:#d9eef2;padding:.2rem .45rem;border-radius:999px;margin-bottom:.55rem
+}
+.concept-card p{color:var(--muted);font-size:.94rem}
+.arch-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.8rem;margin-top:1rem}
+.arch-card{padding:1rem;border:1px solid var(--line);border-radius:6px;background:#fff;min-width:0}
+.arch-card b{display:block;color:var(--cyan-dark);margin-bottom:.3rem}
+.activity{
+  margin-top:1.5rem;padding:1.35rem;border:1px solid var(--line);
+  border-radius:var(--radius);background:var(--soft);min-width:0
+}
+.prediction{display:grid;gap:.6rem;margin:.85rem 0 1rem}
+.prediction label{display:block;padding:.75rem .8rem;background:#fff;border:1px solid var(--line);border-radius:5px}
+.feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}
+.feedback.success{background:var(--green-soft);border-color:var(--green)}
+.feedback.warn{background:var(--amber-soft);border-color:var(--amber)}
+.feedback.error{background:var(--red-soft);border-color:var(--red)}
+.lab-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:1rem}
+.lab-grid>*{min-width:0}
+.lab-panel{border:1px solid var(--line);border-radius:7px;background:#fff;padding:1rem}
+.lab-panel label{display:block;font-weight:750;margin:.75rem 0 .3rem}
+.lab-panel select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+.result-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-top:1rem}
+.result-card{padding:.8rem;border:1px solid var(--line);border-radius:6px;background:#fff;min-width:0}
+.result-card b{display:block;color:var(--cyan-dark);font-size:.78rem;text-transform:uppercase}
+.result-card span{display:block;margin-top:.25rem;overflow-wrap:anywhere}
+.terminal{
+  margin-top:1rem;background:#07141a;color:#dce9ed;border-radius:7px;padding:1rem;
+  border:1px solid #314b56;overflow-x:auto
+}
+.terminal pre{margin:0;white-space:pre-wrap;word-break:break-word}
+.code-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.code-card{min-width:0;background:#09161d;color:#dce9ed;border:1px solid #314b56;border-radius:7px;padding:1rem}
+.code-card h3{color:#fff}
+.code-block{overflow-x:auto;margin:.75rem 0;background:#061016;border:1px solid #253c47;border-radius:6px;padding:1rem}
+.code-block code{white-space:pre}
+.code-note{color:#bfd1d7}
+.exercise-box{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.exercise-head{padding:1rem 1.1rem;background:var(--navy);color:#fff}
+.exercise-head span{display:block;color:var(--cyan-light);font-size:.78rem;font-weight:850;text-transform:uppercase}
+.exercise-body{padding:1.1rem}
+.solution-steps{display:grid;gap:.75rem}
+.solution-step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:.8rem;align-items:start}
+.solution-step>b{
+  display:grid;place-items:center;width:34px;height:34px;border-radius:50%;
+  background:#d9eef2;color:var(--cyan-dark)
+}
+.practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+.practice-card{border:1px solid var(--line);border-radius:7px;padding:1rem;min-width:0}
+.practice-card select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.mini-feedback{margin-top:.75rem;padding:.75rem;border-left:4px solid var(--cyan);background:var(--soft);min-height:4rem}
+.case-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}
+.case-grid label{display:block;font-weight:750}
+.case-grid select{width:100%;margin-top:.3rem;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.quiz{display:grid;gap:1rem}
+.quiz-card{border:1px solid var(--line);border-radius:7px;padding:1rem}
+.quiz-card fieldset{border:0;padding:0;margin:0}
+.quiz-card legend{font-weight:800;margin-bottom:.7rem}
+.quiz-card label{display:block;padding:.5rem .55rem;border-radius:4px}
+.quiz-card label:hover{background:var(--soft)}
+.score{margin-top:1rem;padding:1rem;border:1px solid var(--line);border-radius:6px;background:var(--soft);font-weight:800}
+.reflection-box textarea{width:100%;min-height:145px;resize:vertical;padding:.8rem;border:1px solid var(--line);border-radius:6px}
+.references{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.ref-card{border-top:4px solid var(--cyan);padding:1rem;background:var(--soft)}
+.bottom-nav{margin-top:2rem;display:flex;justify-content:space-between;gap:.7rem;flex-wrap:wrap}
+footer{background:var(--navy-deep);color:#c7d8de}
+.footer-inner{
+  width:min(100%,var(--max));margin:0 auto;padding:1.4rem 1.25rem;
+  display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap
+}
+.progress-wrap{
+  position:fixed;right:1rem;bottom:1rem;z-index:20;background:rgba(7,20,26,.93);
+  color:#fff;padding:.45rem .7rem;border-radius:999px;font-size:.78rem;border:1px solid #3b5965
+}
+@media(max-width:1050px){.arch-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:900px){
+  .hero-grid,.section-head,.lab-grid,.code-grid{grid-template-columns:1fr}
+  .concept-grid,.outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .outcome:nth-child(2){border-right:0}
+  .outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .practice-grid,.case-grid{grid-template-columns:1fr}
+}
+@media(max-width:650px){.result-grid,.references,.arch-grid{grid-template-columns:1fr}}
+@media(max-width:600px){
+  .header-inner{padding-inline:.8rem}.brand{min-width:145px}.top-link{padding:.45rem .6rem}
+  .band,.hero-grid{padding-left:.9rem;padding-right:.9rem}
+  h1{font-size:clamp(2rem,10vw,2.72rem);max-width:none}
+  .concept-grid,.outcomes{grid-template-columns:1fr}
+  .outcome{border-right:0;border-bottom:1px solid var(--line)}
+  .outcome:last-child{border-bottom:0}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+<header>
+<div class="header-inner">
+  <div class="brand"><strong>Programación de Redes</strong><span>Protocolos y APIs</span></div>
+  <div class="nav-scroll" aria-label="Navegación del subtema">
+    <nav>
+      <a href="#inicio">Inicio</a>
+      <a href="#orientacion">Cómo trabajar</a>
+      <a href="#conceptos">Conceptos</a>
+      <a href="#predice">Predice</a>
+      <a href="#experimenta">Experimenta</a>
+      <a href="#codigo">Código</a>
+      <a href="#resuelto">Ejercicio resuelto</a>
+      <a href="#practica">Practica</a>
+      <a href="#caso">Caso profesional</a>
+      <a href="#comprueba">Comprueba</a>
+      <a href="#reflexiona">Reflexión</a>
+    </nav>
+  </div>
+  <a class="top-link" href="index.html">← Curso</a>
+</div>
+</header>
+
+<main id="contenido">
+
+<section class="hero" id="inicio">
+<div class="hero-grid">
+  <div>
+    <div class="eyebrow">Bloque 2 · Tema 2.2 · Subtema 2.2.7</div>
+    <h1>Integración de APIs con aplicaciones de red</h1>
+    <p>Integra datos de servicios externos con información de red para construir herramientas de monitoreo, inventario, diagnóstico y automatización más útiles y resistentes a fallos.</p>
+
+    <div class="hero-actions">
+      <a class="btn" href="#orientacion">Comenzar recorrido</a>
+      <a class="btn secondary" href="tema-2-2-consumo-apis-servicios-web.html">Volver al Tema 2.2</a>
+    </div>
+  </div>
+
+  <div class="hero-board" role="img" aria-label="Flujo de integración de una API con una aplicación de red">
+    <h3>Integrar significa conectar piezas</h3>
+    <div class="integration-flow">
+      <div class="integration-step"><b>1</b><div><strong>Evento local</strong><small>alarma · equipo · IP · interfaz · métrica</small></div></div>
+      <div class="integration-step"><b>2</b><div><strong>Consulta API</strong><small>endpoint · autenticación · timeout</small></div></div>
+      <div class="integration-step"><b>3</b><div><strong>Validación</strong><small>status code · JSON · campos requeridos</small></div></div>
+      <div class="integration-step"><b>4</b><div><strong>Combinación</strong><small>datos locales + datos externos</small></div></div>
+      <div class="integration-step"><b>5</b><div><strong>Resultado útil</strong><small>dashboard · reporte · alerta enriquecida · acción</small></div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="orientacion">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Cómo trabajar este tema</div>
+    <div>
+      <h2>La API es una fuente, no toda la aplicación</h2>
+      <p class="lead">Una integración profesional debe separar lógica local, acceso al servicio externo, validación y presentación del resultado.</p>
+    </div>
+  </div>
+
+  <div class="outcomes">
+    <div class="outcome"><b>1. Diseñar</b> un flujo de integración entre una aplicación de red y una API.</div>
+    <div class="outcome"><b>2. Combinar</b> datos locales con información obtenida externamente.</div>
+    <div class="outcome"><b>3. Aislar</b> el acceso HTTP para facilitar mantenimiento y pruebas.</div>
+    <div class="outcome"><b>4. Mantener</b> funcionalidad básica cuando la API externa falla.</div>
+  </div>
+
+  <div class="scope-note">
+    <strong>Objetivo integrador.</strong> Este subtema reúne los aprendizajes de 2.2.1–2.2.6 en una arquitectura sencilla y aplicable a Telecomunicaciones.
+  </div>
+</div>
+</section>
+
+<section id="conceptos">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Explora</div>
+    <div>
+      <h2>Separar responsabilidades mejora la aplicación</h2>
+      <p class="lead">No conviene mezclar consulta HTTP, lógica de negocio, presentación y credenciales en una única función.</p>
+    </div>
+  </div>
+
+  <div class="concept-grid">
+    <article class="concept-card">
+      <span class="tag">Entrada</span>
+      <h3>Dato de red</h3>
+      <p>Puede ser una alarma, IP, nombre de equipo, interfaz o métrica obtenida localmente.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">Cliente API</span>
+      <h3>Acceso externo</h3>
+      <p>Encapsula URL, headers, timeout, autenticación y tratamiento básico de errores.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">Lógica</span>
+      <h3>Integración</h3>
+      <p>Combina datos de distintas fuentes y decide qué información es útil para la operación.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">Salida</span>
+      <h3>Resultado</h3>
+      <p>Puede alimentar un dashboard, reporte, alerta, ticket o proceso automatizado.</p>
+    </article>
+  </div>
+
+  <div class="arch-grid">
+    <article class="arch-card"><b>1. Entrada</b><span>Alarma: equipo 452</span></article>
+    <article class="arch-card"><b>2. API</b><span>Consultar inventario</span></article>
+    <article class="arch-card"><b>3. Validar</b><span>JSON + campos</span></article>
+    <article class="arch-card"><b>4. Combinar</b><span>alarma + sitio + responsable</span></article>
+    <article class="arch-card"><b>5. Mostrar</b><span>alerta enriquecida</span></article>
+  </div>
+
+  <div class="callout">
+    <strong>Diseño defensivo:</strong> si el dato externo es complementario, su ausencia no debería destruir el flujo principal. Debe quedar claro cuándo un dato está disponible, desactualizado o no pudo obtenerse.
+  </div>
+</div>
+</section>
+
+<section id="predice">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Predice</div>
+    <div>
+      <h2>¿Qué debería ocurrir si falla el inventario?</h2>
+      <p class="lead">El NOC recibe una alarma real, pero la API de inventario no responde.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="prediction">
+      <label><input type="radio" name="prediction" value="a"> Mostrar la alarma y marcar los datos de inventario como no disponibles.</label>
+      <label><input type="radio" name="prediction" value="b"> Ocultar también la alarma porque falta información secundaria.</label>
+      <label><input type="radio" name="prediction" value="c"> Inventar sitio y responsable para completar la pantalla.</label>
+    </div>
+
+    <div class="action-row">
+      <button class="btn" id="checkPrediction" type="button">Comprobar</button>
+      <button class="btn light" id="resetPrediction" type="button">Reintentar</button>
+    </div>
+
+    <div class="feedback" id="predictionFeedback" aria-live="polite">
+      La alarma es el dato principal; el inventario es información complementaria.
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="experimenta">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Experimenta</div>
+    <div>
+      <h2>Construye una integración</h2>
+      <p class="lead">Selecciona una necesidad operativa y observa qué fuentes y salida se combinan.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="lab-grid">
+      <div class="lab-panel">
+        <label for="integrationScenario">Escenario</label>
+        <select id="integrationScenario">
+          <option value="alarm">Enriquecer una alarma con inventario</option>
+          <option value="geo">Agregar ubicación a equipos</option>
+          <option value="ticket">Crear contexto para un ticket</option>
+          <option value="metrics">Combinar métricas locales y cloud</option>
+        </select>
+
+        <label for="failureMode">Si la API falla</label>
+        <select id="failureMode">
+          <option value="degrade">Continuar con datos disponibles</option>
+          <option value="stop">Detener toda la aplicación</option>
+          <option value="invent">Inventar valores</option>
+        </select>
+
+        <button class="btn" id="evaluateIntegration" type="button" style="margin-top:1rem">
+          Evaluar integración
+        </button>
+
+        <div class="feedback" id="integrationFeedback" aria-live="polite">
+          Selecciona escenario y estrategia.
+        </div>
+      </div>
+
+      <div class="lab-panel">
+        <h3>Arquitectura resultante</h3>
+
+        <div class="result-grid">
+          <div class="result-card"><b>Dato local</b><span id="outLocal">Alarma equipo 452</span></div>
+          <div class="result-card"><b>Dato API</b><span id="outApi">sitio + responsable</span></div>
+          <div class="result-card"><b>Salida</b><span id="outOutput">alarma enriquecida</span></div>
+        </div>
+
+        <div class="terminal">
+          <pre id="integrationPreview">Entrada local:
+  equipo_id = 452
+  alarma = "interfaz down"
+
+API:
+  GET /v1/equipos/452
+
+Resultado:
+  alarma + sitio + responsable</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="codigo">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Explica</div>
+    <div>
+      <h2>Separar el cliente API de la lógica principal</h2>
+      <p class="lead">Una función especializada simplifica mantenimiento, pruebas y manejo de errores.</p>
+    </div>
+  </div>
+
+  <div class="code-grid">
+    <article class="code-card">
+      <h3>Cliente de inventario</h3>
+      <div class="code-block"><code>import os
+import requests
+
+def obtener_equipo(equipo_id):
+    token = os.environ["API_TOKEN"]
+
+    url = (
+        "https://api.example"
+        f"/v1/equipos/{equipo_id}"
+    )
+
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/json"
+    }
+
+    try:
+        r = requests.get(
+            url,
+            headers=headers,
+            timeout=5
+        )
+        r.raise_for_status()
+
+        datos = r.json()
+
+        if not isinstance(datos, dict):
+            return None
+
+        return datos
+
+    except requests.RequestException:
+        return None</code></div>
+      <p class="code-note">El acceso HTTP queda concentrado en una función.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Lógica de integración</h3>
+      <div class="code-block"><code>alarma = {
+    "equipo_id": 452,
+    "evento": "interfaz down"
+}
+
+equipo = obtener_equipo(
+    alarma["equipo_id"]
+)
+
+resultado = {
+    "evento": alarma["evento"],
+    "equipo_id": alarma["equipo_id"]
+}
+
+if equipo:
+    resultado["sitio"] = equipo.get("sitio")
+    resultado["responsable"] = equipo.get(
+        "responsable"
+    )
+else:
+    resultado["inventario"] = (
+        "no disponible"
+    )
+
+print(resultado)</code></div>
+      <p class="code-note">La alarma se conserva aunque la fuente complementaria falle.</p>
+    </article>
+  </div>
+
+  <div class="callout">
+    <strong>No mezcles secretos con resultados.</strong> Tokens y API keys no deben formar parte de diccionarios de salida, reportes ni objetos que luego puedan registrarse.
+  </div>
+</div>
+</section>
+
+<section id="resuelto">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Ejercicio resuelto</div>
+    <div>
+      <h2>Enriquecer una alarma con inventario</h2>
+      <p class="lead">Una alarma local contiene el identificador del equipo. La API corporativa aporta sitio y responsable.</p>
+    </div>
+  </div>
+
+  <div class="exercise-box">
+    <div class="exercise-head">
+      <span>Problema</span>
+      <h3>Integrar dos fuentes sin crear una dependencia frágil</h3>
+    </div>
+
+    <div class="exercise-body">
+      <div class="solution-steps">
+        <div class="solution-step"><b>1</b><div><strong>Entrada.</strong><br>Recibir la alarma y extraer <code>equipo_id</code>.</div></div>
+        <div class="solution-step"><b>2</b><div><strong>Consulta.</strong><br>Solicitar el recurso correspondiente en la API de inventario.</div></div>
+        <div class="solution-step"><b>3</b><div><strong>Validación.</strong><br>Comprobar HTTP, JSON y campos relevantes.</div></div>
+        <div class="solution-step"><b>4</b><div><strong>Combinación.</strong><br>Agregar sitio y responsable a la alarma.</div></div>
+        <div class="solution-step"><b>5</b><div><strong>Degradación.</strong><br>Si la API falla, conservar la alarma y marcar inventario como no disponible.</div></div>
+      </div>
+
+      <div class="callout">
+        <strong>Resultado profesional:</strong> la API agrega valor, pero no se convierte en un punto único de fallo para una función principal del NOC.
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="practica">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Practica</div>
+    <div>
+      <h2>Decide cómo integrar</h2>
+      <p class="lead">Selecciona la opción más coherente para cada situación.</p>
+    </div>
+  </div>
+
+  <div class="practice-grid">
+    <article class="practice-card">
+      <h3>Ejercicio 1</h3>
+      <p>La API aporta datos complementarios de inventario.</p>
+      <select id="p1">
+        <option value="">Selecciona…</option>
+        <option value="a">Mantener el flujo principal si la API falla</option>
+        <option value="b">Cerrar toda la aplicación ante cualquier fallo</option>
+        <option value="c">Inventar los campos faltantes</option>
+      </select>
+      <button class="btn" id="checkP1" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p1Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 2</h3>
+      <p>Quieres facilitar mantenimiento del código.</p>
+      <select id="p2">
+        <option value="">Selecciona…</option>
+        <option value="a">Encapsular acceso a la API en funciones o módulos</option>
+        <option value="b">Repetir requests.get en cada parte del programa</option>
+        <option value="c">Copiar tokens por todas las funciones</option>
+      </select>
+      <button class="btn" id="checkP2" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p2Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 3</h3>
+      <p>La API devuelve JSON válido pero sin el campo <code>sitio</code>.</p>
+      <select id="p3">
+        <option value="">Selecciona…</option>
+        <option value="a">Tratar sitio como ausente y continuar según el diseño</option>
+        <option value="b">Inventar un sitio cualquiera</option>
+        <option value="c">Asumir que JSON válido siempre tiene todos los campos</option>
+      </select>
+      <button class="btn" id="checkP3" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p3Feedback">Selecciona una respuesta.</div>
+    </article>
+  </div>
+</div>
+</section>
+
+<section id="caso">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Caso profesional</div>
+    <div>
+      <h2>Herramienta de diagnóstico para el NOC</h2>
+      <p class="lead">El operador introduce un ID de equipo. La aplicación consulta inventario, estado operativo y métricas para construir una vista de diagnóstico.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="case-grid">
+      <label>Arquitectura
+        <select id="caseArchitecture">
+          <option value="">Selecciona…</option>
+          <option value="separate">Separar clientes API y lógica de presentación</option>
+          <option value="mix">Mezclar todo en una única función extensa</option>
+        </select>
+      </label>
+
+      <label>Fallos parciales
+        <select id="casePartial">
+          <option value="">Selecciona…</option>
+          <option value="partial">Mostrar datos disponibles e indicar faltantes</option>
+          <option value="invent">Inventar datos que no llegaron</option>
+        </select>
+      </label>
+
+      <label>Credenciales
+        <select id="caseCredentials">
+          <option value="">Selecciona…</option>
+          <option value="safe">Mantenerlas fuera de la salida y los logs</option>
+          <option value="log">Imprimirlas para depuración</option>
+        </select>
+      </label>
+    </div>
+
+    <button class="btn" id="checkCase" type="button" style="margin-top:1rem">
+      Evaluar arquitectura
+    </button>
+
+    <div class="feedback" id="caseFeedback" aria-live="polite">
+      Una buena integración separa responsabilidades y tolera fallos parciales.
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="comprueba">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Comprueba</div>
+    <div>
+      <h2>Integra todo el Tema 2.2</h2>
+      <p class="lead">Responde las cinco preguntas finales.</p>
+    </div>
+  </div>
+
+  <div class="quiz" id="quiz">
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>1. ¿Por qué conviene encapsular el acceso a una API?</legend>
+        <label><input type="radio" name="q1" value="a"> Para separar responsabilidades y facilitar mantenimiento.</label>
+        <label><input type="radio" name="q1" value="b"> Para evitar usar HTTP.</label>
+        <label><input type="radio" name="q1" value="c"> Para convertir JSON en señal RF.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q1Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>2. ¿Qué hacer si falla una API que aporta datos secundarios?</legend>
+        <label><input type="radio" name="q2" value="a"> Mantener la función principal y marcar los datos secundarios como no disponibles.</label>
+        <label><input type="radio" name="q2" value="b"> Inventar los datos.</label>
+        <label><input type="radio" name="q2" value="c"> Ocultar siempre el evento principal.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q2Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>3. ¿Qué debe validarse antes de integrar una respuesta?</legend>
+        <label><input type="radio" name="q3" value="a"> Estado HTTP, JSON y campos necesarios.</label>
+        <label><input type="radio" name="q3" value="b"> Solo el nombre del archivo Python.</label>
+        <label><input type="radio" name="q3" value="c"> Únicamente el puerto local del PC.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q3Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>4. ¿Qué debe ocurrir con tokens y API keys en la salida?</legend>
+        <label><input type="radio" name="q4" value="a"> Deben mantenerse fuera de resultados y logs.</label>
+        <label><input type="radio" name="q4" value="b"> Deben mostrarse completos.</label>
+        <label><input type="radio" name="q4" value="c"> Deben convertirse en query parameters públicos.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q4Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>5. ¿Qué integra el Tema 2.2?</legend>
+        <label><input type="radio" name="q5" value="a"> Endpoints, solicitudes, parámetros, JSON, autenticación, errores e integración.</label>
+        <label><input type="radio" name="q5" value="b"> Solo códigos HTTP.</label>
+        <label><input type="radio" name="q5" value="c"> Únicamente sockets UDP.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q5Feedback">Selecciona una respuesta.</div>
+    </article>
+
+  </div>
+
+  <div class="action-row" style="margin-top:1rem">
+    <button class="btn" id="checkQuiz" type="button">Comprobar todo</button>
+    <button class="btn light" id="resetQuiz" type="button">Reintentar</button>
+  </div>
+
+  <div class="score" id="scoreBox" aria-live="polite">
+    Aún no has comprobado la actividad.
+  </div>
+</div>
+</section>
+
+<section id="reflexiona">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Reflexión</div>
+    <div>
+      <h2>Diseña una integración útil para Telecomunicaciones</h2>
+      <p class="lead">Propón una aplicación que combine información local de red con una API externa. Indica qué datos usa, cómo los valida y qué ocurre si la API falla.</p>
+    </div>
+  </div>
+
+  <div class="reflection-box">
+    <textarea id="reflectionText" aria-label="Reflexión del estudiante" placeholder="Ejemplo: una alarma local usa equipo_id para consultar inventario; valido HTTP y JSON, agrego sitio y responsable y, si la API falla, mantengo la alarma indicando inventario no disponible..."></textarea>
+
+    <div class="action-row">
+      <button class="btn" id="saveReflection" type="button">Guardar en este navegador</button>
+      <button class="btn light" id="clearReflection" type="button">Borrar</button>
+    </div>
+
+    <p id="reflectionStatus" aria-live="polite">
+      El texto no se transmite; si lo guardas, permanece únicamente en el almacenamiento local de este navegador.
+    </p>
+  </div>
+
+  <div class="references" style="margin-top:2rem">
+    <article class="ref-card">
+      <h3>Ideas clave</h3>
+      <p>Una integración sólida separa acceso HTTP, validación, lógica de negocio y presentación, y tolera fallos parciales sin inventar datos.</p>
+    </article>
+
+    <article class="ref-card">
+      <h3>Cierre del Tema 2.2</h3>
+      <p>Con este subtema se integran endpoints, solicitudes, transporte de datos, JSON, autenticación, errores y uso profesional de APIs en aplicaciones de red.</p>
+    </article>
+  </div>
+
+  <div class="bottom-nav">
+    <a class="btn light" href="tema-2-2-6-manejo-errores-servicios-externos.html">← 2.2.6 Manejo de errores</a>
+    <a class="btn light" href="tema-2-2-consumo-apis-servicios-web.html">Volver al Tema 2.2</a>
+  </div>
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="footer-inner">
+  <div>
+    <strong>Programación de Redes: Protocolos y APIs</strong><br>
+    <span>Subtema 2.2.7 · Integración de APIs con aplicaciones de red</span>
+  </div>
+  <div>Material interactivo · uso local</div>
+</div>
+</footer>
+
+<div class="progress-wrap" aria-hidden="true">
+  Recorrido <b id="progressValue">0%</b>
+</div>
+
+<script>
+(() => {
+"use strict";
+
+const $=id=>document.getElementById(id);
+
+const setFeedback=(el,text,type="")=>{
+  el.textContent=text;
+  el.className="feedback"+(type?" "+type:"");
+};
+
+const setMini=(el,text,ok=null)=>{
+  el.textContent=text;
+  el.style.borderLeftColor=
+    ok===true?"var(--green)":ok===false?"var(--red)":"var(--cyan)";
+  el.style.background=
+    ok===true?"var(--green-soft)":ok===false?"var(--red-soft)":"var(--soft)";
+};
+
+$("checkPrediction").addEventListener("click",()=>{
+  const s=document.querySelector('input[name="prediction"]:checked');
+
+  if(!s){
+    return setFeedback(
+      $("predictionFeedback"),
+      "Selecciona primero una opción.",
+      "warn"
+    );
+  }
+
+  if(s.value==="a"){
+    setFeedback(
+      $("predictionFeedback"),
+      "Correcto. La alarma debe conservarse y la ausencia del inventario debe mostrarse explícitamente.",
+      "success"
+    );
+  }else{
+    setFeedback(
+      $("predictionFeedback"),
+      "Revisa la prioridad de la información: no ocultes un evento real ni inventes datos secundarios.",
+      "error"
+    );
+  }
+});
+
+$("resetPrediction").addEventListener("click",()=>{
+  document.querySelectorAll('input[name="prediction"]').forEach(r=>r.checked=false);
+
+  setFeedback(
+    $("predictionFeedback"),
+    "La alarma es el dato principal; el inventario es información complementaria."
+  );
+});
+
+const scenarios={
+  alarm:{
+    local:"Alarma equipo 452",
+    api:"sitio + responsable",
+    output:"alarma enriquecida",
+    preview:
+`Entrada local:
+  equipo_id = 452
+  alarma = "interfaz down"
+
+API:
+  GET /v1/equipos/452
+
+Resultado:
+  alarma + sitio + responsable`
+  },
+  geo:{
+    local:"Lista de equipos",
+    api:"latitud + longitud",
+    output:"mapa de equipos",
+    preview:
+`Entrada local:
+  equipos = [452, 731, 812]
+
+API:
+  consultar ubicación por recurso
+
+Resultado:
+  inventario + coordenadas`
+  },
+  ticket:{
+    local:"Evento de red",
+    api:"inventario + responsable",
+    output:"contexto para ticket",
+    preview:
+`Entrada local:
+  evento = "latencia alta"
+
+APIs:
+  inventario + responsable
+
+Resultado:
+  ticket con contexto técnico`
+  },
+  metrics:{
+    local:"latencia local",
+    api:"métricas cloud",
+    output:"vista combinada",
+    preview:
+`Entrada local:
+  latencia_ms = 28
+
+API:
+  métricas cloud
+
+Resultado:
+  diagnóstico combinado`
+  }
+};
+
+$("evaluateIntegration").addEventListener("click",()=>{
+  const data=scenarios[$("integrationScenario").value];
+  const failure=$("failureMode").value;
+
+  $("outLocal").textContent=data.local;
+  $("outApi").textContent=data.api;
+  $("outOutput").textContent=data.output;
+  $("integrationPreview").textContent=data.preview;
+
+  const ok=failure==="degrade";
+
+  setFeedback(
+    $("integrationFeedback"),
+    ok
+      ? "Diseño coherente. La integración aprovecha la API sin convertirla en una dependencia absoluta."
+      : "Revisa la tolerancia a fallos: no detengas todo por datos secundarios ni inventes resultados.",
+    ok?"success":"error"
+  );
+});
+
+const practices=[
+  {
+    s:"p1",b:"checkP1",f:"p1Feedback",a:"a",
+    ok:"Correcto. Si los datos son complementarios, la función principal puede continuar.",
+    bad:"Una dependencia secundaria no debería derribar toda la aplicación si el diseño puede degradarse."
+  },
+  {
+    s:"p2",b:"checkP2",f:"p2Feedback",a:"a",
+    ok:"Correcto. Encapsular el acceso a la API facilita mantenimiento y pruebas.",
+    bad:"Duplicar llamadas y secretos en muchos puntos vuelve frágil el código."
+  },
+  {
+    s:"p3",b:"checkP3",f:"p3Feedback",a:"a",
+    ok:"Correcto. JSON válido no garantiza que el campo exista; debes tratar su ausencia explícitamente.",
+    bad:"Nunca inventes datos para ocultar una respuesta incompleta."
+  }
+];
+
+practices.forEach(p=>{
+  $(p.b).addEventListener("click",()=>{
+    const v=$(p.s).value;
+
+    if(!v){
+      return setMini(
+        $(p.f),
+        "Selecciona primero una respuesta."
+      );
+    }
+
+    setMini(
+      $(p.f),
+      v===p.a?p.ok:p.bad,
+      v===p.a
+    );
+  });
+});
+
+$("checkCase").addEventListener("click",()=>{
+  const ok=
+    $("caseArchitecture").value==="separate" &&
+    $("casePartial").value==="partial" &&
+    $("caseCredentials").value==="safe";
+
+  setFeedback(
+    $("caseFeedback"),
+    ok
+      ? "Arquitectura coherente. Separa responsabilidades, tolera fallos parciales y protege credenciales."
+      : "Revisa separación de responsabilidades, fallos parciales y tratamiento de credenciales.",
+    ok?"success":"error"
+  );
+});
+
+const answers={
+  q1:"a",
+  q2:"a",
+  q3:"a",
+  q4:"a",
+  q5:"a"
+};
+
+const explanations={
+  q1:"Encapsular el acceso HTTP facilita mantenimiento, pruebas y control de errores.",
+  q2:"Una fuente secundaria puede fallar sin invalidar necesariamente la función principal.",
+  q3:"Antes de integrar una respuesta debes validar HTTP, JSON y campos necesarios.",
+  q4:"Tokens y API keys no deben aparecer en resultados ni logs.",
+  q5:"El Tema 2.2 integra todo el ciclo de consumo de APIs."
+};
+
+$("checkQuiz").addEventListener("click",()=>{
+  let score=0;
+
+  Object.keys(answers).forEach(q=>{
+    const s=document.querySelector(`input[name="${q}"]:checked`);
+    const ok=s&&s.value===answers[q];
+
+    if(ok){
+      score++;
+    }
+
+    setMini(
+      $(`${q}Feedback`),
+      s
+        ? ((ok?"Correcto. ":"Revisa. ")+explanations[q])
+        : "Falta responder esta pregunta.",
+      ok
+    );
+  });
+
+  $("scoreBox").textContent=
+    `Resultado: ${score}/5. ${
+      score===5
+        ? "Integración sólida de los aprendizajes del Tema 2.2."
+        : "Revisa las explicaciones y vuelve a intentarlo."
+    }`;
+});
+
+$("resetQuiz").addEventListener("click",()=>{
+  document.querySelectorAll('#quiz input[type="radio"]').forEach(r=>r.checked=false);
+
+  Object.keys(answers).forEach(q=>{
+    setMini(
+      $(`${q}Feedback`),
+      "Selecciona una respuesta."
+    );
+  });
+
+  $("scoreBox").textContent=
+    "Aún no has comprobado la actividad.";
+});
+
+const key="pr-redes-2-2-7-reflexion";
+
+try{
+  const saved=localStorage.getItem(key);
+  if(saved){
+    $("reflectionText").value=saved;
+  }
+}catch(_){}
+
+$("saveReflection").addEventListener("click",()=>{
+  try{
+    localStorage.setItem(
+      key,
+      $("reflectionText").value
+    );
+
+    $("reflectionStatus").textContent=
+      "Reflexión guardada únicamente en este navegador.";
+  }catch(_){
+    $("reflectionStatus").textContent=
+      "Este navegador no permitió guardar la reflexión localmente.";
+  }
+});
+
+$("clearReflection").addEventListener("click",()=>{
+  $("reflectionText").value="";
+
+  try{
+    localStorage.removeItem(key);
+  }catch(_){}
+
+  $("reflectionStatus").textContent=
+    "Reflexión borrada del almacenamiento local.";
+});
+
+const sections=[...document.querySelectorAll("main section")];
+
+function updateProgress(){
+  const total=document.documentElement.scrollHeight-window.innerHeight;
+  const pct=
+    total>0
+      ? Math.max(0,Math.min(100,Math.round((window.scrollY/total)*100)))
+      : 100;
+
+  $("progressValue").textContent=pct+"%";
+
+  const marker=window.scrollY+window.innerHeight*.36;
+  let current=sections[0];
+
+  sections.forEach(s=>{
+    if(s.offsetTop<=marker){
+      current=s;
+    }
+  });
+
+  document.querySelectorAll("nav a").forEach(
+    a=>a.removeAttribute("aria-current")
+  );
+
+  if(current&&current.id){
+    const link=document.querySelector(`nav a[href="#${current.id}"]`);
+
+    if(link){
+      link.setAttribute("aria-current","location");
+    }
+  }
+}
+
+window.addEventListener("scroll",updateProgress,{passive:true});
+window.addEventListener("resize",updateProgress);
+updateProgress();
+})();
+</script>
+</body>
+</html>

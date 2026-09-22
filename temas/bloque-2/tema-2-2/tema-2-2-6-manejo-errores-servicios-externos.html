@@ -1,0 +1,1153 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Subtema 2.2.6: manejo de errores y respuestas de servicios externos.">
+<meta name="theme-color" content="#10212a">
+<title>2.2.6 | Manejo de errores y respuestas de servicios externos</title>
+<style>
+:root{
+  --ink:#18212a;--muted:#586775;--line:#cbd5dc;--soft:#f3f6f8;--paper:#fff;
+  --cyan:#007c91;--cyan-dark:#005b6a;--cyan-light:#6ed2e2;
+  --green:#16734a;--green-soft:#e8f5ee;--amber:#8a5600;--amber-soft:#fff3d8;
+  --red:#9b2c2c;--red-soft:#fdecec;--focus:#005fcc;
+  --navy:#10212a;--navy-deep:#07141a;--max:1180px;--radius:8px;
+  --shadow:0 16px 38px rgba(24,33,42,.08)
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;min-width:280px;color:var(--ink);background:var(--paper);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  line-height:1.55;overflow-x:hidden
+}
+button,input,select,textarea{font:inherit;max-width:100%}
+a{color:var(--cyan-dark)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:3px solid var(--focus);outline-offset:3px
+}
+.skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}
+.skip-link:focus{top:1rem}
+header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.header-inner{
+  width:min(100%,var(--max));min-height:66px;margin:0 auto;padding:.55rem 1.25rem;
+  display:flex;gap:1rem;align-items:center;min-width:0
+}
+.brand{min-width:190px}.brand strong{display:block;font-size:.95rem}.brand span{display:block;color:var(--muted);font-size:.78rem}
+.nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}
+nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+nav a{color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;border-bottom:2px solid transparent;font-size:.84rem}
+nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+.top-link{
+  flex:0 0 auto;text-decoration:none;border:1px solid var(--line);border-radius:5px;
+  padding:.48rem .72rem;color:var(--ink);font-weight:750;white-space:nowrap;background:#fff
+}
+main{overflow:hidden}
+section{scroll-margin-top:84px;border-bottom:1px solid var(--line)}
+.band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+.hero{min-height:calc(100svh - 66px);display:grid;align-items:center;background:var(--navy);color:#fff}
+.hero-grid{
+  width:min(100%,var(--max));margin:0 auto;padding:3.4rem 1.25rem;
+  display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:3rem;align-items:center
+}
+.hero-grid>*{min-width:0}
+.eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+h1{
+  font-size:clamp(2rem,5vw,4rem);line-height:1.02;margin:.65rem 0 1.15rem;
+  max-width:20ch;overflow-wrap:normal;word-break:normal;hyphens:none
+}
+h2{
+  font-size:clamp(1.75rem,3.3vw,2.8rem);line-height:1.12;margin:0 0 .8rem;
+  overflow-wrap:normal;word-break:normal;hyphens:none
+}
+h3{font-size:1.22rem;margin:0 0 .55rem}
+p{max-width:72ch}.hero p{color:#d7e5ea;font-size:1.08rem}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}
+.hero-actions{margin-top:1.45rem}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cyan-dark);
+  background:var(--cyan);color:#fff;text-decoration:none;padding:.72rem 1rem;border-radius:5px;font-weight:750
+}
+.btn:hover{background:var(--cyan-dark)}
+.btn.secondary{background:transparent;color:inherit;border-color:currentColor}
+.btn.secondary:hover{background:rgba(255,255,255,.1)}
+.btn.light{background:#fff;color:var(--ink);border-color:var(--line)}
+.btn.light:hover{background:var(--soft);color:var(--cyan-dark)}
+.hero-board{background:var(--navy-deep);border:1px solid #3b5965;border-radius:8px;padding:1.25rem}
+.error-flow{display:grid;gap:.55rem;margin-top:1rem}
+.error-step{
+  display:grid;grid-template-columns:84px minmax(0,1fr);gap:.7rem;align-items:start;
+  padding:.7rem;border:1px solid #3b5965;border-radius:6px;background:#0d2630
+}
+.error-step b{color:var(--cyan-light)}
+.error-step small{display:block;color:#b8cbd2;margin-top:.15rem}
+.section-head{
+  display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem
+}
+.section-head>*{min-width:0}
+.section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}
+.lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+.outcomes{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line)
+}
+.outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}
+.outcome:last-child{border-right:0}
+.outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+.scope-note,.callout{margin-top:1.4rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}
+.concept-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+.concept-card{
+  min-width:0;border:1px solid var(--line);border-radius:var(--radius);
+  padding:1.15rem;background:#fff;box-shadow:var(--shadow)
+}
+.tag{
+  display:inline-block;font-size:.76rem;font-weight:850;color:var(--cyan-dark);
+  background:#d9eef2;padding:.2rem .45rem;border-radius:999px;margin-bottom:.55rem
+}
+.concept-card p{color:var(--muted);font-size:.94rem}
+.table-wrap{overflow-x:auto;margin-top:1.2rem;border:1px solid var(--line);border-radius:7px}
+table{border-collapse:collapse;width:100%;min-width:920px}
+th,td{padding:.8rem;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--soft)}
+.activity{
+  margin-top:1.5rem;padding:1.35rem;border:1px solid var(--line);
+  border-radius:var(--radius);background:var(--soft);min-width:0
+}
+.prediction{display:grid;gap:.6rem;margin:.85rem 0 1rem}
+.prediction label{display:block;padding:.75rem .8rem;background:#fff;border:1px solid var(--line);border-radius:5px}
+.feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}
+.feedback.success{background:var(--green-soft);border-color:var(--green)}
+.feedback.warn{background:var(--amber-soft);border-color:var(--amber)}
+.feedback.error{background:var(--red-soft);border-color:var(--red)}
+.lab-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:1rem}
+.lab-grid>*{min-width:0}
+.lab-panel{border:1px solid var(--line);border-radius:7px;background:#fff;padding:1rem}
+.lab-panel label{display:block;font-weight:750;margin:.75rem 0 .3rem}
+.lab-panel select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+.result-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-top:1rem}
+.result-card{padding:.8rem;border:1px solid var(--line);border-radius:6px;background:#fff;min-width:0}
+.result-card b{display:block;color:var(--cyan-dark);font-size:.78rem;text-transform:uppercase}
+.result-card span{display:block;margin-top:.25rem;overflow-wrap:anywhere}
+.terminal{
+  margin-top:1rem;background:#07141a;color:#dce9ed;border-radius:7px;padding:1rem;
+  border:1px solid #314b56;overflow-x:auto
+}
+.terminal pre{margin:0;white-space:pre-wrap;word-break:break-word}
+.code-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.code-card{min-width:0;background:#09161d;color:#dce9ed;border:1px solid #314b56;border-radius:7px;padding:1rem}
+.code-card h3{color:#fff}
+.code-block{overflow-x:auto;margin:.75rem 0;background:#061016;border:1px solid #253c47;border-radius:6px;padding:1rem}
+.code-block code{white-space:pre}
+.code-note{color:#bfd1d7}
+.exercise-box{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.exercise-head{padding:1rem 1.1rem;background:var(--navy);color:#fff}
+.exercise-head span{display:block;color:var(--cyan-light);font-size:.78rem;font-weight:850;text-transform:uppercase}
+.exercise-body{padding:1.1rem}
+.solution-steps{display:grid;gap:.75rem}
+.solution-step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:.8rem;align-items:start}
+.solution-step>b{
+  display:grid;place-items:center;width:34px;height:34px;border-radius:50%;
+  background:#d9eef2;color:var(--cyan-dark)
+}
+.practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+.practice-card{border:1px solid var(--line);border-radius:7px;padding:1rem;min-width:0}
+.practice-card select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.mini-feedback{margin-top:.75rem;padding:.75rem;border-left:4px solid var(--cyan);background:var(--soft);min-height:4rem}
+.case-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}
+.case-grid label{display:block;font-weight:750}
+.case-grid select{width:100%;margin-top:.3rem;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.quiz{display:grid;gap:1rem}
+.quiz-card{border:1px solid var(--line);border-radius:7px;padding:1rem}
+.quiz-card fieldset{border:0;padding:0;margin:0}
+.quiz-card legend{font-weight:800;margin-bottom:.7rem}
+.quiz-card label{display:block;padding:.5rem .55rem;border-radius:4px}
+.quiz-card label:hover{background:var(--soft)}
+.score{margin-top:1rem;padding:1rem;border:1px solid var(--line);border-radius:6px;background:var(--soft);font-weight:800}
+.reflection-box textarea{
+  width:100%;min-height:145px;resize:vertical;padding:.8rem;border:1px solid var(--line);border-radius:6px
+}
+.references{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.ref-card{border-top:4px solid var(--cyan);padding:1rem;background:var(--soft)}
+.bottom-nav{margin-top:2rem;display:flex;justify-content:space-between;gap:.7rem;flex-wrap:wrap}
+footer{background:var(--navy-deep);color:#c7d8de}
+.footer-inner{
+  width:min(100%,var(--max));margin:0 auto;padding:1.4rem 1.25rem;
+  display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap
+}
+.progress-wrap{
+  position:fixed;right:1rem;bottom:1rem;z-index:20;background:rgba(7,20,26,.93);
+  color:#fff;padding:.45rem .7rem;border-radius:999px;font-size:.78rem;border:1px solid #3b5965
+}
+@media(max-width:900px){
+  .hero-grid,.section-head,.lab-grid,.code-grid{grid-template-columns:1fr}
+  .concept-grid,.outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .outcome:nth-child(2){border-right:0}
+  .outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .practice-grid,.case-grid{grid-template-columns:1fr}
+}
+@media(max-width:650px){.result-grid,.references{grid-template-columns:1fr}}
+@media(max-width:600px){
+  .header-inner{padding-inline:.8rem}.brand{min-width:145px}.top-link{padding:.45rem .6rem}
+  .band,.hero-grid{padding-left:.9rem;padding-right:.9rem}
+  h1{font-size:clamp(2rem,10vw,2.72rem);max-width:none}
+  .concept-grid,.outcomes{grid-template-columns:1fr}
+  .outcome{border-right:0;border-bottom:1px solid var(--line)}
+  .outcome:last-child{border-bottom:0}
+  .error-step{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+<header>
+<div class="header-inner">
+  <div class="brand"><strong>Programación de Redes</strong><span>Protocolos y APIs</span></div>
+
+  <div class="nav-scroll" aria-label="Navegación del subtema">
+    <nav>
+      <a href="#inicio">Inicio</a>
+      <a href="#orientacion">Cómo trabajar</a>
+      <a href="#conceptos">Conceptos</a>
+      <a href="#predice">Predice</a>
+      <a href="#experimenta">Experimenta</a>
+      <a href="#codigo">Código</a>
+      <a href="#resuelto">Ejercicio resuelto</a>
+      <a href="#practica">Practica</a>
+      <a href="#caso">Caso profesional</a>
+      <a href="#comprueba">Comprueba</a>
+      <a href="#reflexiona">Reflexión</a>
+    </nav>
+  </div>
+
+  <a class="top-link" href="index.html">← Curso</a>
+</div>
+</header>
+
+<main id="contenido">
+
+<section class="hero" id="inicio">
+<div class="hero-grid">
+  <div>
+    <div class="eyebrow">Bloque 2 · Tema 2.2 · Subtema 2.2.6</div>
+    <h1>Manejo de errores y respuestas de servicios externos</h1>
+    <p>Diseña clientes que sigan siendo útiles cuando una API tarda, rechaza una solicitud, limita la frecuencia o falla temporalmente.</p>
+
+    <div class="hero-actions">
+      <a class="btn" href="#orientacion">Comenzar recorrido</a>
+      <a class="btn secondary" href="tema-2-2-consumo-apis-servicios-web.html">Volver al Tema 2.2</a>
+    </div>
+  </div>
+
+  <div class="hero-board" role="img" aria-label="Clasificación conceptual de errores al consumir una API">
+    <h3>No todos los fallos significan lo mismo</h3>
+
+    <div class="error-flow">
+      <div class="error-step"><b>Timeout</b><div><strong>No respondió a tiempo</strong><small>no prueba por sí solo que el servicio esté caído</small></div></div>
+      <div class="error-step"><b>Conexión</b><div><strong>No se pudo establecer/completar la comunicación</strong><small>DNS, TCP, TLS o conectividad pueden intervenir</small></div></div>
+      <div class="error-step"><b>4xx</b><div><strong>Problema en la solicitud o permisos</strong><small>normalmente requiere corregir el cliente, no reintentar igual</small></div></div>
+      <div class="error-step"><b>5xx</b><div><strong>Fallo del servicio o dependencia</strong><small>puede ser temporal</small></div></div>
+      <div class="error-step"><b>429</b><div><strong>Demasiadas solicitudes</strong><small>hay que respetar la política del servicio</small></div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="orientacion">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Cómo trabajar este tema</div>
+    <div>
+      <h2>Primero clasifica el fallo; después decide</h2>
+      <p class="lead">Reintentar todo de la misma manera puede empeorar un problema. La respuesta correcta depende del tipo de error y de la operación que intentabas realizar.</p>
+    </div>
+  </div>
+
+  <div class="outcomes">
+    <div class="outcome"><b>1. Diferenciar</b> errores de red y respuestas HTTP no exitosas.</div>
+    <div class="outcome"><b>2. Manejar</b> excepciones frecuentes de <code>requests</code>.</div>
+    <div class="outcome"><b>3. Decidir</b> cuándo un reintento puede ser razonable.</div>
+    <div class="outcome"><b>4. Diseñar</b> una respuesta degradada para una aplicación de red.</div>
+  </div>
+
+  <div class="scope-note">
+    <strong>Alcance.</strong> Se introducen estrategias básicas de robustez. No se desarrollarán circuit breakers, colas distribuidas, alta disponibilidad avanzada ni bibliotecas especializadas de resiliencia.
+  </div>
+</div>
+</section>
+
+<section id="conceptos">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Explora</div>
+    <div>
+      <h2>Error de red y error HTTP no son lo mismo</h2>
+      <p class="lead">Si recibes un código HTTP, el intercambio llegó lo suficientemente lejos como para obtener una respuesta del servicio o de un intermediario.</p>
+    </div>
+  </div>
+
+  <div class="concept-grid">
+    <article class="concept-card">
+      <span class="tag">Timeout</span>
+      <h3>Espera agotada</h3>
+      <p>La operación no recibió a tiempo lo esperado. Es evidencia de no respuesta dentro del límite configurado, no prueba absoluta de caída total.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">ConnectionError</span>
+      <h3>Problema de conexión</h3>
+      <p>Puede deberse a DNS, rechazo de conexión, interrupciones de red u otros fallos de conectividad.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">4xx / 5xx</span>
+      <h3>Respuesta HTTP</h3>
+      <p>El servidor o intermediario sí devolvió una respuesta que debe interpretarse según su código.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">Reintento</span>
+      <h3>Decisión controlada</h3>
+      <p>No debe ser automático para todo. Considera código, método, idempotencia, límites y documentación.</p>
+    </article>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Situación</th><th>Ejemplo</th><th>Acción inicial razonable</th><th>¿Reintentar igual?</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Timeout</td><td>No llega respuesta dentro del límite.</td><td>Registrar contexto y evaluar reintento controlado.</td><td>A veces, si la operación lo permite.</td></tr>
+        <tr><td>ConnectionError</td><td>No se establece la comunicación.</td><td>Tratar como fallo de conectividad y evitar bucles agresivos.</td><td>A veces, con espera.</td></tr>
+        <tr><td>400</td><td>Solicitud inválida.</td><td>Corregir datos o formato.</td><td>No, si envías exactamente lo mismo.</td></tr>
+        <tr><td>401/403</td><td>Autenticación o autorización.</td><td>Revisar credenciales/permisos.</td><td>No sin corregir la causa.</td></tr>
+        <tr><td>404</td><td>Recurso no encontrado.</td><td>Verificar ID o endpoint.</td><td>No suele ayudar repetir igual.</td></tr>
+        <tr><td>429</td><td>Demasiadas solicitudes.</td><td>Reducir frecuencia y respetar instrucciones del servicio.</td><td>Sí, pero después de esperar según política.</td></tr>
+        <tr><td>503</td><td>Servicio no disponible temporalmente.</td><td>Degradar función y considerar reintento con espera.</td><td>Puede ser razonable.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <strong>Idempotencia importa.</strong> Reintentar un GET suele ser conceptualmente menos riesgoso que repetir un POST que podría crear un recurso duplicado. La decisión final depende del contrato real del servicio.
+  </div>
+</div>
+</section>
+
+<section id="predice">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Predice</div>
+    <div>
+      <h2>¿Reintentarías sin cambiar nada?</h2>
+      <p class="lead">Una API responde <code>400 Bad Request</code> porque falta un campo obligatorio.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="prediction">
+      <label><input type="radio" name="prediction" value="a"> No. Primero debo corregir la solicitud.</label>
+      <label><input type="radio" name="prediction" value="b"> Sí. Debo repetirla cientos de veces inmediatamente.</label>
+      <label><input type="radio" name="prediction" value="c"> Debo aumentar el timeout, aunque el servidor ya respondió 400.</label>
+    </div>
+
+    <div class="action-row">
+      <button class="btn" id="checkPrediction" type="button">Comprobar</button>
+      <button class="btn light" id="resetPrediction" type="button">Reintentar</button>
+    </div>
+
+    <div class="feedback" id="predictionFeedback" aria-live="polite">
+      El servidor ya explicó que la solicitud es inválida.
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="experimenta">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Experimenta</div>
+    <div>
+      <h2>Decide la estrategia ante un fallo</h2>
+      <p class="lead">Selecciona un escenario y una acción. El simulador te indica si la decisión es coherente.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="lab-grid">
+      <div class="lab-panel">
+        <label for="failureScenario">Escenario</label>
+        <select id="failureScenario">
+          <option value="timeout">Timeout en GET</option>
+          <option value="bad">400 Bad Request</option>
+          <option value="auth">401 Unauthorized</option>
+          <option value="rate">429 Too Many Requests</option>
+          <option value="unavailable">503 Service Unavailable</option>
+        </select>
+
+        <label for="chosenAction">Acción</label>
+        <select id="chosenAction">
+          <option value="retry">Reintentar con espera</option>
+          <option value="fix">Corregir solicitud</option>
+          <option value="auth">Revisar autenticación</option>
+          <option value="backoff">Reducir frecuencia / respetar espera</option>
+          <option value="degrade">Degradar servicio y considerar reintento</option>
+        </select>
+
+        <button class="btn" id="evaluateFailure" type="button" style="margin-top:1rem">
+          Evaluar decisión
+        </button>
+
+        <div class="feedback" id="failureFeedback" aria-live="polite">
+          Selecciona escenario y respuesta.
+        </div>
+      </div>
+
+      <div class="lab-panel">
+        <h3>Lectura operativa</h3>
+
+        <div class="result-grid">
+          <div class="result-card"><b>Tipo</b><span id="outType">Red / espera</span></div>
+          <div class="result-card"><b>Reintento</b><span id="outRetry">Posible</span></div>
+          <div class="result-card"><b>Prioridad</b><span id="outPriority">No bloquear la aplicación</span></div>
+        </div>
+
+        <div class="terminal">
+          <pre id="failurePreview">Timeout:
+- registrar contexto
+- mostrar estado desconocido
+- esperar
+- reintentar de forma limitada</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="codigo">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Explica</div>
+    <div>
+      <h2>Patrones básicos de manejo de fallos</h2>
+      <p class="lead">El código debe distinguir entre ausencia de respuesta, respuesta HTTP no exitosa y errores inesperados.</p>
+    </div>
+  </div>
+
+  <div class="code-grid">
+    <article class="code-card">
+      <h3>Clasificar excepciones</h3>
+      <div class="code-block"><code>import requests
+
+try:
+    respuesta = requests.get(
+        url,
+        timeout=5
+    )
+
+    respuesta.raise_for_status()
+
+except requests.Timeout:
+    print("Timeout")
+
+except requests.ConnectionError:
+    print("Error de conexión")
+
+except requests.HTTPError as exc:
+    print(
+        "Error HTTP:",
+        exc.response.status_code
+    )
+
+except requests.RequestException as exc:
+    print("Fallo de solicitud:", exc)</code></div>
+      <p class="code-note">Capturar primero excepciones específicas hace más clara la reacción del programa.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Reintento limitado</h3>
+      <div class="code-block"><code>import time
+import requests
+
+for intento in range(3):
+    try:
+        r = requests.get(
+            url,
+            timeout=5
+        )
+        r.raise_for_status()
+        break
+
+    except requests.Timeout:
+        if intento == 2:
+            raise
+
+        time.sleep(2 ** intento)</code></div>
+      <p class="code-note">Este patrón didáctico usa retroceso progresivo simple. En producción conviene respetar la política concreta de la API.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Tratar 429</h3>
+      <div class="code-block"><code>if respuesta.status_code == 429:
+    espera = respuesta.headers.get(
+        "Retry-After"
+    )
+
+    print(
+        "Límite alcanzado.",
+        "Retry-After:", espera
+    )</code></div>
+      <p class="code-note"><code>Retry-After</code> puede orientar la espera cuando el servicio lo proporciona.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Degradación controlada</h3>
+      <div class="code-block"><code>try:
+    r = requests.get(
+        url,
+        timeout=5
+    )
+    r.raise_for_status()
+    datos = r.json()
+
+except requests.RequestException:
+    datos = None
+
+if datos is None:
+    print(
+        "Inventario temporalmente no disponible"
+    )</code></div>
+      <p class="code-note">Una función secundaria puede fallar sin obligar a terminar toda la aplicación.</p>
+    </article>
+  </div>
+
+  <div class="callout">
+    <strong>No reintentes sin límite.</strong> Un bucle agresivo puede aumentar la carga del servicio, empeorar una incidencia o provocar bloqueos por rate limiting.
+  </div>
+</div>
+</section>
+
+<section id="resuelto">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Ejercicio resuelto</div>
+    <div>
+      <h2>Consulta de inventario con degradación</h2>
+      <p class="lead">Una aplicación del NOC consulta una API de inventario para enriquecer alarmas, pero la alarma debe seguir mostrándose aunque la API externa falle.</p>
+    </div>
+  </div>
+
+  <div class="exercise-box">
+    <div class="exercise-head">
+      <span>Problema</span>
+      <h3>Evitar que un servicio secundario bloquee el flujo principal</h3>
+    </div>
+
+    <div class="exercise-body">
+      <div class="solution-steps">
+        <div class="solution-step"><b>1</b><div><strong>Definir timeout.</strong><br>No esperar indefinidamente por inventario.</div></div>
+        <div class="solution-step"><b>2</b><div><strong>Capturar fallos.</strong><br>Distinguir timeout/conexión de errores HTTP.</div></div>
+        <div class="solution-step"><b>3</b><div><strong>Conservar flujo principal.</strong><br>Mostrar la alarma aunque falten datos adicionales.</div></div>
+        <div class="solution-step"><b>4</b><div><strong>Registrar contexto.</strong><br>Guardar tipo de fallo sin registrar secretos.</div></div>
+        <div class="solution-step"><b>5</b><div><strong>Reintentar solo si corresponde.</strong><br>Con límite y espera controlada.</div></div>
+      </div>
+
+      <div class="code-block" style="margin-top:1rem"><code>import requests
+
+def obtener_inventario(equipo_id):
+    url = (
+        "https://api.example"
+        f"/v1/equipos/{equipo_id}"
+    )
+
+    try:
+        r = requests.get(
+            url,
+            timeout=5
+        )
+        r.raise_for_status()
+        return r.json()
+
+    except requests.RequestException:
+        return None
+
+inventario = obtener_inventario(452)
+
+if inventario is None:
+    print(
+        "Alarma recibida; "
+        "inventario no disponible"
+    )
+else:
+    print(
+        "Alarma enriquecida con inventario"
+    )</code></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="practica">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Practica</div>
+    <div>
+      <h2>Reacciona según el tipo de fallo</h2>
+      <p class="lead">Selecciona la acción más coherente.</p>
+    </div>
+  </div>
+
+  <div class="practice-grid">
+    <article class="practice-card">
+      <h3>Ejercicio 1</h3>
+      <p>La API devuelve 400 porque falta un campo obligatorio.</p>
+      <select id="p1">
+        <option value="">Selecciona…</option>
+        <option value="a">Corregir la solicitud</option>
+        <option value="b">Reintentar sin cambios cien veces</option>
+        <option value="c">Aumentar el timeout indefinidamente</option>
+      </select>
+      <button class="btn" id="checkP1" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p1Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 2</h3>
+      <p>La API devuelve 429.</p>
+      <select id="p2">
+        <option value="">Selecciona…</option>
+        <option value="a">Reducir frecuencia y respetar política de espera</option>
+        <option value="b">Enviar aún más solicitudes</option>
+        <option value="c">Cambiar el método a DELETE sin motivo</option>
+      </select>
+      <button class="btn" id="checkP2" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p2Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 3</h3>
+      <p>Una consulta GET produce timeout.</p>
+      <select id="p3">
+        <option value="">Selecciona…</option>
+        <option value="a">Registrar el fallo y evaluar reintento limitado con espera</option>
+        <option value="b">Concluir con certeza que todo el servidor está apagado</option>
+        <option value="c">Ignorar siempre el timeout</option>
+      </select>
+      <button class="btn" id="checkP3" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p3Feedback">Selecciona una respuesta.</div>
+    </article>
+  </div>
+</div>
+</section>
+
+<section id="caso">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Caso profesional</div>
+    <div>
+      <h2>Dashboard dependiente de una API externa</h2>
+      <p class="lead">Un panel de operaciones consulta métricas cada minuto. Si la API externa falla, el panel no debe cerrarse ni presentar datos inventados.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="case-grid">
+      <label>Timeout
+        <select id="caseTimeout">
+          <option value="">Selecciona…</option>
+          <option value="unknown">Mostrar estado desconocido / último dato claramente marcado</option>
+          <option value="invent">Inventar una métrica nueva</option>
+        </select>
+      </label>
+
+      <label>503
+        <select id="case503">
+          <option value="">Selecciona…</option>
+          <option value="degrade">Degradar función y considerar reintento</option>
+          <option value="loop">Crear un bucle infinito inmediato</option>
+        </select>
+      </label>
+
+      <label>Registro
+        <select id="caseLog">
+          <option value="">Selecciona…</option>
+          <option value="context">Registrar código/tipo de fallo sin secretos</option>
+          <option value="token">Registrar token completo</option>
+        </select>
+      </label>
+    </div>
+
+    <button class="btn" id="checkCase" type="button" style="margin-top:1rem">
+      Evaluar diseño
+    </button>
+
+    <div class="feedback" id="caseFeedback" aria-live="polite">
+      La aplicación debe distinguir ausencia de datos de un dato real.
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="comprueba">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Comprueba</div>
+    <div>
+      <h2>Integra lo aprendido</h2>
+      <p class="lead">Responde las cinco preguntas.</p>
+    </div>
+  </div>
+
+  <div class="quiz" id="quiz">
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>1. ¿Un timeout demuestra que el servidor está totalmente caído?</legend>
+        <label><input type="radio" name="q1" value="a"> No. Solo indica que la operación no obtuvo respuesta dentro del tiempo configurado.</label>
+        <label><input type="radio" name="q1" value="b"> Sí, siempre.</label>
+        <label><input type="radio" name="q1" value="c"> Solo si el método es GET.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q1Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>2. ¿Qué suele requerir un 400?</legend>
+        <label><input type="radio" name="q2" value="a"> Corregir la solicitud.</label>
+        <label><input type="radio" name="q2" value="b"> Reintentar exactamente lo mismo sin límite.</label>
+        <label><input type="radio" name="q2" value="c"> Desactivar TLS.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q2Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>3. ¿Qué representa 429?</legend>
+        <label><input type="radio" name="q3" value="a"> Demasiadas solicitudes.</label>
+        <label><input type="radio" name="q3" value="b"> Creación exitosa.</label>
+        <label><input type="radio" name="q3" value="c"> JSON inválido necesariamente.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q3Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>4. ¿Por qué no conviene reintentar un POST indiscriminadamente?</legend>
+        <label><input type="radio" name="q4" value="a"> Porque podría repetir efectos como crear recursos duplicados.</label>
+        <label><input type="radio" name="q4" value="b"> Porque POST nunca usa HTTP.</label>
+        <label><input type="radio" name="q4" value="c"> Porque todos los POST son seguros e idempotentes.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q4Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>5. ¿Qué se estudiará en 2.2.7?</legend>
+        <label><input type="radio" name="q5" value="a"> Integración de APIs con aplicaciones de red.</label>
+        <label><input type="radio" name="q5" value="b"> Diseño de antenas.</label>
+        <label><input type="radio" name="q5" value="c"> Álgebra booleana.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q5Feedback">Selecciona una respuesta.</div>
+    </article>
+
+  </div>
+
+  <div class="action-row" style="margin-top:1rem">
+    <button class="btn" id="checkQuiz" type="button">Comprobar todo</button>
+    <button class="btn light" id="resetQuiz" type="button">Reintentar</button>
+  </div>
+
+  <div class="score" id="scoreBox" aria-live="polite">
+    Aún no has comprobado la actividad.
+  </div>
+</div>
+</section>
+
+<section id="reflexiona">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Reflexión</div>
+    <div>
+      <h2>¿Qué haría tu aplicación cuando una API externa falle?</h2>
+      <p class="lead">Describe qué mostrarías al usuario, qué registrarías y en qué casos considerarías reintentar.</p>
+    </div>
+  </div>
+
+  <div class="reflection-box">
+    <textarea id="reflectionText" aria-label="Reflexión del estudiante" placeholder="Ejemplo: ante timeout mostrar estado desconocido, registrar el fallo, no inventar datos y reintentar de forma limitada si la operación es segura y la política lo permite..."></textarea>
+
+    <div class="action-row">
+      <button class="btn" id="saveReflection" type="button">Guardar en este navegador</button>
+      <button class="btn light" id="clearReflection" type="button">Borrar</button>
+    </div>
+
+    <p id="reflectionStatus" aria-live="polite">
+      El texto no se transmite; si lo guardas, permanece únicamente en el almacenamiento local de este navegador.
+    </p>
+  </div>
+
+  <div class="references" style="margin-top:2rem">
+    <article class="ref-card">
+      <h3>Ideas clave</h3>
+      <p>La robustez empieza por clasificar el fallo, evitar reintentos indiscriminados y separar “sin datos” de “dato real”.</p>
+    </article>
+
+    <article class="ref-card">
+      <h3>Delimitación</h3>
+      <p>En 2.2.7 se integrarán endpoints, solicitudes, datos, JSON, autenticación y manejo de errores dentro de una aplicación de red.</p>
+    </article>
+  </div>
+
+  <div class="bottom-nav">
+    <a class="btn light" href="tema-2-2-5-autenticacion-api-keys-tokens.html">← 2.2.5 Autenticación</a>
+    <a class="btn light" href="tema-2-2-7-integracion-apis-aplicaciones-red.html">2.2.7 Integración de APIs con aplicaciones de red →</a>
+  </div>
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="footer-inner">
+  <div>
+    <strong>Programación de Redes: Protocolos y APIs</strong><br>
+    <span>Subtema 2.2.6 · Manejo de errores y respuestas de servicios externos</span>
+  </div>
+  <div>Material interactivo · uso local</div>
+</div>
+</footer>
+
+<div class="progress-wrap" aria-hidden="true">
+  Recorrido <b id="progressValue">0%</b>
+</div>
+
+<script>
+(() => {
+"use strict";
+
+const $=id=>document.getElementById(id);
+
+const setFeedback=(el,text,type="")=>{
+  el.textContent=text;
+  el.className="feedback"+(type?" "+type:"");
+};
+
+const setMini=(el,text,ok=null)=>{
+  el.textContent=text;
+  el.style.borderLeftColor=
+    ok===true?"var(--green)":ok===false?"var(--red)":"var(--cyan)";
+  el.style.background=
+    ok===true?"var(--green-soft)":ok===false?"var(--red-soft)":"var(--soft)";
+};
+
+$("checkPrediction").addEventListener("click",()=>{
+  const s=document.querySelector('input[name="prediction"]:checked');
+
+  if(!s){
+    return setFeedback(
+      $("predictionFeedback"),
+      "Selecciona primero una opción.",
+      "warn"
+    );
+  }
+
+  if(s.value==="a"){
+    setFeedback(
+      $("predictionFeedback"),
+      "Correcto. Un 400 indica que debes revisar la solicitud; repetirla sin cambios no corrige la causa.",
+      "success"
+    );
+  }else{
+    setFeedback(
+      $("predictionFeedback"),
+      "Revisa la evidencia disponible: el servidor ya respondió y señaló un problema en la solicitud.",
+      "error"
+    );
+  }
+});
+
+$("resetPrediction").addEventListener("click",()=>{
+  document.querySelectorAll('input[name="prediction"]').forEach(r=>r.checked=false);
+
+  setFeedback(
+    $("predictionFeedback"),
+    "El servidor ya explicó que la solicitud es inválida."
+  );
+});
+
+const scenarios={
+  timeout:{
+    action:"retry",
+    type:"Red / espera",
+    retry:"Posible",
+    priority:"No bloquear la aplicación",
+    preview:
+`Timeout:
+- registrar contexto
+- mostrar estado desconocido
+- esperar
+- reintentar de forma limitada`
+  },
+  bad:{
+    action:"fix",
+    type:"4xx",
+    retry:"No sin corregir",
+    priority:"Corregir la solicitud",
+    preview:
+`400 Bad Request:
+- revisar campos
+- revisar formato
+- corregir la solicitud
+- no repetir igual`
+  },
+  auth:{
+    action:"auth",
+    type:"4xx",
+    retry:"No sin corregir",
+    priority:"Revisar credencial/permisos",
+    preview:
+`401 Unauthorized:
+- revisar autenticación
+- validar credencial
+- no exponer secretos
+- reintentar solo tras corregir`
+  },
+  rate:{
+    action:"backoff",
+    type:"4xx / límite",
+    retry:"Sí, después de esperar",
+    priority:"Reducir frecuencia",
+    preview:
+`429 Too Many Requests:
+- reducir frecuencia
+- revisar Retry-After
+- esperar
+- evitar bucles agresivos`
+  },
+  unavailable:{
+    action:"degrade",
+    type:"5xx",
+    retry:"Puede ser razonable",
+    priority:"Degradar y recuperar",
+    preview:
+`503 Service Unavailable:
+- no bloquear flujo principal
+- informar indisponibilidad
+- esperar
+- considerar reintento limitado`
+  }
+};
+
+$("evaluateFailure").addEventListener("click",()=>{
+  const data=scenarios[$("failureScenario").value];
+  const chosen=$("chosenAction").value;
+
+  $("outType").textContent=data.type;
+  $("outRetry").textContent=data.retry;
+  $("outPriority").textContent=data.priority;
+  $("failurePreview").textContent=data.preview;
+
+  const ok=chosen===data.action;
+
+  setFeedback(
+    $("failureFeedback"),
+    ok
+      ? "Decisión coherente con el escenario."
+      : "Revisa el tipo de fallo antes de decidir cómo reaccionar.",
+    ok?"success":"error"
+  );
+});
+
+const practices=[
+  {
+    s:"p1",b:"checkP1",f:"p1Feedback",a:"a",
+    ok:"Correcto. Un 400 requiere corregir la solicitud.",
+    bad:"Repetir exactamente la misma solicitud inválida no soluciona el problema."
+  },
+  {
+    s:"p2",b:"checkP2",f:"p2Feedback",a:"a",
+    ok:"Correcto. 429 exige reducir frecuencia y respetar la política del servicio.",
+    bad:"Aumentar el ritmo de solicitudes puede empeorar el rate limiting."
+  },
+  {
+    s:"p3",b:"checkP3",f:"p3Feedback",a:"a",
+    ok:"Correcto. Un timeout puede justificar un reintento limitado, pero no demuestra caída total.",
+    bad:"Un timeout solo informa que no hubo respuesta dentro del límite configurado."
+  }
+];
+
+practices.forEach(p=>{
+  $(p.b).addEventListener("click",()=>{
+    const v=$(p.s).value;
+
+    if(!v){
+      return setMini(
+        $(p.f),
+        "Selecciona primero una respuesta."
+      );
+    }
+
+    setMini(
+      $(p.f),
+      v===p.a?p.ok:p.bad,
+      v===p.a
+    );
+  });
+});
+
+$("checkCase").addEventListener("click",()=>{
+  const ok=
+    $("caseTimeout").value==="unknown" &&
+    $("case503").value==="degrade" &&
+    $("caseLog").value==="context";
+
+  setFeedback(
+    $("caseFeedback"),
+    ok
+      ? "Diseño coherente. No inventas datos, degradación controlada ante 503 y registro sin exponer secretos."
+      : "Revisa tres principios: no inventar datos, degradar con control y registrar sin secretos.",
+    ok?"success":"error"
+  );
+});
+
+const answers={
+  q1:"a",
+  q2:"a",
+  q3:"a",
+  q4:"a",
+  q5:"a"
+};
+
+const explanations={
+  q1:"Un timeout solo indica que la operación no completó la espera dentro del límite configurado.",
+  q2:"400 normalmente exige corregir la solicitud antes de repetirla.",
+  q3:"429 significa demasiadas solicitudes.",
+  q4:"Un POST puede producir efectos duplicados si se repite sin garantías adicionales.",
+  q5:"El siguiente subtema integra APIs dentro de aplicaciones de red."
+};
+
+$("checkQuiz").addEventListener("click",()=>{
+  let score=0;
+
+  Object.keys(answers).forEach(q=>{
+    const s=document.querySelector(`input[name="${q}"]:checked`);
+    const ok=s&&s.value===answers[q];
+
+    if(ok){
+      score++;
+    }
+
+    setMini(
+      $(`${q}Feedback`),
+      s
+        ? ((ok?"Correcto. ":"Revisa. ")+explanations[q])
+        : "Falta responder esta pregunta.",
+      ok
+    );
+  });
+
+  $("scoreBox").textContent=
+    `Resultado: ${score}/5. ${
+      score===5
+        ? "Dominio sólido del manejo básico de errores en servicios externos."
+        : "Revisa las explicaciones y vuelve a intentarlo."
+    }`;
+});
+
+$("resetQuiz").addEventListener("click",()=>{
+  document.querySelectorAll('#quiz input[type="radio"]').forEach(r=>r.checked=false);
+
+  Object.keys(answers).forEach(q=>{
+    setMini(
+      $(`${q}Feedback`),
+      "Selecciona una respuesta."
+    );
+  });
+
+  $("scoreBox").textContent=
+    "Aún no has comprobado la actividad.";
+});
+
+const key="pr-redes-2-2-6-reflexion";
+
+try{
+  const saved=localStorage.getItem(key);
+  if(saved){
+    $("reflectionText").value=saved;
+  }
+}catch(_){}
+
+$("saveReflection").addEventListener("click",()=>{
+  try{
+    localStorage.setItem(
+      key,
+      $("reflectionText").value
+    );
+
+    $("reflectionStatus").textContent=
+      "Reflexión guardada únicamente en este navegador.";
+  }catch(_){
+    $("reflectionStatus").textContent=
+      "Este navegador no permitió guardar la reflexión localmente.";
+  }
+});
+
+$("clearReflection").addEventListener("click",()=>{
+  $("reflectionText").value="";
+
+  try{
+    localStorage.removeItem(key);
+  }catch(_){}
+
+  $("reflectionStatus").textContent=
+    "Reflexión borrada del almacenamiento local.";
+});
+
+const sections=[...document.querySelectorAll("main section")];
+
+function updateProgress(){
+  const total=document.documentElement.scrollHeight-window.innerHeight;
+  const pct=
+    total>0
+      ? Math.max(0,Math.min(100,Math.round((window.scrollY/total)*100)))
+      : 100;
+
+  $("progressValue").textContent=pct+"%";
+
+  const marker=window.scrollY+window.innerHeight*.36;
+  let current=sections[0];
+
+  sections.forEach(s=>{
+    if(s.offsetTop<=marker){
+      current=s;
+    }
+  });
+
+  document.querySelectorAll("nav a").forEach(
+    a=>a.removeAttribute("aria-current")
+  );
+
+  if(current&&current.id){
+    const link=document.querySelector(`nav a[href="#${current.id}"]`);
+
+    if(link){
+      link.setAttribute("aria-current","location");
+    }
+  }
+}
+
+window.addEventListener("scroll",updateProgress,{passive:true});
+window.addEventListener("resize",updateProgress);
+updateProgress();
+})();
+</script>
+</body>
+</html>

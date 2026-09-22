@@ -1,0 +1,1142 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Subtema 2.2.3: envío y recepción de parámetros y datos en APIs.">
+<meta name="theme-color" content="#10212a">
+<title>2.2.3 | Parámetros y datos en APIs</title>
+<style>
+:root{
+  --ink:#18212a;--muted:#586775;--line:#cbd5dc;--soft:#f3f6f8;--paper:#fff;
+  --cyan:#007c91;--cyan-dark:#005b6a;--cyan-light:#6ed2e2;
+  --green:#16734a;--green-soft:#e8f5ee;--amber:#8a5600;--amber-soft:#fff3d8;
+  --red:#9b2c2c;--red-soft:#fdecec;--focus:#005fcc;
+  --navy:#10212a;--navy-deep:#07141a;--max:1180px;--radius:8px;
+  --shadow:0 16px 38px rgba(24,33,42,.08)
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;min-width:280px;color:var(--ink);background:var(--paper);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  line-height:1.55;overflow-x:hidden
+}
+button,input,select,textarea{font:inherit;max-width:100%}
+a{color:var(--cyan-dark)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:3px solid var(--focus);outline-offset:3px
+}
+.skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}
+.skip-link:focus{top:1rem}
+header{
+  position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);
+  border-bottom:1px solid var(--line);backdrop-filter:blur(8px)
+}
+.header-inner{
+  width:min(100%,var(--max));min-height:66px;margin:0 auto;padding:.55rem 1.25rem;
+  display:flex;gap:1rem;align-items:center;min-width:0
+}
+.brand{min-width:190px}.brand strong{display:block;font-size:.95rem}.brand span{display:block;color:var(--muted);font-size:.78rem}
+.nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}
+nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+nav a{
+  color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;
+  border-bottom:2px solid transparent;font-size:.84rem
+}
+nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+.top-link{
+  flex:0 0 auto;text-decoration:none;border:1px solid var(--line);border-radius:5px;
+  padding:.48rem .72rem;color:var(--ink);font-weight:750;white-space:nowrap;background:#fff
+}
+main{overflow:hidden}
+section{scroll-margin-top:84px;border-bottom:1px solid var(--line)}
+.band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+.hero{min-height:calc(100svh - 66px);display:grid;align-items:center;background:var(--navy);color:#fff}
+.hero-grid{
+  width:min(100%,var(--max));margin:0 auto;padding:3.4rem 1.25rem;
+  display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:3rem;align-items:center
+}
+.hero-grid>*{min-width:0}
+.eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+h1{
+  font-size:clamp(2rem,5vw,4rem);line-height:1.02;margin:.65rem 0 1.15rem;
+  max-width:19ch;overflow-wrap:normal;word-break:normal;hyphens:none
+}
+h2{
+  font-size:clamp(1.75rem,3.3vw,2.8rem);line-height:1.12;margin:0 0 .8rem;
+  overflow-wrap:normal;word-break:normal;hyphens:none
+}
+h3{font-size:1.22rem;margin:0 0 .55rem}
+p{max-width:72ch}.hero p{color:#d7e5ea;font-size:1.08rem}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}
+.hero-actions{margin-top:1.45rem}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cyan-dark);
+  background:var(--cyan);color:#fff;text-decoration:none;padding:.72rem 1rem;border-radius:5px;font-weight:750
+}
+.btn:hover{background:var(--cyan-dark)}
+.btn.secondary{background:transparent;color:inherit;border-color:currentColor}
+.btn.secondary:hover{background:rgba(255,255,255,.1)}
+.btn.light{background:#fff;color:var(--ink);border-color:var(--line)}
+.btn.light:hover{background:var(--soft);color:var(--cyan-dark)}
+.hero-board{background:var(--navy-deep);border:1px solid #3b5965;border-radius:8px;padding:1.25rem}
+.data-flow{display:grid;gap:.55rem;margin-top:1rem}
+.data-step{
+  display:grid;grid-template-columns:105px minmax(0,1fr);gap:.7rem;align-items:start;
+  padding:.7rem;border:1px solid #3b5965;border-radius:6px;background:#0d2630
+}
+.data-step b{color:var(--cyan-light)}
+.data-step small{display:block;color:#b8cbd2;margin-top:.12rem}
+.section-head{
+  display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem
+}
+.section-head>*{min-width:0}
+.section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}
+.lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+.outcomes{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line)
+}
+.outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}
+.outcome:last-child{border-right:0}
+.outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+.scope-note,.callout{margin-top:1.4rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}
+.concept-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+.concept-card{
+  min-width:0;border:1px solid var(--line);border-radius:var(--radius);
+  padding:1.15rem;background:#fff;box-shadow:var(--shadow)
+}
+.tag{
+  display:inline-block;font-size:.76rem;font-weight:850;color:var(--cyan-dark);
+  background:#d9eef2;padding:.2rem .45rem;border-radius:999px;margin-bottom:.55rem
+}
+.concept-card p{color:var(--muted);font-size:.94rem}
+.table-wrap{overflow-x:auto;margin-top:1.2rem;border:1px solid var(--line);border-radius:7px}
+table{border-collapse:collapse;width:100%;min-width:880px}
+th,td{padding:.8rem;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--soft)}
+.activity{
+  margin-top:1.5rem;padding:1.35rem;border:1px solid var(--line);
+  border-radius:var(--radius);background:var(--soft);min-width:0
+}
+.prediction{display:grid;gap:.6rem;margin:.85rem 0 1rem}
+.prediction label{display:block;padding:.75rem .8rem;background:#fff;border:1px solid var(--line);border-radius:5px}
+.feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}
+.feedback.success{background:var(--green-soft);border-color:var(--green)}
+.feedback.warn{background:var(--amber-soft);border-color:var(--amber)}
+.feedback.error{background:var(--red-soft);border-color:var(--red)}
+.lab-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:1rem}
+.lab-grid>*{min-width:0}
+.lab-panel{border:1px solid var(--line);border-radius:7px;background:#fff;padding:1rem}
+.lab-panel label{display:block;font-weight:750;margin:.75rem 0 .3rem}
+.lab-panel select,.lab-panel input{
+  width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px;background:#fff
+}
+.result-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-top:1rem}
+.result-card{padding:.8rem;border:1px solid var(--line);border-radius:6px;background:#fff;min-width:0}
+.result-card b{display:block;color:var(--cyan-dark);font-size:.78rem;text-transform:uppercase}
+.result-card span{display:block;margin-top:.25rem;overflow-wrap:anywhere}
+.terminal{
+  margin-top:1rem;background:#07141a;color:#dce9ed;border-radius:7px;padding:1rem;
+  border:1px solid #314b56;overflow-x:auto
+}
+.terminal pre{margin:0;white-space:pre-wrap;word-break:break-word}
+.code-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.code-card{min-width:0;background:#09161d;color:#dce9ed;border:1px solid #314b56;border-radius:7px;padding:1rem}
+.code-card h3{color:#fff}
+.code-block{overflow-x:auto;margin:.75rem 0;background:#061016;border:1px solid #253c47;border-radius:6px;padding:1rem}
+.code-block code{white-space:pre}
+.code-note{color:#bfd1d7}
+.exercise-box{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.exercise-head{padding:1rem 1.1rem;background:var(--navy);color:#fff}
+.exercise-head span{display:block;color:var(--cyan-light);font-size:.78rem;font-weight:850;text-transform:uppercase}
+.exercise-body{padding:1.1rem}
+.solution-steps{display:grid;gap:.75rem}
+.solution-step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:.8rem;align-items:start}
+.solution-step>b{
+  display:grid;place-items:center;width:34px;height:34px;border-radius:50%;
+  background:#d9eef2;color:var(--cyan-dark)
+}
+.practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+.practice-card{border:1px solid var(--line);border-radius:7px;padding:1rem;min-width:0}
+.practice-card select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.mini-feedback{margin-top:.75rem;padding:.75rem;border-left:4px solid var(--cyan);background:var(--soft);min-height:4rem}
+.case-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}
+.case-grid label{display:block;font-weight:750}
+.case-grid select{width:100%;margin-top:.3rem;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.quiz{display:grid;gap:1rem}
+.quiz-card{border:1px solid var(--line);border-radius:7px;padding:1rem}
+.quiz-card fieldset{border:0;padding:0;margin:0}
+.quiz-card legend{font-weight:800;margin-bottom:.7rem}
+.quiz-card label{display:block;padding:.5rem .55rem;border-radius:4px}
+.quiz-card label:hover{background:var(--soft)}
+.score{margin-top:1rem;padding:1rem;border:1px solid var(--line);border-radius:6px;background:var(--soft);font-weight:800}
+.reflection-box textarea{
+  width:100%;min-height:145px;resize:vertical;padding:.8rem;border:1px solid var(--line);border-radius:6px
+}
+.references{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.ref-card{border-top:4px solid var(--cyan);padding:1rem;background:var(--soft)}
+.bottom-nav{margin-top:2rem;display:flex;justify-content:space-between;gap:.7rem;flex-wrap:wrap}
+footer{background:var(--navy-deep);color:#c7d8de}
+.footer-inner{
+  width:min(100%,var(--max));margin:0 auto;padding:1.4rem 1.25rem;
+  display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap
+}
+.progress-wrap{
+  position:fixed;right:1rem;bottom:1rem;z-index:20;background:rgba(7,20,26,.93);
+  color:#fff;padding:.45rem .7rem;border-radius:999px;font-size:.78rem;border:1px solid #3b5965
+}
+@media(max-width:900px){
+  .hero-grid,.section-head,.lab-grid,.code-grid{grid-template-columns:1fr}
+  .concept-grid,.outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .outcome:nth-child(2){border-right:0}
+  .outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .practice-grid,.case-grid{grid-template-columns:1fr}
+}
+@media(max-width:650px){.result-grid,.references{grid-template-columns:1fr}}
+@media(max-width:600px){
+  .header-inner{padding-inline:.8rem}.brand{min-width:145px}.top-link{padding:.45rem .6rem}
+  .band,.hero-grid{padding-left:.9rem;padding-right:.9rem}
+  h1{font-size:clamp(2rem,10vw,2.72rem);max-width:none}
+  .concept-grid,.outcomes{grid-template-columns:1fr}
+  .outcome{border-right:0;border-bottom:1px solid var(--line)}
+  .outcome:last-child{border-bottom:0}
+  .data-step{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+<header>
+<div class="header-inner">
+  <div class="brand"><strong>Programación de Redes</strong><span>Protocolos y APIs</span></div>
+
+  <div class="nav-scroll" aria-label="Navegación del subtema">
+    <nav>
+      <a href="#inicio">Inicio</a>
+      <a href="#orientacion">Cómo trabajar</a>
+      <a href="#conceptos">Conceptos</a>
+      <a href="#predice">Predice</a>
+      <a href="#experimenta">Experimenta</a>
+      <a href="#codigo">Código</a>
+      <a href="#resuelto">Ejercicio resuelto</a>
+      <a href="#practica">Practica</a>
+      <a href="#caso">Caso profesional</a>
+      <a href="#comprueba">Comprueba</a>
+      <a href="#reflexiona">Reflexión</a>
+    </nav>
+  </div>
+
+  <a class="top-link" href="index.html">← Curso</a>
+</div>
+</header>
+
+<main id="contenido">
+
+<section class="hero" id="inicio">
+<div class="hero-grid">
+  <div>
+    <div class="eyebrow">Bloque 2 · Tema 2.2 · Subtema 2.2.3</div>
+    <h1>Envío y recepción de parámetros y datos</h1>
+    <p>Aprende a decidir dónde colocar cada dato de una solicitud: ruta, query parameters, cuerpo JSON o formulario, y cómo recibir el contenido básico de una respuesta.</p>
+
+    <div class="hero-actions">
+      <a class="btn" href="#orientacion">Comenzar recorrido</a>
+      <a class="btn secondary" href="tema-2-2-consumo-apis-servicios-web.html">Volver al Tema 2.2</a>
+    </div>
+  </div>
+
+  <div class="hero-board" role="img" aria-label="Opciones para enviar información a una API">
+    <h3>¿Dónde viaja cada dato?</h3>
+
+    <div class="data-flow">
+      <div class="data-step"><b>Ruta</b><div><strong>/equipos/452</strong><small>identifica un recurso concreto</small></div></div>
+      <div class="data-step"><b>Query</b><div><strong>?zona=sur&amp;estado=up</strong><small>filtra o ajusta una consulta</small></div></div>
+      <div class="data-step"><b>JSON</b><div><strong>{"estado":"mantenimiento"}</strong><small>datos estructurados en el cuerpo</small></div></div>
+      <div class="data-step"><b>Form</b><div><strong>campo=valor</strong><small>datos codificados como formulario cuando la API lo exige</small></div></div>
+      <div class="data-step"><b>Respuesta</b><div><strong>status + headers + body</strong><small>resultado devuelto por el servicio</small></div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="orientacion">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Cómo trabajar este tema</div>
+    <div>
+      <h2>No todos los datos se envían de la misma forma</h2>
+      <p class="lead">La documentación de la API define qué dato pertenece a la ruta, qué dato es un filtro y qué información debe ir en el cuerpo.</p>
+    </div>
+  </div>
+
+  <div class="outcomes">
+    <div class="outcome"><b>1. Diferenciar</b> parámetros de ruta, query y datos de cuerpo.</div>
+    <div class="outcome"><b>2. Enviar</b> parámetros con <code>params=</code> y JSON con <code>json=</code>.</div>
+    <div class="outcome"><b>3. Reconocer</b> cuándo se utiliza <code>data=</code> para formularios.</div>
+    <div class="outcome"><b>4. Inspeccionar</b> contenido básico recibido en una respuesta HTTP.</div>
+  </div>
+
+  <div class="scope-note">
+    <strong>Alcance.</strong> En este subtema nos centramos en transportar datos. La interpretación detallada de objetos y arreglos JSON se desarrollará en 2.2.4.
+  </div>
+</div>
+</section>
+
+<section id="conceptos">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Explora</div>
+    <div>
+      <h2>Ruta, query y cuerpo cumplen funciones diferentes</h2>
+      <p class="lead">La ubicación de un dato comunica parte de su significado dentro del contrato de la API.</p>
+    </div>
+  </div>
+
+  <div class="concept-grid">
+    <article class="concept-card">
+      <span class="tag">Path</span>
+      <h3>Identificador</h3>
+      <p>Forma parte de la ruta y suele identificar un recurso, por ejemplo <code>/equipos/452</code>.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">Query</span>
+      <h3>Filtro o ajuste</h3>
+      <p>Se añade después de <code>?</code> y suele utilizarse para filtrar, ordenar o paginar.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">Body</span>
+      <h3>Contenido enviado</h3>
+      <p>Transporta datos de una operación, por ejemplo un objeto JSON en POST o PATCH.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">Response</span>
+      <h3>Contenido recibido</h3>
+      <p>Puede inspeccionarse como texto, bytes o JSON, dependiendo del <code>Content-Type</code> y del contrato.</p>
+    </article>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Necesidad</th><th>Ejemplo</th><th>requests</th><th>Observación</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Identificar equipo 452</td><td><code>/equipos/452</code></td><td>Construir URL/ruta</td><td>El ID forma parte del endpoint documentado.</td></tr>
+        <tr><td>Filtrar por zona</td><td><code>?zona=sur</code></td><td><code>params={"zona":"sur"}</code></td><td>Requests codifica el query.</td></tr>
+        <tr><td>Enviar JSON</td><td><code>{"estado":"mantenimiento"}</code></td><td><code>json=datos</code></td><td>Serializa JSON y prepara Content-Type adecuado.</td></tr>
+        <tr><td>Enviar formulario</td><td><code>usuario=operador</code></td><td><code>data=datos</code></td><td>Úsalo cuando la API documente formato de formulario.</td></tr>
+        <tr><td>Recibir texto</td><td>cuerpo de respuesta</td><td><code>respuesta.text</code></td><td>Devuelve una representación textual.</td></tr>
+        <tr><td>Recibir bytes</td><td>contenido binario</td><td><code>respuesta.content</code></td><td>Devuelve bytes.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <strong>Evita concatenar query strings manualmente.</strong> Usar <code>params=</code> reduce errores de codificación y hace el código más legible.
+  </div>
+</div>
+</section>
+
+<section id="predice">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Predice</div>
+    <div>
+      <h2>¿Dónde enviarías este dato?</h2>
+      <p class="lead">Quieres consultar una colección de enlaces y filtrar únicamente los de la zona <code>sur</code>.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="prediction">
+      <label><input type="radio" name="prediction" value="a"> Como query parameter mediante <code>params={"zona":"sur"}</code>.</label>
+      <label><input type="radio" name="prediction" value="b"> Como contraseña dentro de la URL.</label>
+      <label><input type="radio" name="prediction" value="c"> Como excepción Python.</label>
+    </div>
+
+    <div class="action-row">
+      <button class="btn" id="checkPrediction" type="button">Comprobar</button>
+      <button class="btn light" id="resetPrediction" type="button">Reintentar</button>
+    </div>
+
+    <div class="feedback" id="predictionFeedback" aria-live="polite">
+      La zona actúa como filtro de una colección.
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="experimenta">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Experimenta</div>
+    <div>
+      <h2>Construye el transporte de datos</h2>
+      <p class="lead">Selecciona la operación y la forma de envío. El simulador genera código didáctico.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="lab-grid">
+      <div class="lab-panel">
+        <label for="operation">Operación</label>
+        <select id="operation">
+          <option value="filter">Consultar enlaces de zona sur</option>
+          <option value="single">Consultar equipo 452</option>
+          <option value="patch">Modificar estado de equipo 452</option>
+          <option value="form">Enviar formulario documentado</option>
+        </select>
+
+        <label for="sendMode">Forma de envío</label>
+        <select id="sendMode">
+          <option value="params">params=</option>
+          <option value="path">Ruta</option>
+          <option value="json">json=</option>
+          <option value="data">data=</option>
+        </select>
+
+        <button class="btn" id="evaluateTransport" type="button" style="margin-top:1rem">
+          Evaluar y generar
+        </button>
+
+        <div class="feedback" id="transportFeedback" aria-live="polite">
+          Relaciona intención y mecanismo de transporte.
+        </div>
+      </div>
+
+      <div class="lab-panel">
+        <h3>Resultado conceptual</h3>
+
+        <div class="result-grid">
+          <div class="result-card"><b>Mecanismo esperado</b><span id="outMode">params=</span></div>
+          <div class="result-card"><b>Método</b><span id="outMethod">GET</span></div>
+          <div class="result-card"><b>Destino</b><span id="outTarget">/v1/enlaces</span></div>
+        </div>
+
+        <div class="terminal">
+          <pre id="transportPreview">params = {"zona": "sur"}
+
+respuesta = requests.get(
+    url,
+    params=params,
+    timeout=5
+)</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="codigo">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Explica</div>
+    <div>
+      <h2>Patrones prácticos con requests</h2>
+      <p class="lead">La clave está en respetar el formato definido por la API.</p>
+    </div>
+  </div>
+
+  <div class="code-grid">
+    <article class="code-card">
+      <h3>Query parameters</h3>
+      <div class="code-block"><code>import requests
+
+url = "https://api.example/v1/enlaces"
+
+params = {
+    "zona": "sur",
+    "estado": "up"
+}
+
+respuesta = requests.get(
+    url,
+    params=params,
+    timeout=5
+)
+
+print(respuesta.url)</code></div>
+      <p class="code-note">La biblioteca codifica los parámetros y construye la URL final.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Parámetro de ruta</h3>
+      <div class="code-block"><code>equipo_id = 452
+
+url = (
+    "https://api.example"
+    f"/v1/equipos/{equipo_id}"
+)
+
+respuesta = requests.get(
+    url,
+    timeout=5
+)</code></div>
+      <p class="code-note">El identificador se incorpora a la ruta porque así lo define el endpoint.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Cuerpo JSON</h3>
+      <div class="code-block"><code>url = (
+    "https://api.example"
+    "/v1/equipos/452"
+)
+
+datos = {
+    "estado": "mantenimiento"
+}
+
+respuesta = requests.patch(
+    url,
+    json=datos,
+    timeout=5
+)</code></div>
+      <p class="code-note"><code>json=</code> es adecuado cuando la API espera JSON.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Formulario</h3>
+      <div class="code-block"><code>url = "https://api.example/v1/sesion"
+
+datos = {
+    "usuario": "operador",
+    "modo": "consulta"
+}
+
+respuesta = requests.post(
+    url,
+    data=datos,
+    timeout=5
+)</code></div>
+      <p class="code-note"><code>data=</code> no sustituye a <code>json=</code>: úsalo solo si el servicio documenta ese formato.</p>
+    </article>
+  </div>
+
+  <div class="callout">
+    <strong>GET y cuerpo:</strong> aunque HTTP no prohíbe universalmente un cuerpo en GET, su semántica e interoperabilidad son problemáticas y muchas implementaciones lo ignoran o rechazan. Para filtros de consulta, utiliza el mecanismo documentado, normalmente query parameters.
+  </div>
+</div>
+</section>
+
+<section id="resuelto">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Ejercicio resuelto</div>
+    <div>
+      <h2>Actualizar el estado de un equipo</h2>
+      <p class="lead">La API documenta un endpoint individual y espera JSON para una modificación parcial.</p>
+    </div>
+  </div>
+
+  <div class="exercise-box">
+    <div class="exercise-head">
+      <span>Problema</span>
+      <h3>Modificar el equipo 452 a estado mantenimiento</h3>
+    </div>
+
+    <div class="exercise-body">
+      <div class="solution-steps">
+        <div class="solution-step"><b>1</b><div><strong>Ruta.</strong><br><code>/v1/equipos/452</code></div></div>
+        <div class="solution-step"><b>2</b><div><strong>Método.</strong><br>PATCH, porque se modifica una parte del recurso.</div></div>
+        <div class="solution-step"><b>3</b><div><strong>Formato.</strong><br>La documentación indica JSON.</div></div>
+        <div class="solution-step"><b>4</b><div><strong>Datos.</strong><br><code>{"estado":"mantenimiento"}</code></div></div>
+        <div class="solution-step"><b>5</b><div><strong>Recepción.</strong><br>Comprobar código de estado y luego interpretar el cuerpo según el contrato.</div></div>
+      </div>
+
+      <div class="code-block" style="margin-top:1rem"><code>import requests
+
+url = (
+    "https://api.example"
+    "/v1/equipos/452"
+)
+
+datos = {
+    "estado": "mantenimiento"
+}
+
+respuesta = requests.patch(
+    url,
+    json=datos,
+    timeout=5
+)
+
+print(respuesta.status_code)
+print(respuesta.text)</code></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="practica">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Practica</div>
+    <div>
+      <h2>Elige dónde enviar cada dato</h2>
+      <p class="lead">Relaciona el dato con su lugar correcto en la solicitud.</p>
+    </div>
+  </div>
+
+  <div class="practice-grid">
+    <article class="practice-card">
+      <h3>Ejercicio 1</h3>
+      <p>Filtrar alarmas por severidad alta.</p>
+      <select id="p1">
+        <option value="">Selecciona…</option>
+        <option value="a">params={"severidad":"alta"}</option>
+        <option value="b">json={"password":"alta"}</option>
+        <option value="c">raise_for_status()</option>
+      </select>
+      <button class="btn" id="checkP1" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p1Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 2</h3>
+      <p>Modificar solo la descripción del recurso 7 cuando la API espera JSON.</p>
+      <select id="p2">
+        <option value="">Selecciona…</option>
+        <option value="a">json={"descripcion":"Nodo principal"}</option>
+        <option value="b">params={"DELETE":"7"}</option>
+        <option value="c">data=b"" sin revisar documentación</option>
+      </select>
+      <button class="btn" id="checkP2" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p2Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 3</h3>
+      <p>Recibir el cuerpo de respuesta como texto.</p>
+      <select id="p3">
+        <option value="">Selecciona…</option>
+        <option value="a">respuesta.text</option>
+        <option value="b">respuesta.password</option>
+        <option value="c">requests.path</option>
+      </select>
+      <button class="btn" id="checkP3" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p3Feedback">Selecciona una respuesta.</div>
+    </article>
+  </div>
+</div>
+</section>
+
+<section id="caso">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Caso profesional</div>
+    <div>
+      <h2>Actualización de inventario desde campo</h2>
+      <p class="lead">Una aplicación recibe el ID del equipo, consulta su ficha y permite actualizar únicamente su observación técnica.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="case-grid">
+      <label>Identificador
+        <select id="caseId">
+          <option value="">Selecciona…</option>
+          <option value="path">Usarlo en la ruta documentada</option>
+          <option value="secret">Guardarlo como contraseña</option>
+        </select>
+      </label>
+
+      <label>Consulta
+        <select id="caseRead">
+          <option value="">Selecciona…</option>
+          <option value="get">GET al recurso individual</option>
+          <option value="delete">DELETE para leer</option>
+        </select>
+      </label>
+
+      <label>Actualización
+        <select id="caseUpdate">
+          <option value="">Selecciona…</option>
+          <option value="patch">PATCH con json=...</option>
+          <option value="query">Guardar el nuevo texto como token</option>
+        </select>
+      </label>
+    </div>
+
+    <button class="btn" id="checkCase" type="button" style="margin-top:1rem">
+      Evaluar diseño
+    </button>
+
+    <div class="feedback" id="caseFeedback" aria-live="polite">
+      Identifica claramente recurso, intención y formato del dato.
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="comprueba">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Comprueba</div>
+    <div>
+      <h2>Integra lo aprendido</h2>
+      <p class="lead">Responde las cinco preguntas.</p>
+    </div>
+  </div>
+
+  <div class="quiz" id="quiz">
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>1. ¿Para qué se utiliza params= en requests?</legend>
+        <label><input type="radio" name="q1" value="a"> Para parámetros de consulta.</label>
+        <label><input type="radio" name="q1" value="b"> Para desactivar TLS.</label>
+        <label><input type="radio" name="q1" value="c"> Para capturar excepciones.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q1Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>2. ¿Cuándo es apropiado usar json=datos?</legend>
+        <label><input type="radio" name="q2" value="a"> Cuando la API espera un cuerpo JSON.</label>
+        <label><input type="radio" name="q2" value="b"> Siempre, incluso si la API documenta otro formato.</label>
+        <label><input type="radio" name="q2" value="c"> Solo para cambiar el puerto TCP.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q2Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>3. ¿Qué representa normalmente /equipos/452?</legend>
+        <label><input type="radio" name="q3" value="a"> Una ruta que identifica un recurso concreto.</label>
+        <label><input type="radio" name="q3" value="b"> Un código de estado.</label>
+        <label><input type="radio" name="q3" value="c"> Un token de autenticación.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q3Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>4. ¿Qué diferencia básica existe entre respuesta.text y respuesta.content?</legend>
+        <label><input type="radio" name="q4" value="a"> text ofrece contenido textual; content devuelve bytes.</label>
+        <label><input type="radio" name="q4" value="b"> No existe ninguna diferencia.</label>
+        <label><input type="radio" name="q4" value="c"> content siempre devuelve un diccionario Python.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q4Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>5. ¿Qué se estudiará en 2.2.4?</legend>
+        <label><input type="radio" name="q5" value="a"> Procesamiento de respuestas JSON.</label>
+        <label><input type="radio" name="q5" value="b"> Diseño de antenas.</label>
+        <label><input type="radio" name="q5" value="c"> Álgebra booleana.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q5Feedback">Selecciona una respuesta.</div>
+    </article>
+
+  </div>
+
+  <div class="action-row" style="margin-top:1rem">
+    <button class="btn" id="checkQuiz" type="button">Comprobar todo</button>
+    <button class="btn light" id="resetQuiz" type="button">Reintentar</button>
+  </div>
+
+  <div class="score" id="scoreBox" aria-live="polite">
+    Aún no has comprobado la actividad.
+  </div>
+</div>
+</section>
+
+<section id="reflexiona">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Reflexión</div>
+    <div>
+      <h2>Diseña una solicitud completa</h2>
+      <p class="lead">Propón una operación de una API de red e indica qué datos irían en ruta, query y cuerpo, además de qué información esperarías recibir.</p>
+    </div>
+  </div>
+
+  <div class="reflection-box">
+    <textarea id="reflectionText" aria-label="Reflexión del estudiante" placeholder="Ejemplo: /equipos/452 identifica el equipo; ?detalle=true ajusta la consulta; PATCH envía json={...}; luego reviso status_code y el cuerpo de respuesta..."></textarea>
+
+    <div class="action-row">
+      <button class="btn" id="saveReflection" type="button">Guardar en este navegador</button>
+      <button class="btn light" id="clearReflection" type="button">Borrar</button>
+    </div>
+
+    <p id="reflectionStatus" aria-live="polite">
+      El texto no se transmite; si lo guardas, permanece únicamente en el almacenamiento local de este navegador.
+    </p>
+  </div>
+
+  <div class="references" style="margin-top:2rem">
+    <article class="ref-card">
+      <h3>Ideas clave</h3>
+      <p>Ruta, query y cuerpo tienen responsabilidades distintas. <code>params=</code>, <code>json=</code> y <code>data=</code> deben utilizarse de acuerdo con el contrato de la API.</p>
+    </article>
+
+    <article class="ref-card">
+      <h3>Delimitación</h3>
+      <p>En 2.2.4 se analizará cómo convertir una respuesta JSON en estructuras Python y validar los datos recibidos.</p>
+    </article>
+  </div>
+
+  <div class="bottom-nav">
+    <a class="btn light" href="tema-2-2-2-solicitudes-http-desde-aplicaciones.html">← 2.2.2 Solicitudes HTTP</a>
+    <a class="btn light" href="tema-2-2-4-procesamiento-respuestas-json.html">2.2.4 Procesamiento de respuestas JSON →</a>
+  </div>
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="footer-inner">
+  <div>
+    <strong>Programación de Redes: Protocolos y APIs</strong><br>
+    <span>Subtema 2.2.3 · Envío y recepción de parámetros y datos</span>
+  </div>
+  <div>Material interactivo · uso local</div>
+</div>
+</footer>
+
+<div class="progress-wrap" aria-hidden="true">
+  Recorrido <b id="progressValue">0%</b>
+</div>
+
+<script>
+(() => {
+"use strict";
+
+const $=id=>document.getElementById(id);
+
+const setFeedback=(el,text,type="")=>{
+  el.textContent=text;
+  el.className="feedback"+(type?" "+type:"");
+};
+
+const setMini=(el,text,ok=null)=>{
+  el.textContent=text;
+  el.style.borderLeftColor=
+    ok===true?"var(--green)":ok===false?"var(--red)":"var(--cyan)";
+  el.style.background=
+    ok===true?"var(--green-soft)":ok===false?"var(--red-soft)":"var(--soft)";
+};
+
+$("checkPrediction").addEventListener("click",()=>{
+  const s=document.querySelector('input[name="prediction"]:checked');
+
+  if(!s){
+    return setFeedback(
+      $("predictionFeedback"),
+      "Selecciona primero una opción.",
+      "warn"
+    );
+  }
+
+  if(s.value==="a"){
+    setFeedback(
+      $("predictionFeedback"),
+      "Correcto. El filtro zona=sur pertenece naturalmente al query cuando así lo documenta la API.",
+      "success"
+    );
+  }else{
+    setFeedback(
+      $("predictionFeedback"),
+      "Revisa la función del dato: se trata de un filtro de consulta, no de una credencial ni una excepción.",
+      "error"
+    );
+  }
+});
+
+$("resetPrediction").addEventListener("click",()=>{
+  document.querySelectorAll('input[name="prediction"]').forEach(r=>r.checked=false);
+
+  setFeedback(
+    $("predictionFeedback"),
+    "La zona actúa como filtro de una colección."
+  );
+});
+
+const operations={
+  filter:{
+    expected:"params",
+    label:"params=",
+    method:"GET",
+    target:"/v1/enlaces",
+    preview:
+`params = {"zona": "sur"}
+
+respuesta = requests.get(
+    url,
+    params=params,
+    timeout=5
+)`
+  },
+  single:{
+    expected:"path",
+    label:"Ruta",
+    method:"GET",
+    target:"/v1/equipos/452",
+    preview:
+`equipo_id = 452
+
+url = (
+    "https://api.example"
+    f"/v1/equipos/{equipo_id}"
+)
+
+respuesta = requests.get(
+    url,
+    timeout=5
+)`
+  },
+  patch:{
+    expected:"json",
+    label:"json=",
+    method:"PATCH",
+    target:"/v1/equipos/452",
+    preview:
+`datos = {
+    "estado": "mantenimiento"
+}
+
+respuesta = requests.patch(
+    url,
+    json=datos,
+    timeout=5
+)`
+  },
+  form:{
+    expected:"data",
+    label:"data=",
+    method:"POST",
+    target:"/v1/sesion",
+    preview:
+`datos = {
+    "usuario": "operador",
+    "modo": "consulta"
+}
+
+respuesta = requests.post(
+    url,
+    data=datos,
+    timeout=5
+)`
+  }
+};
+
+$("evaluateTransport").addEventListener("click",()=>{
+  const op=operations[$("operation").value];
+  const chosen=$("sendMode").value;
+
+  $("outMode").textContent=op.label;
+  $("outMethod").textContent=op.method;
+  $("outTarget").textContent=op.target;
+  $("transportPreview").textContent=op.preview;
+
+  const ok=chosen===op.expected;
+
+  setFeedback(
+    $("transportFeedback"),
+    ok
+      ? `Elección coherente: ${op.label} corresponde a este dato según el escenario.`
+      : `Para este escenario, el mecanismo esperado es ${op.label}.`,
+    ok?"success":"error"
+  );
+});
+
+const practices=[
+  {
+    s:"p1",b:"checkP1",f:"p1Feedback",a:"a",
+    ok:"Correcto. Un filtro de colección se envía normalmente mediante params cuando así lo define la API.",
+    bad:"La severidad es un filtro de consulta, no una contraseña ni una excepción."
+  },
+  {
+    s:"p2",b:"checkP2",f:"p2Feedback",a:"a",
+    ok:"Correcto. Si la API espera JSON, json=datos expresa claramente el cuerpo estructurado.",
+    bad:"Respeta el formato documentado por la API; no sustituyas JSON por otro mecanismo sin motivo."
+  },
+  {
+    s:"p3",b:"checkP3",f:"p3Feedback",a:"a",
+    ok:"Correcto. respuesta.text proporciona el cuerpo decodificado como texto.",
+    bad:"Para contenido textual, utiliza respuesta.text."
+  }
+];
+
+practices.forEach(p=>{
+  $(p.b).addEventListener("click",()=>{
+    const v=$(p.s).value;
+
+    if(!v){
+      return setMini(
+        $(p.f),
+        "Selecciona primero una respuesta."
+      );
+    }
+
+    setMini(
+      $(p.f),
+      v===p.a?p.ok:p.bad,
+      v===p.a
+    );
+  });
+});
+
+$("checkCase").addEventListener("click",()=>{
+  const ok=
+    $("caseId").value==="path" &&
+    $("caseRead").value==="get" &&
+    $("caseUpdate").value==="patch";
+
+  setFeedback(
+    $("caseFeedback"),
+    ok
+      ? "Diseño coherente. El ID identifica el recurso, GET lo consulta y PATCH envía la modificación parcial como JSON."
+      : "Revisa la responsabilidad de cada parte: identificador en ruta, método de lectura y cuerpo de actualización.",
+    ok?"success":"error"
+  );
+});
+
+const answers={
+  q1:"a",
+  q2:"a",
+  q3:"a",
+  q4:"a",
+  q5:"a"
+};
+
+const explanations={
+  q1:"params= se utiliza para parámetros de consulta.",
+  q2:"json=datos es apropiado cuando la API espera JSON.",
+  q3:"/equipos/452 identifica un recurso concreto dentro de la interfaz.",
+  q4:"respuesta.text ofrece texto; respuesta.content devuelve bytes.",
+  q5:"El siguiente subtema procesa respuestas JSON."
+};
+
+$("checkQuiz").addEventListener("click",()=>{
+  let score=0;
+
+  Object.keys(answers).forEach(q=>{
+    const s=document.querySelector(`input[name="${q}"]:checked`);
+    const ok=s&&s.value===answers[q];
+
+    if(ok){
+      score++;
+    }
+
+    setMini(
+      $(`${q}Feedback`),
+      s
+        ? ((ok?"Correcto. ":"Revisa. ")+explanations[q])
+        : "Falta responder esta pregunta.",
+      ok
+    );
+  });
+
+  $("scoreBox").textContent=
+    `Resultado: ${score}/5. ${
+      score===5
+        ? "Dominio sólido del envío y recepción básica de parámetros y datos."
+        : "Revisa las explicaciones y vuelve a intentarlo."
+    }`;
+});
+
+$("resetQuiz").addEventListener("click",()=>{
+  document.querySelectorAll('#quiz input[type="radio"]').forEach(r=>r.checked=false);
+
+  Object.keys(answers).forEach(q=>{
+    setMini(
+      $(`${q}Feedback`),
+      "Selecciona una respuesta."
+    );
+  });
+
+  $("scoreBox").textContent=
+    "Aún no has comprobado la actividad.";
+});
+
+const key="pr-redes-2-2-3-reflexion";
+
+try{
+  const saved=localStorage.getItem(key);
+  if(saved){
+    $("reflectionText").value=saved;
+  }
+}catch(_){}
+
+$("saveReflection").addEventListener("click",()=>{
+  try{
+    localStorage.setItem(
+      key,
+      $("reflectionText").value
+    );
+
+    $("reflectionStatus").textContent=
+      "Reflexión guardada únicamente en este navegador.";
+  }catch(_){
+    $("reflectionStatus").textContent=
+      "Este navegador no permitió guardar la reflexión localmente.";
+  }
+});
+
+$("clearReflection").addEventListener("click",()=>{
+  $("reflectionText").value="";
+
+  try{
+    localStorage.removeItem(key);
+  }catch(_){}
+
+  $("reflectionStatus").textContent=
+    "Reflexión borrada del almacenamiento local.";
+});
+
+const sections=[...document.querySelectorAll("main section")];
+
+function updateProgress(){
+  const total=document.documentElement.scrollHeight-window.innerHeight;
+  const pct=
+    total>0
+      ? Math.max(0,Math.min(100,Math.round((window.scrollY/total)*100)))
+      : 100;
+
+  $("progressValue").textContent=pct+"%";
+
+  const marker=window.scrollY+window.innerHeight*.36;
+  let current=sections[0];
+
+  sections.forEach(s=>{
+    if(s.offsetTop<=marker){
+      current=s;
+    }
+  });
+
+  document.querySelectorAll("nav a").forEach(
+    a=>a.removeAttribute("aria-current")
+  );
+
+  if(current&&current.id){
+    const link=document.querySelector(`nav a[href="#${current.id}"]`);
+
+    if(link){
+      link.setAttribute("aria-current","location");
+    }
+  }
+}
+
+window.addEventListener("scroll",updateProgress,{passive:true});
+window.addEventListener("resize",updateProgress);
+updateProgress();
+})();
+</script>
+</body>
+</html>
