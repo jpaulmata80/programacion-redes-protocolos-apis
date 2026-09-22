@@ -6,80 +6,186 @@
   <meta name="author" content="Jean Paul Mata Quevedo">
   <meta name="copyright" content="Jean Paul Mata Quevedo">
   <meta name="description" content="Material educativo interactivo de Programación de Redes: Protocolos y APIs.">
+  <meta name="theme-color" content="#E20613">
   <title>Programación de Redes: Protocolos y APIs</title>
-  <style>
-    :root { color-scheme: light dark; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    * { box-sizing: border-box; }
-    body { margin: 0; min-height: 100vh; background: #f8fafc; color: #0f172a; }
-    header { background: #0f172a; color: #f8fafc; }
-    .wrap { width: min(1080px, calc(100% - 32px)); margin: 0 auto; }
-    header .wrap { padding: 64px 0 54px; }
-    .eyebrow { color: #93c5fd; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; font-size: .8rem; }
-    h1 { max-width: 860px; margin: .55rem 0 1rem; font-size: clamp(2rem, 5vw, 4rem); line-height: 1.05; }
-    header p { max-width: 760px; color: #cbd5e1; line-height: 1.65; }
-    main.wrap { padding: 42px 0 56px; }
-    .blocks { display: grid; gap: 24px; }
-    .block { border: 1px solid #cbd5e1; border-radius: 18px; padding: 24px; background: #fff; }
-    .block small { color: #2563eb; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
-    .block h2 { margin: .55rem 0 .5rem; }
-    .block > p { color: #475569; line-height: 1.55; margin-bottom: 1.25rem; }
-    .topics { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
-    .topic { display: block; padding: 18px; border: 1px solid #dbe3ea; border-radius: 12px; color: inherit; text-decoration: none; background: #f8fafc; }
-    .topic b { display: block; color: #2563eb; font-size: .82rem; margin-bottom: .35rem; }
-    .topic span { display: block; font-weight: 750; line-height: 1.35; }
-    .pending { margin-top: .55rem; color: #64748b; font-size: .8rem; font-weight: 650; }
-    footer { padding: 22px 0 32px; color: #64748b; font-size: .9rem; border-top: 1px solid #e2e8f0; }
-    @media (prefers-color-scheme: dark) {
-      body { background: #020617; color: #e2e8f0; }
-      .block { background: #0f172a; border-color: #334155; }
-      .block > p { color: #cbd5e1; }
-      .topic { background: #111827; border-color: #334155; }
-      .pending { color: #94a3b8; }
-      footer { border-color: #334155; color: #94a3b8; }
-    }
-  </style>
   <link rel="stylesheet" href="assets/css/curso.css">
 </head>
 <body class="course-home">
-  <header>
-    <div class="wrap">
-      <a class="institution-logo-link institution-logo-link--home" href="index.html" aria-label="Universidad Católica de Cuenca">
-        <img class="institution-logo" src="assets/img/logo-ucacue.png" alt="Universidad Católica de Cuenca">
-      </a>
-      <div class="eyebrow">Material educativo interactivo</div>
-      <h1>Programación de Redes: Protocolos y APIs</h1>
-      <p>Acceso organizado a los contenidos interactivos de la asignatura. Los temas y subtemas se publican como recursos HTML autónomos.</p>
+  <header class="site-header">
+    <div class="topbar">
+      <div class="wrap topbar-inner">
+        <a class="institution-brand" href="index.html" aria-label="Inicio de Programación de Redes">
+          <span class="logo-box">
+            <img class="institution-logo" src="assets/img/logo-ucacue.png" alt="Universidad Católica de Cuenca">
+          </span>
+          <span class="institution-copy">
+            <strong>Universidad Católica de Cuenca</strong>
+            <small>Material educativo interactivo</small>
+          </span>
+        </a>
+        <span class="topbar-label">Aula digital · 2026</span>
+      </div>
+    </div>
+
+    <div class="course-hero">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow">Programación · Redes · Servicios</div>
+          <h1>Programación de Redes:<br><span>Protocolos y APIs</span></h1>
+          <p>Un recorrido práctico por programación aplicada a redes, comunicación mediante sockets, automatización, HTTP y desarrollo de APIs.</p>
+          <div class="hero-actions">
+            <a class="primary-action" href="#bloques">Explorar contenidos</a>
+            <span class="hero-summary"><b>2</b> bloques <i></i><b>8</b> temas</span>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-label="Mapa conceptual del curso">
+          <div class="visual-title">Ruta del curso</div>
+          <div class="network-flow">
+            <div class="network-node">
+              <span class="node-number">01</span>
+              <strong>Programar</strong>
+              <small>Aplicaciones de red</small>
+            </div>
+            <span class="network-arrow" aria-hidden="true">→</span>
+            <div class="network-node">
+              <span class="node-number">02</span>
+              <strong>Comunicar</strong>
+              <small>TCP · UDP · HTTP</small>
+            </div>
+            <span class="network-arrow" aria-hidden="true">→</span>
+            <div class="network-node">
+              <span class="node-number">03</span>
+              <strong>Integrar</strong>
+              <small>Servicios y APIs</small>
+            </div>
+          </div>
+          <div class="visual-note">De los fundamentos a la integración de aplicaciones conectadas.</div>
+        </div>
+      </div>
     </div>
   </header>
 
-  <main class="wrap">
-    <section class="blocks" aria-label="Bloques de la asignatura">
-      <article class="block">
-        <small>Bloque 1</small>
-        <h2>Programación de redes y automatización de tareas</h2>
-        <p>Fundamentos de programación aplicada a redes, sockets, automatización y procesamiento de información de red.</p>
-        <div class="topics">
-          <a class="topic" href="temas/bloque-1/tema-1-1/tema-1-1-fundamentos-programacion-aplicada-redes.html"><b>Tema 1.1</b><span>Fundamentos de programación aplicada a redes</span></a>
-          <div class="topic"><b>Tema 1.2</b><span>Programación de sockets TCP y UDP</span><div class="pending">HTML pendiente de publicación</div></div>
-          <div class="topic"><b>Tema 1.3</b><span>Automatización de tareas de red</span><div class="pending">HTML pendiente de publicación</div></div>
-          <div class="topic"><b>Tema 1.4</b><span>Obtención y procesamiento de información de red</span><div class="pending">HTML pendiente de publicación</div></div>
+  <main>
+    <section class="course-content wrap" id="bloques">
+      <div class="section-intro">
+        <div>
+          <span class="section-kicker">Contenidos</span>
+          <h2>Ruta de aprendizaje</h2>
         </div>
-      </article>
+        <p>Selecciona un tema disponible para ingresar a su recurso interactivo. Los contenidos pendientes se activarán progresivamente.</p>
+      </div>
 
-      <article class="block">
-        <small>Bloque 2</small>
-        <h2>APIs, servicios web e integración de aplicaciones de red</h2>
-        <p>HTTP, consumo y desarrollo de APIs REST e integración de aplicaciones de red.</p>
-        <div class="topics">
-          <div class="topic"><b>Tema 2.1</b><span>Fundamentos de servicios web y protocolo HTTP</span><div class="pending">HTML pendiente de publicación</div></div>
-          <div class="topic"><b>Tema 2.2</b><span>Consumo de APIs y servicios web</span><div class="pending">HTML pendiente de publicación</div></div>
-          <div class="topic"><b>Tema 2.3</b><span>Desarrollo de APIs REST</span><div class="pending">HTML pendiente de publicación</div></div>
-          <div class="topic"><b>Tema 2.4</b><span>Integración y buenas prácticas en aplicaciones de red</span><div class="pending">HTML pendiente de publicación</div></div>
-        </div>
-      </article>
+      <div class="blocks">
+        <article class="block-card">
+          <div class="block-heading">
+            <div class="block-index">01</div>
+            <div>
+              <span class="block-label">Bloque 1</span>
+              <h3>Programación de redes y automatización de tareas</h3>
+              <p>Fundamentos de programación aplicada a redes, sockets, automatización y procesamiento de información de red.</p>
+            </div>
+          </div>
+
+          <div class="topics">
+            <a class="topic topic--available" href="temas/bloque-1/tema-1-1/tema-1-1-fundamentos-programacion-aplicada-redes.html">
+              <div class="topic-top">
+                <span class="topic-code">Tema 1.1</span>
+                <span class="status status--available">Disponible</span>
+              </div>
+              <strong>Fundamentos de programación aplicada a redes</strong>
+              <span class="topic-link">Abrir tema <b aria-hidden="true">→</b></span>
+            </a>
+
+            <div class="topic topic--pending">
+              <div class="topic-top">
+                <span class="topic-code">Tema 1.2</span>
+                <span class="status">Próximamente</span>
+              </div>
+              <strong>Programación de sockets TCP y UDP</strong>
+              <span class="topic-muted">HTML pendiente de publicación</span>
+            </div>
+
+            <div class="topic topic--pending">
+              <div class="topic-top">
+                <span class="topic-code">Tema 1.3</span>
+                <span class="status">Próximamente</span>
+              </div>
+              <strong>Automatización de tareas de red</strong>
+              <span class="topic-muted">HTML pendiente de publicación</span>
+            </div>
+
+            <div class="topic topic--pending">
+              <div class="topic-top">
+                <span class="topic-code">Tema 1.4</span>
+                <span class="status">Próximamente</span>
+              </div>
+              <strong>Obtención y procesamiento de información de red</strong>
+              <span class="topic-muted">HTML pendiente de publicación</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="block-card">
+          <div class="block-heading">
+            <div class="block-index">02</div>
+            <div>
+              <span class="block-label">Bloque 2</span>
+              <h3>APIs, servicios web e integración de aplicaciones de red</h3>
+              <p>HTTP, consumo y desarrollo de APIs REST e integración de aplicaciones de red.</p>
+            </div>
+          </div>
+
+          <div class="topics">
+            <div class="topic topic--pending">
+              <div class="topic-top">
+                <span class="topic-code">Tema 2.1</span>
+                <span class="status">Próximamente</span>
+              </div>
+              <strong>Fundamentos de servicios web y protocolo HTTP</strong>
+              <span class="topic-muted">HTML pendiente de publicación</span>
+            </div>
+
+            <div class="topic topic--pending">
+              <div class="topic-top">
+                <span class="topic-code">Tema 2.2</span>
+                <span class="status">Próximamente</span>
+              </div>
+              <strong>Consumo de APIs y servicios web</strong>
+              <span class="topic-muted">HTML pendiente de publicación</span>
+            </div>
+
+            <div class="topic topic--pending">
+              <div class="topic-top">
+                <span class="topic-code">Tema 2.3</span>
+                <span class="status">Próximamente</span>
+              </div>
+              <strong>Desarrollo de APIs REST</strong>
+              <span class="topic-muted">HTML pendiente de publicación</span>
+            </div>
+
+            <div class="topic topic--pending">
+              <div class="topic-top">
+                <span class="topic-code">Tema 2.4</span>
+                <span class="status">Próximamente</span>
+              </div>
+              <strong>Integración y buenas prácticas en aplicaciones de red</strong>
+              <span class="topic-muted">HTML pendiente de publicación</span>
+            </div>
+          </div>
+        </article>
+      </div>
     </section>
   </main>
 
-  <footer><div class="wrap">© 2026 Jean Paul Mata Quevedo · Material educativo universitario.</div></footer>
+  <footer class="course-footer">
+    <div class="wrap footer-inner">
+      <div>
+        <strong>Programación de Redes: Protocolos y APIs</strong>
+        <span>Material educativo universitario</span>
+      </div>
+      <span>© 2026 Jean Paul Mata Quevedo</span>
+    </div>
+  </footer>
 </body>
 </html>
