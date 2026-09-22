@@ -701,42 +701,36 @@ body:not(.course-home) .feedback {
 
 
 /* ---------- Logo institucional dentro del hero ---------- */
-/* Se usa como fondo del contenedor para evitar recortes provocados por
-   reglas heredadas sobre elementos <img> en las páginas de contenido. */
 .course-home .hero-institution-logo,
 body:not(.course-home) .hero-institution-logo {
   display: block;
+  width: 176px;
+  max-width: 46vw;
   margin: 0 0 1.6rem;
   padding: 0;
   border: 0;
   text-decoration: none;
-  background-image: url("../img/logo-ucacue.png");
-  background-repeat: no-repeat;
-  background-position: left center;
-  background-size: contain;
-  aspect-ratio: 263 / 150;
+  background: transparent;
   overflow: visible;
-}
-
-.course-home .hero-institution-logo {
-  width: 184px;
-  max-width: 46vw;
+  line-height: 0;
 }
 
 body:not(.course-home) .hero-institution-logo {
-  width: 168px;
+  width: 164px;
   max-width: 44vw;
 }
 
-/* La imagen queda en el HTML por accesibilidad/estructura, pero el dibujo
-   visible lo hace el fondo para garantizar que se muestre completo. */
 .course-home .hero-institution-logo .institution-logo,
 body:not(.course-home) .hero-institution-logo .institution-logo {
   display: block !important;
-  width: 1px !important;
-  height: 1px !important;
-  opacity: 0 !important;
-  pointer-events: none;
+  width: 100% !important;
+  height: auto !important;
+  max-width: none !important;
+  max-height: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  object-fit: contain !important;
+  overflow: visible !important;
 }
 
 .course-home .hero-institution-logo:focus-visible,
@@ -751,16 +745,8 @@ body:not(.course-home) .hero-institution-logo:focus-visible {
   body:not(.course-home) .hero-institution-logo {
     margin-bottom: 1.25rem;
   }
-
-  .course-home .hero-institution-logo {
-    width: 154px;
-    max-width: 52vw;
-  }
-
-  body:not(.course-home) .hero-institution-logo {
-    width: 146px;
-    max-width: 50vw;
-  }
+  .course-home .hero-institution-logo { width: 152px; max-width: 52vw; }
+  body:not(.course-home) .hero-institution-logo { width: 144px; max-width: 50vw; }
 }
 /* ---------- Fin logo institucional dentro del hero ---------- */
 
