@@ -1,0 +1,1093 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Subtema 2.3.3: recepción, validación y procesamiento de datos en una API con FastAPI.">
+<meta name="theme-color" content="#10212a">
+<title>2.3.3 | Recepción, validación y procesamiento de datos</title>
+<style>
+:root{
+  --ink:#18212a;--muted:#586775;--line:#cbd5dc;--soft:#f3f6f8;--paper:#fff;
+  --cyan:#007c91;--cyan-dark:#005b6a;--cyan-light:#6ed2e2;
+  --green:#16734a;--green-soft:#e8f5ee;--amber:#8a5600;--amber-soft:#fff3d8;
+  --red:#9b2c2c;--red-soft:#fdecec;--focus:#005fcc;
+  --navy:#10212a;--navy-deep:#07141a;--max:1180px;--radius:8px;
+  --shadow:0 16px 38px rgba(24,33,42,.08)
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;min-width:280px;color:var(--ink);background:var(--paper);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  line-height:1.55;overflow-x:hidden
+}
+button,input,select,textarea{font:inherit;max-width:100%}
+a{color:var(--cyan-dark)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:3px solid var(--focus);outline-offset:3px
+}
+.skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}
+.skip-link:focus{top:1rem}
+header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.header-inner{
+  width:min(100%,var(--max));min-height:66px;margin:0 auto;padding:.55rem 1.25rem;
+  display:flex;gap:1rem;align-items:center;min-width:0
+}
+.brand{min-width:190px}.brand strong{display:block;font-size:.95rem}.brand span{display:block;color:var(--muted);font-size:.78rem}
+.nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}
+nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+nav a{color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;border-bottom:2px solid transparent;font-size:.84rem}
+nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+.top-link{
+  flex:0 0 auto;text-decoration:none;border:1px solid var(--line);border-radius:5px;
+  padding:.48rem .72rem;color:var(--ink);font-weight:750;white-space:nowrap;background:#fff
+}
+main{overflow:hidden}
+section{scroll-margin-top:84px;border-bottom:1px solid var(--line)}
+.band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+.hero{min-height:calc(100svh - 66px);display:grid;align-items:center;background:var(--navy);color:#fff}
+.hero-grid{
+  width:min(100%,var(--max));margin:0 auto;padding:3.4rem 1.25rem;
+  display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:3rem;align-items:center
+}
+.hero-grid>*{min-width:0}
+.eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+h1{
+  font-size:clamp(2rem,5vw,4rem);line-height:1.02;margin:.65rem 0 1.15rem;
+  max-width:20ch;overflow-wrap:normal;word-break:normal;hyphens:none
+}
+h2{
+  font-size:clamp(1.75rem,3.3vw,2.8rem);line-height:1.12;margin:0 0 .8rem;
+  overflow-wrap:normal;word-break:normal;hyphens:none
+}
+h3{font-size:1.22rem;margin:0 0 .55rem}
+p{max-width:72ch}.hero p{color:#d7e5ea;font-size:1.08rem}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}.hero-actions{margin-top:1.45rem}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cyan-dark);
+  background:var(--cyan);color:#fff;text-decoration:none;padding:.72rem 1rem;border-radius:5px;font-weight:750
+}
+.btn:hover{background:var(--cyan-dark)}
+.btn.secondary{background:transparent;color:inherit;border-color:currentColor}
+.btn.secondary:hover{background:rgba(255,255,255,.1)}
+.btn.light{background:#fff;color:var(--ink);border-color:var(--line)}
+.btn.light:hover{background:var(--soft);color:var(--cyan-dark)}
+.hero-board{background:var(--navy-deep);border:1px solid #3b5965;border-radius:8px;padding:1.25rem}
+.validation-flow{display:grid;gap:.55rem;margin-top:1rem}
+.validation-step{
+  display:grid;grid-template-columns:42px minmax(0,1fr);gap:.7rem;align-items:start;
+  padding:.7rem;border:1px solid #3b5965;border-radius:6px;background:#0d2630
+}
+.validation-step b{
+  display:grid;place-items:center;width:42px;height:42px;border-radius:50%;
+  background:#153d4a;color:var(--cyan-light)
+}
+.validation-step small{display:block;color:#b8cbd2;margin-top:.15rem}
+.section-head{
+  display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem
+}
+.section-head>*{min-width:0}
+.section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}
+.lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+.outcomes{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line)
+}
+.outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}
+.outcome:last-child{border-right:0}
+.outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+.scope-note,.callout{margin-top:1.4rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}
+.concept-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+.concept-card{
+  min-width:0;border:1px solid var(--line);border-radius:var(--radius);
+  padding:1.15rem;background:#fff;box-shadow:var(--shadow)
+}
+.tag{
+  display:inline-block;font-size:.76rem;font-weight:850;color:var(--cyan-dark);
+  background:#d9eef2;padding:.2rem .45rem;border-radius:999px;margin-bottom:.55rem
+}
+.concept-card p{color:var(--muted);font-size:.94rem}
+.table-wrap{overflow-x:auto;margin-top:1.2rem;border:1px solid var(--line);border-radius:7px}
+table{border-collapse:collapse;width:100%;min-width:930px}
+th,td{padding:.8rem;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--soft)}
+.activity{
+  margin-top:1.5rem;padding:1.35rem;border:1px solid var(--line);
+  border-radius:var(--radius);background:var(--soft);min-width:0
+}
+.prediction{display:grid;gap:.6rem;margin:.85rem 0 1rem}
+.prediction label{display:block;padding:.75rem .8rem;background:#fff;border:1px solid var(--line);border-radius:5px}
+.feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}
+.feedback.success{background:var(--green-soft);border-color:var(--green)}
+.feedback.warn{background:var(--amber-soft);border-color:var(--amber)}
+.feedback.error{background:var(--red-soft);border-color:var(--red)}
+.lab-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:1rem}
+.lab-grid>*{min-width:0}
+.lab-panel{border:1px solid var(--line);border-radius:7px;background:#fff;padding:1rem}
+.lab-panel label{display:block;font-weight:750;margin:.75rem 0 .3rem}
+.lab-panel select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+.result-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-top:1rem}
+.result-card{padding:.8rem;border:1px solid var(--line);border-radius:6px;background:#fff;min-width:0}
+.result-card b{display:block;color:var(--cyan-dark);font-size:.78rem;text-transform:uppercase}
+.result-card span{display:block;margin-top:.25rem;overflow-wrap:anywhere}
+.terminal{
+  margin-top:1rem;background:#07141a;color:#dce9ed;border-radius:7px;padding:1rem;
+  border:1px solid #314b56;overflow-x:auto
+}
+.terminal pre{margin:0;white-space:pre-wrap;word-break:break-word}
+.code-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.code-card{min-width:0;background:#09161d;color:#dce9ed;border:1px solid #314b56;border-radius:7px;padding:1rem}
+.code-card h3{color:#fff}
+.code-block{overflow-x:auto;margin:.75rem 0;background:#061016;border:1px solid #253c47;border-radius:6px;padding:1rem}
+.code-block code{white-space:pre}
+.code-note{color:#bfd1d7}
+.exercise-box{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.exercise-head{padding:1rem 1.1rem;background:var(--navy);color:#fff}
+.exercise-head span{display:block;color:var(--cyan-light);font-size:.78rem;font-weight:850;text-transform:uppercase}
+.exercise-body{padding:1.1rem}
+.solution-steps{display:grid;gap:.75rem}
+.solution-step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:.8rem;align-items:start}
+.solution-step>b{
+  display:grid;place-items:center;width:34px;height:34px;border-radius:50%;
+  background:#d9eef2;color:var(--cyan-dark)
+}
+.practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+.practice-card{border:1px solid var(--line);border-radius:7px;padding:1rem;min-width:0}
+.practice-card select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.mini-feedback{margin-top:.75rem;padding:.75rem;border-left:4px solid var(--cyan);background:var(--soft);min-height:4rem}
+.case-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}
+.case-grid label{display:block;font-weight:750}
+.case-grid select{width:100%;margin-top:.3rem;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.quiz{display:grid;gap:1rem}
+.quiz-card{border:1px solid var(--line);border-radius:7px;padding:1rem}
+.quiz-card fieldset{border:0;padding:0;margin:0}
+.quiz-card legend{font-weight:800;margin-bottom:.7rem}
+.quiz-card label{display:block;padding:.5rem .55rem;border-radius:4px}
+.quiz-card label:hover{background:var(--soft)}
+.score{margin-top:1rem;padding:1rem;border:1px solid var(--line);border-radius:6px;background:var(--soft);font-weight:800}
+.reflection-box textarea{width:100%;min-height:145px;resize:vertical;padding:.8rem;border:1px solid var(--line);border-radius:6px}
+.references{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.ref-card{border-top:4px solid var(--cyan);padding:1rem;background:var(--soft)}
+.bottom-nav{margin-top:2rem;display:flex;justify-content:space-between;gap:.7rem;flex-wrap:wrap}
+footer{background:var(--navy-deep);color:#c7d8de}
+.footer-inner{
+  width:min(100%,var(--max));margin:0 auto;padding:1.4rem 1.25rem;
+  display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap
+}
+.progress-wrap{
+  position:fixed;right:1rem;bottom:1rem;z-index:20;background:rgba(7,20,26,.93);
+  color:#fff;padding:.45rem .7rem;border-radius:999px;font-size:.78rem;border:1px solid #3b5965
+}
+@media(max-width:900px){
+  .hero-grid,.section-head,.lab-grid,.code-grid{grid-template-columns:1fr}
+  .concept-grid,.outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .outcome:nth-child(2){border-right:0}
+  .outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .practice-grid,.case-grid{grid-template-columns:1fr}
+}
+@media(max-width:650px){.result-grid,.references{grid-template-columns:1fr}}
+@media(max-width:600px){
+  .header-inner{padding-inline:.8rem}.brand{min-width:145px}.top-link{padding:.45rem .6rem}
+  .band,.hero-grid{padding-left:.9rem;padding-right:.9rem}
+  h1{font-size:clamp(2rem,10vw,2.72rem);max-width:none}
+  .concept-grid,.outcomes{grid-template-columns:1fr}
+  .outcome{border-right:0;border-bottom:1px solid var(--line)}
+  .outcome:last-child{border-bottom:0}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+<header>
+<div class="header-inner">
+  <div class="brand"><strong>Programación de Redes</strong><span>Protocolos y APIs</span></div>
+  <div class="nav-scroll" aria-label="Navegación del subtema">
+    <nav>
+      <a href="#inicio">Inicio</a>
+      <a href="#orientacion">Cómo trabajar</a>
+      <a href="#conceptos">Conceptos</a>
+      <a href="#predice">Predice</a>
+      <a href="#experimenta">Experimenta</a>
+      <a href="#codigo">Código</a>
+      <a href="#resuelto">Ejercicio resuelto</a>
+      <a href="#practica">Practica</a>
+      <a href="#caso">Caso profesional</a>
+      <a href="#comprueba">Comprueba</a>
+      <a href="#reflexiona">Reflexión</a>
+    </nav>
+  </div>
+  <a class="top-link" href="index.html">← Curso</a>
+</div>
+</header>
+
+<main id="contenido">
+
+<section class="hero" id="inicio">
+<div class="hero-grid">
+  <div>
+    <div class="eyebrow">Bloque 2 · Tema 2.3 · Subtema 2.3.3</div>
+    <h1>Recepción, validación y procesamiento de datos</h1>
+    <p>Haz que la API acepte únicamente datos coherentes con su contrato: modelos Pydantic, tipos, restricciones, parámetros y procesamiento previo a la lógica del servicio.</p>
+
+    <div class="hero-actions">
+      <a class="btn" href="#orientacion">Comenzar recorrido</a>
+      <a class="btn secondary" href="tema-2-3-desarrollo-apis-rest.html">Volver al Tema 2.3</a>
+    </div>
+  </div>
+
+  <div class="hero-board" role="img" aria-label="Flujo de recepción y validación de datos en una API">
+    <h3>De entrada externa a dato confiable</h3>
+    <div class="validation-flow">
+      <div class="validation-step"><b>1</b><div><strong>Recibir</strong><small>path · query · body</small></div></div>
+      <div class="validation-step"><b>2</b><div><strong>Interpretar</strong><small>tipos declarados</small></div></div>
+      <div class="validation-step"><b>3</b><div><strong>Validar</strong><small>campos · rangos · restricciones</small></div></div>
+      <div class="validation-step"><b>4</b><div><strong>Procesar</strong><small>normalizar · transformar · preparar</small></div></div>
+      <div class="validation-step"><b>5</b><div><strong>Usar</strong><small>lógica del servicio</small></div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="orientacion">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Cómo trabajar este tema</div>
+    <div>
+      <h2>No confíes en la entrada solo porque llegó como JSON</h2>
+      <p class="lead">JSON válido únicamente confirma sintaxis. La API debe verificar que los campos, tipos y reglas correspondan al modelo que espera.</p>
+    </div>
+  </div>
+
+  <div class="outcomes">
+    <div class="outcome"><b>1. Modelar</b> cuerpos de solicitud con Pydantic.</div>
+    <div class="outcome"><b>2. Validar</b> tipos, campos obligatorios y restricciones.</div>
+    <div class="outcome"><b>3. Diferenciar</b> path, query y body en la recepción.</div>
+    <div class="outcome"><b>4. Procesar</b> datos validados antes de usarlos.</div>
+  </div>
+
+  <div class="scope-note">
+    <strong>Alcance.</strong> Trabajaremos validación de entrada. La implementación completa de operaciones CRUD se desarrollará en 2.3.4.
+  </div>
+</div>
+</section>
+
+<section id="conceptos">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Explora</div>
+    <div>
+      <h2>Validar es convertir una entrada externa en un dato utilizable</h2>
+      <p class="lead">FastAPI utiliza anotaciones de tipo y modelos Pydantic para comprobar automáticamente gran parte del contrato.</p>
+    </div>
+  </div>
+
+  <div class="concept-grid">
+    <article class="concept-card">
+      <span class="tag">Path</span>
+      <h3>Identificador</h3>
+      <p>Valores como <code>/equipos/{equipo_id}</code> pueden validarse declarando <code>equipo_id: int</code>.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">Query</span>
+      <h3>Filtro</h3>
+      <p>Parámetros opcionales o requeridos pueden tiparse y restringirse antes de llegar a la lógica.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">Body</span>
+      <h3>Modelo Pydantic</h3>
+      <p>Un <code>BaseModel</code> define los campos que debe contener un cuerpo JSON estructurado.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">Procesamiento</span>
+      <h3>Dato limpio</h3>
+      <p>Después de validar puedes normalizar cadenas, calcular campos o preparar información para otra capa.</p>
+    </article>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Entrada</th><th>Declaración</th><th>Validación</th><th>Ejemplo de fallo</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Path</td><td><code>equipo_id: int</code></td><td>Debe convertirse a entero.</td><td><code>/equipos/abc</code></td></tr>
+        <tr><td>Query</td><td><code>limit: int = 20</code></td><td>Tipo entero; pueden añadirse límites.</td><td><code>?limit=texto</code></td></tr>
+        <tr><td>Body</td><td><code>equipo: EquipoEntrada</code></td><td>Campos y tipos del modelo.</td><td>Falta un campo obligatorio.</td></tr>
+        <tr><td>Restricción</td><td><code>Field(min_length=2)</code></td><td>Regla adicional.</td><td>Nombre demasiado corto.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <strong>Respuesta de validación:</strong> cuando la solicitud no cumple el esquema esperado, FastAPI responde normalmente con un error HTTP <code>422 Unprocessable Entity</code> y detalles de validación antes de ejecutar la lógica del endpoint.
+  </div>
+</div>
+</section>
+
+<section id="predice">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Predice</div>
+    <div>
+      <h2>¿Qué ocurre con una entrada inválida?</h2>
+      <p class="lead">El endpoint espera <code>equipo_id: int</code> y el cliente solicita <code>/api/equipos/abc</code>.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="prediction">
+      <label><input type="radio" name="prediction" value="a"> La validación detecta que <code>abc</code> no puede interpretarse como entero.</label>
+      <label><input type="radio" name="prediction" value="b"> FastAPI inventa automáticamente un ID numérico.</label>
+      <label><input type="radio" name="prediction" value="c"> El valor se convierte en contraseña.</label>
+    </div>
+
+    <div class="action-row">
+      <button class="btn" id="checkPrediction" type="button">Comprobar</button>
+      <button class="btn light" id="resetPrediction" type="button">Reintentar</button>
+    </div>
+
+    <div class="feedback" id="predictionFeedback" aria-live="polite">
+      Los tipos declarados forman parte del contrato de entrada.
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="experimenta">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Experimenta</div>
+    <div>
+      <h2>Evalúa datos de entrada</h2>
+      <p class="lead">Selecciona un escenario y observa si el modelo debería aceptarlo.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="lab-grid">
+      <div class="lab-panel">
+        <label for="validationScenario">Escenario</label>
+        <select id="validationScenario">
+          <option value="valid">Equipo válido</option>
+          <option value="missing">Falta nombre</option>
+          <option value="badip">IP con formato inválido</option>
+          <option value="short">Nombre demasiado corto</option>
+        </select>
+
+        <button class="btn" id="evaluateValidation" type="button" style="margin-top:1rem">
+          Validar entrada
+        </button>
+
+        <div class="feedback" id="validationFeedback" aria-live="polite">
+          Selecciona un escenario.
+        </div>
+      </div>
+
+      <div class="lab-panel">
+        <h3>Resultado conceptual</h3>
+
+        <div class="result-grid">
+          <div class="result-card"><b>Estado</b><span id="outStatus">válido</span></div>
+          <div class="result-card"><b>Campo</b><span id="outField">todos</span></div>
+          <div class="result-card"><b>Acción</b><span id="outAction">continuar</span></div>
+        </div>
+
+        <div class="terminal">
+          <pre id="validationPreview">{
+  "nombre": "RTR-AZG-01",
+  "ip": "10.10.0.1",
+  "activo": true
+}
+
+Resultado:
+  entrada aceptada</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="codigo">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Explica</div>
+    <div>
+      <h2>Modelos y restricciones con Pydantic</h2>
+      <p class="lead">El modelo expresa el contrato del cuerpo antes de que la lógica del endpoint lo utilice.</p>
+    </div>
+  </div>
+
+  <div class="code-grid">
+    <article class="code-card">
+      <h3>Modelo básico</h3>
+      <div class="code-block"><code>from pydantic import BaseModel
+
+class EquipoEntrada(BaseModel):
+    nombre: str
+    ip: str
+    activo: bool = True</code></div>
+      <p class="code-note">Los campos sin valor por defecto son obligatorios.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Restricciones con Field</h3>
+      <div class="code-block"><code>from pydantic import BaseModel, Field
+
+class EquipoEntrada(BaseModel):
+    nombre: str = Field(
+        min_length=2,
+        max_length=40
+    )
+
+    prioridad: int = Field(
+        ge=1,
+        le=5
+    )</code></div>
+      <p class="code-note"><code>ge</code> y <code>le</code> permiten establecer límites numéricos.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Validar una dirección IP</h3>
+      <div class="code-block"><code>from ipaddress import IPv4Address
+from pydantic import BaseModel
+
+class EquipoEntrada(BaseModel):
+    nombre: str
+    ip: IPv4Address</code></div>
+      <p class="code-note">Usar un tipo específico evita aceptar cualquier cadena como dirección IPv4.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Recibir el body</h3>
+      <div class="code-block"><code>@app.post("/api/equipos")
+def crear_equipo(
+    equipo: EquipoEntrada
+):
+    return {
+        "recibido": equipo.model_dump()
+    }</code></div>
+      <p class="code-note">En Pydantic v2, <code>model_dump()</code> convierte el modelo en un diccionario Python.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Query con restricción</h3>
+      <div class="code-block"><code>from fastapi import Query
+
+@app.get("/api/equipos")
+def listar_equipos(
+    limit: int = Query(
+        default=20,
+        ge=1,
+        le=100
+    )
+):
+    return {
+        "limit": limit
+    }</code></div>
+      <p class="code-note">La API rechaza valores fuera del rango declarado.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>Procesar después de validar</h3>
+      <div class="code-block"><code>@app.post("/api/equipos")
+def crear_equipo(
+    equipo: EquipoEntrada
+):
+    nombre_normalizado = (
+        equipo.nombre.strip().upper()
+    )
+
+    return {
+        "nombre": nombre_normalizado,
+        "ip": str(equipo.ip),
+        "activo": equipo.activo
+    }</code></div>
+      <p class="code-note">La transformación ocurre sobre datos que ya superaron la validación del modelo.</p>
+    </article>
+  </div>
+
+  <div class="callout">
+    <strong>No confundir validación con lógica de negocio.</strong> Comprobar que <code>prioridad</code> esté entre 1 y 5 es validación de formato/regla. Comprobar si un equipo ya existe en inventario pertenece a la lógica del servicio.
+  </div>
+</div>
+</section>
+
+<section id="resuelto">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Ejercicio resuelto</div>
+    <div>
+      <h2>Registrar un equipo de red</h2>
+      <p class="lead">La API recibe nombre, IPv4, prioridad y estado inicial.</p>
+    </div>
+  </div>
+
+  <div class="exercise-box">
+    <div class="exercise-head">
+      <span>Problema</span>
+      <h3>Validar antes de procesar</h3>
+    </div>
+
+    <div class="exercise-body">
+      <div class="solution-steps">
+        <div class="solution-step"><b>1</b><div><strong>Definir modelo.</strong><br>Nombre, IPv4, prioridad y estado.</div></div>
+        <div class="solution-step"><b>2</b><div><strong>Restringir.</strong><br>Nombre mínimo 2 caracteres; prioridad entre 1 y 5.</div></div>
+        <div class="solution-step"><b>3</b><div><strong>Recibir body.</strong><br>Usar el modelo como parámetro del endpoint.</div></div>
+        <div class="solution-step"><b>4</b><div><strong>Procesar.</strong><br>Normalizar el nombre.</div></div>
+        <div class="solution-step"><b>5</b><div><strong>Responder.</strong><br>Devolver representación coherente del dato aceptado.</div></div>
+      </div>
+
+      <div class="code-block" style="margin-top:1rem"><code>from ipaddress import IPv4Address
+from fastapi import FastAPI
+from pydantic import BaseModel, Field
+
+app = FastAPI()
+
+class EquipoEntrada(BaseModel):
+    nombre: str = Field(
+        min_length=2,
+        max_length=40
+    )
+    ip: IPv4Address
+    prioridad: int = Field(
+        ge=1,
+        le=5
+    )
+    activo: bool = True
+
+@app.post("/api/equipos")
+def crear_equipo(
+    equipo: EquipoEntrada
+):
+    return {
+        "nombre": equipo.nombre.strip().upper(),
+        "ip": str(equipo.ip),
+        "prioridad": equipo.prioridad,
+        "activo": equipo.activo
+    }</code></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="practica">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Practica</div>
+    <div>
+      <h2>Decide qué debe validar la API</h2>
+      <p class="lead">Selecciona la opción correcta para cada caso.</p>
+    </div>
+  </div>
+
+  <div class="practice-grid">
+    <article class="practice-card">
+      <h3>Ejercicio 1</h3>
+      <p>El cliente envía <code>prioridad=9</code> y el rango permitido es 1–5.</p>
+      <select id="p1">
+        <option value="">Selecciona…</option>
+        <option value="a">Rechazar la entrada mediante validación</option>
+        <option value="b">Aceptar siempre cualquier número</option>
+        <option value="c">Convertir 9 en contraseña</option>
+      </select>
+      <button class="btn" id="checkP1" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p1Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 2</h3>
+      <p>El campo <code>activo</code> debe ser opcional con valor inicial <code>True</code>.</p>
+      <select id="p2">
+        <option value="">Selecciona…</option>
+        <option value="a">activo: bool = True</option>
+        <option value="b">activo: bool sin valor por defecto</option>
+        <option value="c">activo = "password"</option>
+      </select>
+      <button class="btn" id="checkP2" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p2Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 3</h3>
+      <p>Quieres impedir que <code>limit</code> sea mayor que 100.</p>
+      <select id="p3">
+        <option value="">Selecciona…</option>
+        <option value="a">Query(default=20, ge=1, le=100)</option>
+        <option value="b">Aceptar cualquier valor</option>
+        <option value="c">Usar DELETE</option>
+      </select>
+      <button class="btn" id="checkP3" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p3Feedback">Selecciona una respuesta.</div>
+    </article>
+  </div>
+</div>
+</section>
+
+<section id="caso">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Caso profesional</div>
+    <div>
+      <h2>API para registrar equipos del NOC</h2>
+      <p class="lead">La aplicación recibe nombre, IP, prioridad y estado. Los datos pasarán después a una capa de inventario.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="case-grid">
+      <label>IP
+        <select id="caseIp">
+          <option value="">Selecciona…</option>
+          <option value="typed">Validar con un tipo de dirección IP</option>
+          <option value="text">Aceptar cualquier texto sin comprobar</option>
+        </select>
+      </label>
+
+      <label>Prioridad
+        <select id="casePriority">
+          <option value="">Selecciona…</option>
+          <option value="range">Restringir a un rango permitido</option>
+          <option value="free">Aceptar cualquier entero</option>
+        </select>
+      </label>
+
+      <label>Procesamiento
+        <select id="caseProcessing">
+          <option value="">Selecciona…</option>
+          <option value="after">Normalizar después de validar</option>
+          <option value="before">Procesar datos sin saber si son válidos</option>
+        </select>
+      </label>
+    </div>
+
+    <button class="btn" id="checkCase" type="button" style="margin-top:1rem">
+      Evaluar diseño
+    </button>
+
+    <div class="feedback" id="caseFeedback" aria-live="polite">
+      Una entrada externa debe validarse antes de incorporarse a la lógica de la aplicación.
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="comprueba">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Comprueba</div>
+    <div>
+      <h2>Integra lo aprendido</h2>
+      <p class="lead">Responde las cinco preguntas.</p>
+    </div>
+  </div>
+
+  <div class="quiz" id="quiz">
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>1. ¿Para qué sirve BaseModel?</legend>
+        <label><input type="radio" name="q1" value="a"> Para declarar la estructura y tipos esperados de datos.</label>
+        <label><input type="radio" name="q1" value="b"> Para reemplazar HTTP.</label>
+        <label><input type="radio" name="q1" value="c"> Para abrir sockets UDP.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q1Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>2. ¿JSON sintácticamente válido garantiza que el dato sea válido para la API?</legend>
+        <label><input type="radio" name="q2" value="a"> No. También debe cumplir el esquema y las reglas.</label>
+        <label><input type="radio" name="q2" value="b"> Sí, siempre.</label>
+        <label><input type="radio" name="q2" value="c"> Solo si contiene una IP.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q2Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>3. ¿Qué hace Field(ge=1, le=5)?</legend>
+        <label><input type="radio" name="q3" value="a"> Restringe el valor al rango de 1 a 5.</label>
+        <label><input type="radio" name="q3" value="b"> Define un endpoint GET.</label>
+        <label><input type="radio" name="q3" value="c"> Cifra el cuerpo JSON.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q3Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>4. ¿Cuándo conviene procesar o normalizar un dato?</legend>
+        <label><input type="radio" name="q4" value="a"> Después de que supere la validación correspondiente.</label>
+        <label><input type="radio" name="q4" value="b"> Antes de saber si cumple el contrato.</label>
+        <label><input type="radio" name="q4" value="c"> Solo después de enviarlo por UDP.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q4Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>5. ¿Qué se estudiará en 2.3.4?</legend>
+        <label><input type="radio" name="q5" value="a"> Implementación de operaciones CRUD básicas.</label>
+        <label><input type="radio" name="q5" value="b"> Diseño de antenas.</label>
+        <label><input type="radio" name="q5" value="c"> Electrónica analógica.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q5Feedback">Selecciona una respuesta.</div>
+    </article>
+
+  </div>
+
+  <div class="action-row" style="margin-top:1rem">
+    <button class="btn" id="checkQuiz" type="button">Comprobar todo</button>
+    <button class="btn light" id="resetQuiz" type="button">Reintentar</button>
+  </div>
+
+  <div class="score" id="scoreBox" aria-live="polite">
+    Aún no has comprobado la actividad.
+  </div>
+</div>
+</section>
+
+<section id="reflexiona">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Reflexión</div>
+    <div>
+      <h2>Diseña un modelo de entrada</h2>
+      <p class="lead">Propón un recurso de red con cuatro campos e indica cuáles son obligatorios, qué tipos usarías y qué restricciones aplicarías.</p>
+    </div>
+  </div>
+
+  <div class="reflection-box">
+    <textarea id="reflectionText" aria-label="Reflexión del estudiante" placeholder="Ejemplo: EquipoEntrada con nombre obligatorio de 2–40 caracteres, IPv4 válida, prioridad de 1–5 y activo opcional con True..."></textarea>
+
+    <div class="action-row">
+      <button class="btn" id="saveReflection" type="button">Guardar en este navegador</button>
+      <button class="btn light" id="clearReflection" type="button">Borrar</button>
+    </div>
+
+    <p id="reflectionStatus" aria-live="polite">
+      El texto no se transmite; si lo guardas, permanece únicamente en el almacenamiento local de este navegador.
+    </p>
+  </div>
+
+  <div class="references" style="margin-top:2rem">
+    <article class="ref-card">
+      <h3>Ideas clave</h3>
+      <p>La entrada externa debe ser recibida, interpretada, validada y recién después procesada por la lógica del servicio.</p>
+    </article>
+
+    <article class="ref-card">
+      <h3>Delimitación</h3>
+      <p>En 2.3.4 estos modelos se utilizarán dentro de operaciones CRUD completas.</p>
+    </article>
+  </div>
+
+  <div class="bottom-nav">
+    <a class="btn light" href="tema-2-3-2-desarrollo-api-framework-moderno.html">← 2.3.2 Desarrollo con framework</a>
+    <a class="btn light" href="tema-2-3-4-operaciones-crud-basicas.html">2.3.4 Operaciones CRUD básicas →</a>
+  </div>
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="footer-inner">
+  <div>
+    <strong>Programación de Redes: Protocolos y APIs</strong><br>
+    <span>Subtema 2.3.3 · Recepción, validación y procesamiento de datos</span>
+  </div>
+  <div>Material interactivo · uso local</div>
+</div>
+</footer>
+
+<div class="progress-wrap" aria-hidden="true">
+  Recorrido <b id="progressValue">0%</b>
+</div>
+
+<script>
+(() => {
+"use strict";
+
+const $=id=>document.getElementById(id);
+
+const setFeedback=(el,text,type="")=>{
+  el.textContent=text;
+  el.className="feedback"+(type?" "+type:"");
+};
+
+const setMini=(el,text,ok=null)=>{
+  el.textContent=text;
+  el.style.borderLeftColor=
+    ok===true?"var(--green)":ok===false?"var(--red)":"var(--cyan)";
+  el.style.background=
+    ok===true?"var(--green-soft)":ok===false?"var(--red-soft)":"var(--soft)";
+};
+
+$("checkPrediction").addEventListener("click",()=>{
+  const s=document.querySelector('input[name="prediction"]:checked');
+
+  if(!s){
+    return setFeedback(
+      $("predictionFeedback"),
+      "Selecciona primero una opción.",
+      "warn"
+    );
+  }
+
+  if(s.value==="a"){
+    setFeedback(
+      $("predictionFeedback"),
+      "Correcto. El tipo int forma parte del contrato y la entrada no cumple esa expectativa.",
+      "success"
+    );
+  }else{
+    setFeedback(
+      $("predictionFeedback"),
+      "Revisa la función de la validación: el framework no inventa valores para entradas incompatibles.",
+      "error"
+    );
+  }
+});
+
+$("resetPrediction").addEventListener("click",()=>{
+  document.querySelectorAll('input[name="prediction"]').forEach(r=>r.checked=false);
+
+  setFeedback(
+    $("predictionFeedback"),
+    "Los tipos declarados forman parte del contrato de entrada."
+  );
+});
+
+const scenarios={
+  valid:{
+    status:"válido",
+    field:"todos",
+    action:"continuar",
+    preview:
+`{
+  "nombre": "RTR-AZG-01",
+  "ip": "10.10.0.1",
+  "activo": true
+}
+
+Resultado:
+  entrada aceptada`,
+    ok:true,
+    message:"Entrada válida. Puede continuar hacia la lógica del servicio."
+  },
+  missing:{
+    status:"inválido",
+    field:"nombre",
+    action:"rechazar",
+    preview:
+`{
+  "ip": "10.10.0.1",
+  "activo": true
+}
+
+Resultado:
+  falta campo obligatorio: nombre`,
+    ok:false,
+    message:"Falta un campo obligatorio. La solicitud debe rechazarse antes de procesarla."
+  },
+  badip:{
+    status:"inválido",
+    field:"ip",
+    action:"rechazar",
+    preview:
+`{
+  "nombre": "RTR-AZG-01",
+  "ip": "999.1.1.1",
+  "activo": true
+}
+
+Resultado:
+  IPv4 no válida`,
+    ok:false,
+    message:"La dirección IP no cumple el tipo esperado."
+  },
+  short:{
+    status:"inválido",
+    field:"nombre",
+    action:"rechazar",
+    preview:
+`{
+  "nombre": "R",
+  "ip": "10.10.0.1",
+  "activo": true
+}
+
+Resultado:
+  nombre demasiado corto`,
+    ok:false,
+    message:"La cadena no cumple la longitud mínima definida."
+  }
+};
+
+$("evaluateValidation").addEventListener("click",()=>{
+  const data=scenarios[$("validationScenario").value];
+
+  $("outStatus").textContent=data.status;
+  $("outField").textContent=data.field;
+  $("outAction").textContent=data.action;
+  $("validationPreview").textContent=data.preview;
+
+  setFeedback(
+    $("validationFeedback"),
+    data.message,
+    data.ok?"success":"error"
+  );
+});
+
+const practices=[
+  {
+    s:"p1",b:"checkP1",f:"p1Feedback",a:"a",
+    ok:"Correcto. El rango forma parte del contrato y debe validarse.",
+    bad:"Aceptar cualquier valor rompe la regla declarada por la API."
+  },
+  {
+    s:"p2",b:"checkP2",f:"p2Feedback",a:"a",
+    ok:"Correcto. El valor por defecto hace que el campo pueda omitirse.",
+    bad:"Sin valor por defecto, el campo se considera requerido en este modelo."
+  },
+  {
+    s:"p3",b:"checkP3",f:"p3Feedback",a:"a",
+    ok:"Correcto. Query permite declarar límites mínimo y máximo.",
+    bad:"La API debe validar el rango antes de utilizar el valor."
+  }
+];
+
+practices.forEach(p=>{
+  $(p.b).addEventListener("click",()=>{
+    const v=$(p.s).value;
+
+    if(!v){
+      return setMini($(p.f),"Selecciona primero una respuesta.");
+    }
+
+    setMini($(p.f),v===p.a?p.ok:p.bad,v===p.a);
+  });
+});
+
+$("checkCase").addEventListener("click",()=>{
+  const ok=
+    $("caseIp").value==="typed" &&
+    $("casePriority").value==="range" &&
+    $("caseProcessing").value==="after";
+
+  setFeedback(
+    $("caseFeedback"),
+    ok
+      ? "Diseño coherente. Validas tipo y rango antes de transformar o usar los datos."
+      : "Revisa el flujo correcto: validar primero y procesar después.",
+    ok?"success":"error"
+  );
+});
+
+const answers={q1:"a",q2:"a",q3:"a",q4:"a",q5:"a"};
+
+const explanations={
+  q1:"BaseModel declara estructura y tipos esperados.",
+  q2:"JSON válido puede incumplir el esquema de la API.",
+  q3:"Field(ge=1, le=5) restringe el rango permitido.",
+  q4:"El procesamiento debe trabajar con datos que ya superaron la validación.",
+  q5:"El siguiente subtema implementa operaciones CRUD básicas."
+};
+
+$("checkQuiz").addEventListener("click",()=>{
+  let score=0;
+
+  Object.keys(answers).forEach(q=>{
+    const s=document.querySelector(`input[name="${q}"]:checked`);
+    const ok=s&&s.value===answers[q];
+
+    if(ok){score++;}
+
+    setMini(
+      $(`${q}Feedback`),
+      s?((ok?"Correcto. ":"Revisa. ")+explanations[q]):"Falta responder esta pregunta.",
+      ok
+    );
+  });
+
+  $("scoreBox").textContent=
+    `Resultado: ${score}/5. ${
+      score===5
+        ? "Dominio sólido de recepción, validación y procesamiento de datos."
+        : "Revisa las explicaciones y vuelve a intentarlo."
+    }`;
+});
+
+$("resetQuiz").addEventListener("click",()=>{
+  document.querySelectorAll('#quiz input[type="radio"]').forEach(r=>r.checked=false);
+
+  Object.keys(answers).forEach(q=>{
+    setMini($(`${q}Feedback`),"Selecciona una respuesta.");
+  });
+
+  $("scoreBox").textContent="Aún no has comprobado la actividad.";
+});
+
+const key="pr-redes-2-3-3-reflexion";
+
+try{
+  const saved=localStorage.getItem(key);
+  if(saved){$("reflectionText").value=saved;}
+}catch(_){}
+
+$("saveReflection").addEventListener("click",()=>{
+  try{
+    localStorage.setItem(key,$("reflectionText").value);
+    $("reflectionStatus").textContent="Reflexión guardada únicamente en este navegador.";
+  }catch(_){
+    $("reflectionStatus").textContent="Este navegador no permitió guardar la reflexión localmente.";
+  }
+});
+
+$("clearReflection").addEventListener("click",()=>{
+  $("reflectionText").value="";
+  try{localStorage.removeItem(key);}catch(_){}
+  $("reflectionStatus").textContent="Reflexión borrada del almacenamiento local.";
+});
+
+const sections=[...document.querySelectorAll("main section")];
+
+function updateProgress(){
+  const total=document.documentElement.scrollHeight-window.innerHeight;
+  const pct=total>0?Math.max(0,Math.min(100,Math.round((window.scrollY/total)*100))):100;
+
+  $("progressValue").textContent=pct+"%";
+
+  const marker=window.scrollY+window.innerHeight*.36;
+  let current=sections[0];
+
+  sections.forEach(s=>{
+    if(s.offsetTop<=marker){current=s;}
+  });
+
+  document.querySelectorAll("nav a").forEach(a=>a.removeAttribute("aria-current"));
+
+  if(current&&current.id){
+    const link=document.querySelector(`nav a[href="#${current.id}"]`);
+    if(link){link.setAttribute("aria-current","location");}
+  }
+}
+
+window.addEventListener("scroll",updateProgress,{passive:true});
+window.addEventListener("resize",updateProgress);
+updateProgress();
+})();
+</script>
+</body>
+</html>

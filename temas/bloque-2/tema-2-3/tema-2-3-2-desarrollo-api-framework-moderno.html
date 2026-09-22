@@ -1,0 +1,1061 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Subtema 2.3.2: desarrollo de una API mediante un framework moderno.">
+<meta name="theme-color" content="#10212a">
+<title>2.3.2 | Desarrollo de una API mediante un framework moderno</title>
+<style>
+:root{
+  --ink:#18212a;--muted:#586775;--line:#cbd5dc;--soft:#f3f6f8;--paper:#fff;
+  --cyan:#007c91;--cyan-dark:#005b6a;--cyan-light:#6ed2e2;
+  --green:#16734a;--green-soft:#e8f5ee;--amber:#8a5600;--amber-soft:#fff3d8;
+  --red:#9b2c2c;--red-soft:#fdecec;--focus:#005fcc;
+  --navy:#10212a;--navy-deep:#07141a;--max:1180px;--radius:8px;
+  --shadow:0 16px 38px rgba(24,33,42,.08)
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;min-width:280px;color:var(--ink);background:var(--paper);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  line-height:1.55;overflow-x:hidden
+}
+button,input,select,textarea{font:inherit;max-width:100%}
+a{color:var(--cyan-dark)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:3px solid var(--focus);outline-offset:3px
+}
+.skip-link{position:fixed;left:1rem;top:-6rem;z-index:100;padding:.7rem 1rem;background:var(--ink);color:#fff}
+.skip-link:focus{top:1rem}
+header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.header-inner{
+  width:min(100%,var(--max));min-height:66px;margin:0 auto;padding:.55rem 1.25rem;
+  display:flex;gap:1rem;align-items:center;min-width:0
+}
+.brand{min-width:190px}.brand strong{display:block;font-size:.95rem}.brand span{display:block;color:var(--muted);font-size:.78rem}
+.nav-scroll{flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin}
+nav{display:flex;gap:.2rem;width:max-content;min-width:100%}
+nav a{color:var(--ink);text-decoration:none;white-space:nowrap;padding:.45rem .62rem;border-bottom:2px solid transparent;font-size:.84rem}
+nav a:hover,nav a[aria-current="location"]{color:var(--cyan-dark);border-color:var(--cyan)}
+.top-link{
+  flex:0 0 auto;text-decoration:none;border:1px solid var(--line);border-radius:5px;
+  padding:.48rem .72rem;color:var(--ink);font-weight:750;white-space:nowrap;background:#fff
+}
+main{overflow:hidden}
+section{scroll-margin-top:84px;border-bottom:1px solid var(--line)}
+.band{width:min(100%,var(--max));margin:0 auto;padding:4.2rem 1.25rem}
+.hero{min-height:calc(100svh - 66px);display:grid;align-items:center;background:var(--navy);color:#fff}
+.hero-grid{
+  width:min(100%,var(--max));margin:0 auto;padding:3.4rem 1.25rem;
+  display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:3rem;align-items:center
+}
+.hero-grid>*{min-width:0}
+.eyebrow{color:var(--cyan-light);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+h1{
+  font-size:clamp(2rem,5vw,4rem);line-height:1.02;margin:.65rem 0 1.15rem;
+  max-width:20ch;overflow-wrap:normal;word-break:normal;hyphens:none
+}
+h2{
+  font-size:clamp(1.75rem,3.3vw,2.8rem);line-height:1.12;margin:0 0 .8rem;
+  overflow-wrap:normal;word-break:normal;hyphens:none
+}
+h3{font-size:1.22rem;margin:0 0 .55rem}
+p{max-width:72ch}.hero p{color:#d7e5ea;font-size:1.08rem}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.hero-actions,.action-row{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}.hero-actions{margin-top:1.45rem}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cyan-dark);
+  background:var(--cyan);color:#fff;text-decoration:none;padding:.72rem 1rem;border-radius:5px;font-weight:750
+}
+.btn:hover{background:var(--cyan-dark)}
+.btn.secondary{background:transparent;color:inherit;border-color:currentColor}
+.btn.secondary:hover{background:rgba(255,255,255,.1)}
+.btn.light{background:#fff;color:var(--ink);border-color:var(--line)}
+.btn.light:hover{background:var(--soft);color:var(--cyan-dark)}
+.hero-board{background:var(--navy-deep);border:1px solid #3b5965;border-radius:8px;padding:1.25rem}
+.framework-flow{display:grid;gap:.55rem;margin-top:1rem}
+.framework-step{
+  display:grid;grid-template-columns:42px minmax(0,1fr);gap:.7rem;align-items:start;
+  padding:.7rem;border:1px solid #3b5965;border-radius:6px;background:#0d2630
+}
+.framework-step b{
+  display:grid;place-items:center;width:42px;height:42px;border-radius:50%;
+  background:#153d4a;color:var(--cyan-light)
+}
+.framework-step small{display:block;color:#b8cbd2;margin-top:.15rem}
+.section-head{
+  display:grid;grid-template-columns:150px minmax(0,1fr);gap:1.5rem;align-items:start;margin-bottom:2.2rem
+}
+.section-head>*{min-width:0}
+.section-code{color:var(--cyan-dark);font-weight:800;font-size:.9rem}
+.lead{font-size:1.08rem;color:var(--muted);margin-top:.3rem}
+.outcomes{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line)
+}
+.outcome{min-width:0;padding:1.15rem;border-right:1px solid var(--line)}
+.outcome:last-child{border-right:0}
+.outcome b{display:block;color:var(--cyan-dark);margin-bottom:.35rem}
+.scope-note,.callout{margin-top:1.4rem;padding:1rem 1.1rem;border-left:4px solid var(--cyan);background:var(--soft)}
+.concept-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+.concept-card{
+  min-width:0;border:1px solid var(--line);border-radius:var(--radius);
+  padding:1.15rem;background:#fff;box-shadow:var(--shadow)
+}
+.tag{
+  display:inline-block;font-size:.76rem;font-weight:850;color:var(--cyan-dark);
+  background:#d9eef2;padding:.2rem .45rem;border-radius:999px;margin-bottom:.55rem
+}
+.concept-card p{color:var(--muted);font-size:.94rem}
+.table-wrap{overflow-x:auto;margin-top:1.2rem;border:1px solid var(--line);border-radius:7px}
+table{border-collapse:collapse;width:100%;min-width:900px}
+th,td{padding:.8rem;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--soft)}
+.activity{
+  margin-top:1.5rem;padding:1.35rem;border:1px solid var(--line);
+  border-radius:var(--radius);background:var(--soft);min-width:0
+}
+.prediction{display:grid;gap:.6rem;margin:.85rem 0 1rem}
+.prediction label{display:block;padding:.75rem .8rem;background:#fff;border:1px solid var(--line);border-radius:5px}
+.feedback{margin-top:.9rem;padding:.9rem 1rem;border-left:4px solid var(--cyan);background:#fff;min-height:3rem}
+.feedback.success{background:var(--green-soft);border-color:var(--green)}
+.feedback.warn{background:var(--amber-soft);border-color:var(--amber)}
+.feedback.error{background:var(--red-soft);border-color:var(--red)}
+.lab-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:1rem}
+.lab-grid>*{min-width:0}
+.lab-panel{border:1px solid var(--line);border-radius:7px;background:#fff;padding:1rem}
+.lab-panel label{display:block;font-weight:750;margin:.75rem 0 .3rem}
+.lab-panel select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px;background:#fff}
+.result-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-top:1rem}
+.result-card{padding:.8rem;border:1px solid var(--line);border-radius:6px;background:#fff;min-width:0}
+.result-card b{display:block;color:var(--cyan-dark);font-size:.78rem;text-transform:uppercase}
+.result-card span{display:block;margin-top:.25rem;overflow-wrap:anywhere}
+.terminal{
+  margin-top:1rem;background:#07141a;color:#dce9ed;border-radius:7px;padding:1rem;
+  border:1px solid #314b56;overflow-x:auto
+}
+.terminal pre{margin:0;white-space:pre-wrap;word-break:break-word}
+.code-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.code-card{min-width:0;background:#09161d;color:#dce9ed;border:1px solid #314b56;border-radius:7px;padding:1rem}
+.code-card h3{color:#fff}
+.code-block{overflow-x:auto;margin:.75rem 0;background:#061016;border:1px solid #253c47;border-radius:6px;padding:1rem}
+.code-block code{white-space:pre}
+.code-note{color:#bfd1d7}
+.exercise-box{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.exercise-head{padding:1rem 1.1rem;background:var(--navy);color:#fff}
+.exercise-head span{display:block;color:var(--cyan-light);font-size:.78rem;font-weight:850;text-transform:uppercase}
+.exercise-body{padding:1.1rem}
+.solution-steps{display:grid;gap:.75rem}
+.solution-step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:.8rem;align-items:start}
+.solution-step>b{
+  display:grid;place-items:center;width:34px;height:34px;border-radius:50%;
+  background:#d9eef2;color:var(--cyan-dark)
+}
+.practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+.practice-card{border:1px solid var(--line);border-radius:7px;padding:1rem;min-width:0}
+.practice-card select{width:100%;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.mini-feedback{margin-top:.75rem;padding:.75rem;border-left:4px solid var(--cyan);background:var(--soft);min-height:4rem}
+.case-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}
+.case-grid label{display:block;font-weight:750}
+.case-grid select{width:100%;margin-top:.3rem;padding:.65rem;border:1px solid var(--line);border-radius:5px}
+.quiz{display:grid;gap:1rem}
+.quiz-card{border:1px solid var(--line);border-radius:7px;padding:1rem}
+.quiz-card fieldset{border:0;padding:0;margin:0}
+.quiz-card legend{font-weight:800;margin-bottom:.7rem}
+.quiz-card label{display:block;padding:.5rem .55rem;border-radius:4px}
+.quiz-card label:hover{background:var(--soft)}
+.score{margin-top:1rem;padding:1rem;border:1px solid var(--line);border-radius:6px;background:var(--soft);font-weight:800}
+.reflection-box textarea{width:100%;min-height:145px;resize:vertical;padding:.8rem;border:1px solid var(--line);border-radius:6px}
+.references{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.ref-card{border-top:4px solid var(--cyan);padding:1rem;background:var(--soft)}
+.bottom-nav{margin-top:2rem;display:flex;justify-content:space-between;gap:.7rem;flex-wrap:wrap}
+footer{background:var(--navy-deep);color:#c7d8de}
+.footer-inner{
+  width:min(100%,var(--max));margin:0 auto;padding:1.4rem 1.25rem;
+  display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap
+}
+.progress-wrap{
+  position:fixed;right:1rem;bottom:1rem;z-index:20;background:rgba(7,20,26,.93);
+  color:#fff;padding:.45rem .7rem;border-radius:999px;font-size:.78rem;border:1px solid #3b5965
+}
+@media(max-width:900px){
+  .hero-grid,.section-head,.lab-grid,.code-grid{grid-template-columns:1fr}
+  .concept-grid,.outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .outcome:nth-child(2){border-right:0}
+  .outcome:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .practice-grid,.case-grid{grid-template-columns:1fr}
+}
+@media(max-width:650px){.result-grid,.references{grid-template-columns:1fr}}
+@media(max-width:600px){
+  .header-inner{padding-inline:.8rem}.brand{min-width:145px}.top-link{padding:.45rem .6rem}
+  .band,.hero-grid{padding-left:.9rem;padding-right:.9rem}
+  h1{font-size:clamp(2rem,10vw,2.72rem);max-width:none}
+  .concept-grid,.outcomes{grid-template-columns:1fr}
+  .outcome{border-right:0;border-bottom:1px solid var(--line)}
+  .outcome:last-child{border-bottom:0}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+<header>
+<div class="header-inner">
+  <div class="brand"><strong>Programación de Redes</strong><span>Protocolos y APIs</span></div>
+  <div class="nav-scroll" aria-label="Navegación del subtema">
+    <nav>
+      <a href="#inicio">Inicio</a>
+      <a href="#orientacion">Cómo trabajar</a>
+      <a href="#conceptos">Conceptos</a>
+      <a href="#predice">Predice</a>
+      <a href="#experimenta">Experimenta</a>
+      <a href="#codigo">Código</a>
+      <a href="#resuelto">Ejercicio resuelto</a>
+      <a href="#practica">Practica</a>
+      <a href="#caso">Caso profesional</a>
+      <a href="#comprueba">Comprueba</a>
+      <a href="#reflexiona">Reflexión</a>
+    </nav>
+  </div>
+  <a class="top-link" href="index.html">← Curso</a>
+</div>
+</header>
+
+<main id="contenido">
+
+<section class="hero" id="inicio">
+<div class="hero-grid">
+  <div>
+    <div class="eyebrow">Bloque 2 · Tema 2.3 · Subtema 2.3.2</div>
+    <h1>Desarrollo de una API mediante un framework moderno</h1>
+    <p>Convierte el diseño del endpoint en un servicio ejecutable con Python y FastAPI: aplicación, rutas, parámetros, respuestas JSON y servidor ASGI.</p>
+
+    <div class="hero-actions">
+      <a class="btn" href="#orientacion">Comenzar recorrido</a>
+      <a class="btn secondary" href="tema-2-3-desarrollo-apis-rest.html">Volver al Tema 2.3</a>
+    </div>
+  </div>
+
+  <div class="hero-board" role="img" aria-label="Flujo de implementación básica de una API con FastAPI">
+    <h3>Del diseño al servicio</h3>
+    <div class="framework-flow">
+      <div class="framework-step"><b>1</b><div><strong>Crear entorno</strong><small>Python + dependencias</small></div></div>
+      <div class="framework-step"><b>2</b><div><strong>Crear app</strong><small>FastAPI()</small></div></div>
+      <div class="framework-step"><b>3</b><div><strong>Declarar rutas</strong><small>@app.get · @app.post ...</small></div></div>
+      <div class="framework-step"><b>4</b><div><strong>Recibir parámetros</strong><small>path · query</small></div></div>
+      <div class="framework-step"><b>5</b><div><strong>Responder</strong><small>dict → JSON</small></div></div>
+      <div class="framework-step"><b>6</b><div><strong>Ejecutar</strong><small>servidor ASGI</small></div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="orientacion">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Cómo trabajar este tema</div>
+    <div>
+      <h2>Implementa lo que ya diseñaste</h2>
+      <p class="lead">El framework no sustituye el diseño. Su función es facilitar la implementación del contrato definido en 2.3.1.</p>
+    </div>
+  </div>
+
+  <div class="outcomes">
+    <div class="outcome"><b>1. Crear</b> una aplicación FastAPI mínima.</div>
+    <div class="outcome"><b>2. Declarar</b> endpoints con métodos HTTP.</div>
+    <div class="outcome"><b>3. Recibir</b> parámetros de ruta y query.</div>
+    <div class="outcome"><b>4. Ejecutar</b> y probar localmente el servicio.</div>
+  </div>
+
+  <div class="scope-note">
+    <strong>Alcance.</strong> Este subtema usa FastAPI como framework didáctico. La validación estructurada con modelos de datos se profundizará en 2.3.3.
+  </div>
+</div>
+</section>
+
+<section id="conceptos">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Explora</div>
+    <div>
+      <h2>El framework conecta HTTP con funciones Python</h2>
+      <p class="lead">Un decorador asocia un método y una ruta con una función que procesa la solicitud y genera una respuesta.</p>
+    </div>
+  </div>
+
+  <div class="concept-grid">
+    <article class="concept-card">
+      <span class="tag">Aplicación</span>
+      <h3>FastAPI()</h3>
+      <p>Representa la aplicación web sobre la que se registran los endpoints.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">Decorador</span>
+      <h3>@app.get(...)</h3>
+      <p>Asocia una ruta y un método HTTP con una función de Python.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">Parámetro</span>
+      <h3>Path / Query</h3>
+      <p>FastAPI obtiene valores desde la ruta o desde la query según la firma de la función.</p>
+    </article>
+
+    <article class="concept-card">
+      <span class="tag">Respuesta</span>
+      <h3>dict → JSON</h3>
+      <p>Un diccionario retornado por la función se serializa como respuesta JSON.</p>
+    </article>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Diseño</th><th>FastAPI</th><th>Resultado</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>GET /api/enlaces</code></td><td><code>@app.get("/api/enlaces")</code></td><td>Lista o representación de la colección.</td></tr>
+        <tr><td><code>GET /api/enlaces/{id}</code></td><td><code>@app.get("/api/enlaces/{enlace_id}")</code></td><td>Recurso individual.</td></tr>
+        <tr><td><code>?estado=alerta</code></td><td>Parámetro opcional en la función</td><td>Filtro de consulta.</td></tr>
+        <tr><td>Respuesta JSON</td><td><code>return {"id": 15}</code></td><td>FastAPI serializa el diccionario.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <strong>FastAPI no es el servidor de producción por sí solo.</strong> La aplicación sigue el estándar ASGI y necesita un servidor ASGI, como Uvicorn, para recibir conexiones HTTP.
+  </div>
+</div>
+</section>
+
+<section id="predice">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Predice</div>
+    <div>
+      <h2>¿Qué representa este decorador?</h2>
+      <p class="lead"><code>@app.get("/api/enlaces/{enlace_id}")</code></p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="prediction">
+      <label><input type="radio" name="prediction" value="a"> Un endpoint GET con un parámetro variable en la ruta.</label>
+      <label><input type="radio" name="prediction" value="b"> Una conexión UDP obligatoria.</label>
+      <label><input type="radio" name="prediction" value="c"> Una API key.</label>
+    </div>
+
+    <div class="action-row">
+      <button class="btn" id="checkPrediction" type="button">Comprobar</button>
+      <button class="btn light" id="resetPrediction" type="button">Reintentar</button>
+    </div>
+
+    <div class="feedback" id="predictionFeedback" aria-live="polite">
+      El decorador vincula método HTTP y ruta con una función Python.
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="experimenta">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Experimenta</div>
+    <div>
+      <h2>Genera un endpoint básico</h2>
+      <p class="lead">Selecciona recurso y operación. El simulador construye un ejemplo FastAPI.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="lab-grid">
+      <div class="lab-panel">
+        <label for="resourceType">Recurso</label>
+        <select id="resourceType">
+          <option value="enlaces">Enlaces</option>
+          <option value="estaciones">Estaciones</option>
+          <option value="alarmas">Alarmas</option>
+        </select>
+
+        <label for="operationType">Operación</label>
+        <select id="operationType">
+          <option value="list">Listar colección</option>
+          <option value="read">Consultar recurso 15</option>
+          <option value="filter">Filtrar por estado</option>
+        </select>
+
+        <button class="btn" id="buildCode" type="button" style="margin-top:1rem">Generar código</button>
+
+        <div class="feedback" id="codeFeedback" aria-live="polite">
+          Selecciona recurso y operación.
+        </div>
+      </div>
+
+      <div class="lab-panel">
+        <h3>Implementación propuesta</h3>
+
+        <div class="result-grid">
+          <div class="result-card"><b>Método</b><span id="outMethod">GET</span></div>
+          <div class="result-card"><b>Ruta</b><span id="outPath">/api/enlaces</span></div>
+          <div class="result-card"><b>Entrada</b><span id="outInput">sin parámetros</span></div>
+        </div>
+
+        <div class="terminal">
+          <pre id="codePreview">from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/api/enlaces")
+def listar_enlaces():
+    return {
+        "items": []
+    }</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="codigo">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Explica</div>
+    <div>
+      <h2>Construye una API mínima paso a paso</h2>
+      <p class="lead">Un único archivo permite comprender la arquitectura antes de separar el proyecto en módulos.</p>
+    </div>
+  </div>
+
+  <div class="code-grid">
+    <article class="code-card">
+      <h3>1. Instalar dependencias</h3>
+      <div class="code-block"><code>python -m pip install fastapi uvicorn</code></div>
+      <p class="code-note">FastAPI y Uvicorn son dependencias externas del proyecto.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>2. Crear la aplicación</h3>
+      <div class="code-block"><code>from fastapi import FastAPI
+
+app = FastAPI(
+    title="API de Red"
+)</code></div>
+      <p class="code-note">La variable <code>app</code> representa la aplicación ASGI.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>3. Declarar un endpoint</h3>
+      <div class="code-block"><code>@app.get("/api/enlaces")
+def listar_enlaces():
+    return {
+        "items": [
+            {
+                "id": 15,
+                "estado": "up"
+            }
+        ]
+    }</code></div>
+      <p class="code-note">El decorador registra la ruta y el método.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>4. Parámetro de ruta</h3>
+      <div class="code-block"><code>@app.get(
+    "/api/enlaces/{enlace_id}"
+)
+def obtener_enlace(
+    enlace_id: int
+):
+    return {
+        "id": enlace_id,
+        "estado": "up"
+    }</code></div>
+      <p class="code-note">El valor de la ruta se entrega como argumento de la función.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>5. Query parameter</h3>
+      <div class="code-block"><code>@app.get("/api/alarmas")
+def listar_alarmas(
+    estado: str | None = None
+):
+    return {
+        "filtro_estado": estado
+    }</code></div>
+      <p class="code-note">Un argumento que no forma parte de la ruta puede interpretarse como query parameter.</p>
+    </article>
+
+    <article class="code-card">
+      <h3>6. Ejecutar localmente</h3>
+      <div class="code-block"><code>uvicorn main:app --reload</code></div>
+      <p class="code-note"><code>main</code> es el nombre del archivo y <code>app</code> la variable FastAPI.</p>
+    </article>
+  </div>
+
+  <div class="callout">
+    <strong>Uso didáctico de --reload:</strong> facilita el desarrollo local al recargar cambios automáticamente. No debe asumirse como configuración de producción.
+  </div>
+</div>
+</section>
+
+<section id="resuelto">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Ejercicio resuelto</div>
+    <div>
+      <h2>Implementar una API mínima de estaciones</h2>
+      <p class="lead">Tomamos el diseño del 2.3.1 y lo convertimos en código ejecutable.</p>
+    </div>
+  </div>
+
+  <div class="exercise-box">
+    <div class="exercise-head">
+      <span>Problema</span>
+      <h3>Crear GET de colección y GET individual</h3>
+    </div>
+
+    <div class="exercise-body">
+      <div class="solution-steps">
+        <div class="solution-step"><b>1</b><div><strong>Crear app.</strong><br>Instanciar <code>FastAPI()</code>.</div></div>
+        <div class="solution-step"><b>2</b><div><strong>Registrar colección.</strong><br><code>GET /api/estaciones</code>.</div></div>
+        <div class="solution-step"><b>3</b><div><strong>Registrar individual.</strong><br><code>GET /api/estaciones/{id}</code>.</div></div>
+        <div class="solution-step"><b>4</b><div><strong>Retornar diccionarios.</strong><br>FastAPI los serializa como JSON.</div></div>
+        <div class="solution-step"><b>5</b><div><strong>Ejecutar.</strong><br>Levantar el servicio con Uvicorn.</div></div>
+      </div>
+
+      <div class="code-block" style="margin-top:1rem"><code>from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/api/estaciones")
+def listar_estaciones():
+    return {
+        "items": [
+            {
+                "id": 7,
+                "nombre": "AZG-07"
+            }
+        ]
+    }
+
+@app.get(
+    "/api/estaciones/{estacion_id}"
+)
+def obtener_estacion(
+    estacion_id: int
+):
+    return {
+        "id": estacion_id,
+        "nombre": "AZG-07"
+    }</code></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="practica">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Practica</div>
+    <div>
+      <h2>Relaciona diseño e implementación</h2>
+      <p class="lead">Selecciona la opción correcta para cada caso.</p>
+    </div>
+  </div>
+
+  <div class="practice-grid">
+    <article class="practice-card">
+      <h3>Ejercicio 1</h3>
+      <p>Implementar <code>GET /api/equipos</code>.</p>
+      <select id="p1">
+        <option value="">Selecciona…</option>
+        <option value="a">@app.get("/api/equipos")</option>
+        <option value="b">@app.delete("/api/equipos")</option>
+        <option value="c">requests.get("/api/equipos")</option>
+      </select>
+      <button class="btn" id="checkP1" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p1Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 2</h3>
+      <p>Recibir un ID entero desde la ruta.</p>
+      <select id="p2">
+        <option value="">Selecciona…</option>
+        <option value="a">equipo_id: int</option>
+        <option value="b">equipo_id = "password"</option>
+        <option value="c">timeout=5</option>
+      </select>
+      <button class="btn" id="checkP2" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p2Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="practice-card">
+      <h3>Ejercicio 3</h3>
+      <p>Ejecutar <code>app</code> definida en <code>main.py</code>.</p>
+      <select id="p3">
+        <option value="">Selecciona…</option>
+        <option value="a">uvicorn main:app --reload</option>
+        <option value="b">python --delete-api</option>
+        <option value="c">requests main:app</option>
+      </select>
+      <button class="btn" id="checkP3" type="button" style="margin-top:.7rem">Comprobar</button>
+      <div class="mini-feedback" id="p3Feedback">Selecciona una respuesta.</div>
+    </article>
+  </div>
+</div>
+</section>
+
+<section id="caso">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Caso profesional</div>
+    <div>
+      <h2>Prototipo de API interna para el NOC</h2>
+      <p class="lead">El equipo necesita un prototipo que exponga enlaces y alarmas antes de conectar una base de datos real.</p>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="case-grid">
+      <label>Estructura
+        <select id="caseStructure">
+          <option value="">Selecciona…</option>
+          <option value="design">Implementar rutas según el diseño 2.3.1</option>
+          <option value="random">Crear rutas sin contrato previo</option>
+        </select>
+      </label>
+
+      <label>Datos
+        <select id="caseData">
+          <option value="">Selecciona…</option>
+          <option value="mock">Usar datos simulados para el prototipo</option>
+          <option value="secret">Incluir contraseñas reales en el código</option>
+        </select>
+      </label>
+
+      <label>Ejecución
+        <select id="caseRun">
+          <option value="">Selecciona…</option>
+          <option value="local">Ejecutar localmente con Uvicorn</option>
+          <option value="production">Usar --reload como producción definitiva</option>
+        </select>
+      </label>
+    </div>
+
+    <button class="btn" id="checkCase" type="button" style="margin-top:1rem">Evaluar prototipo</button>
+
+    <div class="feedback" id="caseFeedback" aria-live="polite">
+      Un prototipo debe respetar el contrato aunque todavía utilice datos simulados.
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="comprueba">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Comprueba</div>
+    <div>
+      <h2>Integra lo aprendido</h2>
+      <p class="lead">Responde las cinco preguntas.</p>
+    </div>
+  </div>
+
+  <div class="quiz" id="quiz">
+    <article class="quiz-card">
+      <fieldset>
+        <legend>1. ¿Qué hace FastAPI()?</legend>
+        <label><input type="radio" name="q1" value="a"> Crea la aplicación sobre la que se registran endpoints.</label>
+        <label><input type="radio" name="q1" value="b"> Instala Python.</label>
+        <label><input type="radio" name="q1" value="c"> Reemplaza TCP por UDP.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q1Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>2. ¿Qué representa @app.get("/api/enlaces")?</legend>
+        <label><input type="radio" name="q2" value="a"> Un endpoint GET sobre esa ruta.</label>
+        <label><input type="radio" name="q2" value="b"> Una API key.</label>
+        <label><input type="radio" name="q2" value="c"> Un código HTTP de respuesta.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q2Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>3. ¿Para qué sirve Uvicorn?</legend>
+        <label><input type="radio" name="q3" value="a"> Para ejecutar la aplicación ASGI y recibir solicitudes HTTP.</label>
+        <label><input type="radio" name="q3" value="b"> Para modelar bases de datos automáticamente.</label>
+        <label><input type="radio" name="q3" value="c"> Para cifrar contraseñas por sí solo.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q3Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>4. ¿Qué ocurre al retornar un dict?</legend>
+        <label><input type="radio" name="q4" value="a"> FastAPI lo serializa como respuesta JSON.</label>
+        <label><input type="radio" name="q4" value="b"> Se convierte en paquete ICMP.</label>
+        <label><input type="radio" name="q4" value="c"> Se elimina automáticamente.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q4Feedback">Selecciona una respuesta.</div>
+    </article>
+
+    <article class="quiz-card">
+      <fieldset>
+        <legend>5. ¿Qué se estudiará en 2.3.3?</legend>
+        <label><input type="radio" name="q5" value="a"> Recepción, validación y procesamiento de datos.</label>
+        <label><input type="radio" name="q5" value="b"> Diseño de antenas.</label>
+        <label><input type="radio" name="q5" value="c"> Álgebra booleana.</label>
+      </fieldset>
+      <div class="mini-feedback" id="q5Feedback">Selecciona una respuesta.</div>
+    </article>
+  </div>
+
+  <div class="action-row" style="margin-top:1rem">
+    <button class="btn" id="checkQuiz" type="button">Comprobar todo</button>
+    <button class="btn light" id="resetQuiz" type="button">Reintentar</button>
+  </div>
+
+  <div class="score" id="scoreBox" aria-live="polite">
+    Aún no has comprobado la actividad.
+  </div>
+</div>
+</section>
+
+<section id="reflexiona">
+<div class="band">
+  <div class="section-head">
+    <div class="section-code">Reflexión</div>
+    <div>
+      <h2>Convierte un diseño en código</h2>
+      <p class="lead">Elige uno de los recursos del 2.3.1 y escribe cómo implementarías su colección y su ruta individual con FastAPI.</p>
+    </div>
+  </div>
+
+  <div class="reflection-box">
+    <textarea id="reflectionText" aria-label="Reflexión del estudiante" placeholder="Ejemplo: app = FastAPI(); @app.get('/api/equipos') para colección y @app.get('/api/equipos/{equipo_id}') para el recurso individual..."></textarea>
+
+    <div class="action-row">
+      <button class="btn" id="saveReflection" type="button">Guardar en este navegador</button>
+      <button class="btn light" id="clearReflection" type="button">Borrar</button>
+    </div>
+
+    <p id="reflectionStatus" aria-live="polite">
+      El texto no se transmite; si lo guardas, permanece únicamente en el almacenamiento local de este navegador.
+    </p>
+  </div>
+
+  <div class="references" style="margin-top:2rem">
+    <article class="ref-card">
+      <h3>Ideas clave</h3>
+      <p>FastAPI conecta rutas y métodos HTTP con funciones Python, mientras Uvicorn permite ejecutar la aplicación ASGI.</p>
+    </article>
+
+    <article class="ref-card">
+      <h3>Delimitación</h3>
+      <p>En 2.3.3 se incorporarán modelos y validación de datos recibidos por la API.</p>
+    </article>
+  </div>
+
+  <div class="bottom-nav">
+    <a class="btn light" href="tema-2-3-1-diseno-recursos-endpoints-api.html">← 2.3.1 Diseño de recursos y endpoints</a>
+    <a class="btn light" href="tema-2-3-3-recepcion-validacion-procesamiento-datos.html">2.3.3 Recepción y validación de datos →</a>
+  </div>
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="footer-inner">
+  <div>
+    <strong>Programación de Redes: Protocolos y APIs</strong><br>
+    <span>Subtema 2.3.2 · Desarrollo de una API mediante un framework moderno</span>
+  </div>
+  <div>Material interactivo · uso local</div>
+</div>
+</footer>
+
+<div class="progress-wrap" aria-hidden="true">
+  Recorrido <b id="progressValue">0%</b>
+</div>
+
+<script>
+(() => {
+"use strict";
+
+const $=id=>document.getElementById(id);
+
+const setFeedback=(el,text,type="")=>{
+  el.textContent=text;
+  el.className="feedback"+(type?" "+type:"");
+};
+
+const setMini=(el,text,ok=null)=>{
+  el.textContent=text;
+  el.style.borderLeftColor=
+    ok===true?"var(--green)":ok===false?"var(--red)":"var(--cyan)";
+  el.style.background=
+    ok===true?"var(--green-soft)":ok===false?"var(--red-soft)":"var(--soft)";
+};
+
+$("checkPrediction").addEventListener("click",()=>{
+  const s=document.querySelector('input[name="prediction"]:checked');
+
+  if(!s){
+    return setFeedback(
+      $("predictionFeedback"),
+      "Selecciona primero una opción.",
+      "warn"
+    );
+  }
+
+  if(s.value==="a"){
+    setFeedback(
+      $("predictionFeedback"),
+      "Correcto. El decorador registra un GET y la parte entre llaves representa un valor variable de ruta.",
+      "success"
+    );
+  }else{
+    setFeedback(
+      $("predictionFeedback"),
+      "Revisa la función del decorador: asocia método HTTP y ruta con una función Python.",
+      "error"
+    );
+  }
+});
+
+$("resetPrediction").addEventListener("click",()=>{
+  document.querySelectorAll('input[name="prediction"]').forEach(r=>r.checked=false);
+
+  setFeedback(
+    $("predictionFeedback"),
+    "El decorador vincula método HTTP y ruta con una función Python."
+  );
+});
+
+const resources={
+  enlaces:"enlaces",
+  estaciones:"estaciones",
+  alarmas:"alarmas"
+};
+
+$("buildCode").addEventListener("click",()=>{
+  const r=resources[$("resourceType").value];
+  const op=$("operationType").value;
+
+  let path=`/api/${r}`;
+  let method="GET";
+  let input="sin parámetros";
+  let code="";
+
+  if(op==="list"){
+    code=
+`from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("${path}")
+def listar_${r}():
+    return {
+        "items": []
+    }`;
+  }
+
+  if(op==="read"){
+    path+="/{recurso_id}";
+    input="recurso_id: int";
+    code=
+`from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("${path}")
+def obtener_${r}(
+    recurso_id: int
+):
+    return {
+        "id": recurso_id
+    }`;
+  }
+
+  if(op==="filter"){
+    input="estado: str | None";
+    code=
+`from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("${path}")
+def listar_${r}(
+    estado: str | None = None
+):
+    return {
+        "estado": estado,
+        "items": []
+    }`;
+  }
+
+  $("outMethod").textContent=method;
+  $("outPath").textContent=path;
+  $("outInput").textContent=input;
+  $("codePreview").textContent=code;
+
+  setFeedback(
+    $("codeFeedback"),
+    "Código generado. El ejemplo conserva el diseño de recurso y endpoint definido previamente.",
+    "success"
+  );
+});
+
+const practices=[
+  {
+    s:"p1",b:"checkP1",f:"p1Feedback",a:"a",
+    ok:"Correcto. El decorador @app.get registra un endpoint GET en esa ruta.",
+    bad:"requests.get consume una API; @app.get define un endpoint en el servidor."
+  },
+  {
+    s:"p2",b:"checkP2",f:"p2Feedback",a:"a",
+    ok:"Correcto. La anotación int indica el tipo esperado para el parámetro.",
+    bad:"El ID de la ruta se recibe como argumento de la función."
+  },
+  {
+    s:"p3",b:"checkP3",f:"p3Feedback",a:"a",
+    ok:"Correcto. main:app indica archivo main.py y variable app.",
+    bad:"Uvicorn ejecuta la aplicación ASGI; la forma main:app identifica módulo y objeto."
+  }
+];
+
+practices.forEach(p=>{
+  $(p.b).addEventListener("click",()=>{
+    const v=$(p.s).value;
+
+    if(!v){
+      return setMini($(p.f),"Selecciona primero una respuesta.");
+    }
+
+    setMini($(p.f),v===p.a?p.ok:p.bad,v===p.a);
+  });
+});
+
+$("checkCase").addEventListener("click",()=>{
+  const ok=
+    $("caseStructure").value==="design" &&
+    $("caseData").value==="mock" &&
+    $("caseRun").value==="local";
+
+  setFeedback(
+    $("caseFeedback"),
+    ok
+      ? "Prototipo coherente. Implementa el contrato, usa datos simulados y se ejecuta localmente para desarrollo."
+      : "Revisa diseño previo, uso de datos de prueba y diferencia entre desarrollo y producción.",
+    ok?"success":"error"
+  );
+});
+
+const answers={q1:"a",q2:"a",q3:"a",q4:"a",q5:"a"};
+
+const explanations={
+  q1:"FastAPI() crea la aplicación donde se registran endpoints.",
+  q2:"El decorador define un endpoint GET para esa ruta.",
+  q3:"Uvicorn ejecuta la aplicación ASGI y atiende solicitudes.",
+  q4:"FastAPI serializa estructuras compatibles, como dict, a JSON.",
+  q5:"El siguiente subtema trabaja recepción, validación y procesamiento de datos."
+};
+
+$("checkQuiz").addEventListener("click",()=>{
+  let score=0;
+
+  Object.keys(answers).forEach(q=>{
+    const s=document.querySelector(`input[name="${q}"]:checked`);
+    const ok=s&&s.value===answers[q];
+
+    if(ok){score++;}
+
+    setMini(
+      $(`${q}Feedback`),
+      s?((ok?"Correcto. ":"Revisa. ")+explanations[q]):"Falta responder esta pregunta.",
+      ok
+    );
+  });
+
+  $("scoreBox").textContent=
+    `Resultado: ${score}/5. ${
+      score===5
+        ? "Dominio sólido de la implementación básica de una API con FastAPI."
+        : "Revisa las explicaciones y vuelve a intentarlo."
+    }`;
+});
+
+$("resetQuiz").addEventListener("click",()=>{
+  document.querySelectorAll('#quiz input[type="radio"]').forEach(r=>r.checked=false);
+
+  Object.keys(answers).forEach(q=>{
+    setMini($(`${q}Feedback`),"Selecciona una respuesta.");
+  });
+
+  $("scoreBox").textContent="Aún no has comprobado la actividad.";
+});
+
+const key="pr-redes-2-3-2-reflexion";
+
+try{
+  const saved=localStorage.getItem(key);
+  if(saved){$("reflectionText").value=saved;}
+}catch(_){}
+
+$("saveReflection").addEventListener("click",()=>{
+  try{
+    localStorage.setItem(key,$("reflectionText").value);
+    $("reflectionStatus").textContent="Reflexión guardada únicamente en este navegador.";
+  }catch(_){
+    $("reflectionStatus").textContent="Este navegador no permitió guardar la reflexión localmente.";
+  }
+});
+
+$("clearReflection").addEventListener("click",()=>{
+  $("reflectionText").value="";
+  try{localStorage.removeItem(key);}catch(_){}
+  $("reflectionStatus").textContent="Reflexión borrada del almacenamiento local.";
+});
+
+const sections=[...document.querySelectorAll("main section")];
+
+function updateProgress(){
+  const total=document.documentElement.scrollHeight-window.innerHeight;
+  const pct=total>0?Math.max(0,Math.min(100,Math.round((window.scrollY/total)*100))):100;
+  $("progressValue").textContent=pct+"%";
+
+  const marker=window.scrollY+window.innerHeight*.36;
+  let current=sections[0];
+
+  sections.forEach(s=>{
+    if(s.offsetTop<=marker){current=s;}
+  });
+
+  document.querySelectorAll("nav a").forEach(a=>a.removeAttribute("aria-current"));
+
+  if(current&&current.id){
+    const link=document.querySelector(`nav a[href="#${current.id}"]`);
+    if(link){link.setAttribute("aria-current","location");}
+  }
+}
+
+window.addEventListener("scroll",updateProgress,{passive:true});
+window.addEventListener("resize",updateProgress);
+updateProgress();
+})();
+</script>
+</body>
+</html>
