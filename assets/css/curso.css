@@ -703,30 +703,35 @@ body:not(.course-home) .feedback {
 /* ---------- Logo institucional dentro del hero ---------- */
 .course-home .hero-institution-logo,
 body:not(.course-home) .hero-institution-logo {
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-start;
-  width: max-content;
-  max-width: 100%;
+  display: block;
   margin: 0 0 1.6rem;
   padding: 0;
   text-decoration: none;
   background: transparent;
   border: 0;
+  overflow: visible;
+  line-height: 0;
 }
 
-.course-home .hero-institution-logo .institution-logo {
+.course-home .hero-institution-logo {
   width: 178px;
-  max-width: min(46vw, 178px);
-  height: auto;
-  object-fit: contain;
+  max-width: 46vw;
 }
 
-body:not(.course-home) .hero-institution-logo .institution-logo {
+body:not(.course-home) .hero-institution-logo {
   width: 162px;
-  max-width: min(44vw, 162px);
+  max-width: 44vw;
+}
+
+.course-home .hero-institution-logo .institution-logo,
+body:not(.course-home) .hero-institution-logo .institution-logo {
+  display: block;
+  width: 100%;
+  max-width: none;
   height: auto;
+  min-height: 1px;
   object-fit: contain;
+  overflow: visible;
 }
 
 .course-home .hero-institution-logo:focus-visible,
@@ -742,12 +747,14 @@ body:not(.course-home) .hero-institution-logo:focus-visible {
     margin-bottom: 1.25rem;
   }
 
-  .course-home .hero-institution-logo .institution-logo {
+  .course-home .hero-institution-logo {
     width: 148px;
+    max-width: 52vw;
   }
 
-  body:not(.course-home) .hero-institution-logo .institution-logo {
+  body:not(.course-home) .hero-institution-logo {
     width: 138px;
+    max-width: 50vw;
   }
 }
 /* ---------- Fin logo institucional dentro del hero ---------- */
