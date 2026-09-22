@@ -631,10 +631,6 @@ body:not(.course-home) .feedback {
     padding: 5px 8px;
   }
 
-  .course-home .institution-logo {
-    width: 82px;
-  }
-
   .course-home .hero-grid {
     min-height: 0;
     padding: 52px 0 48px;
@@ -701,52 +697,39 @@ body:not(.course-home) .feedback {
 
 
 /* ---------- Logo institucional dentro del hero ---------- */
-.course-home .hero-institution-logo,
-body:not(.course-home) .hero-institution-logo {
-  display: block;
-  width: 176px;
-  max-width: 46vw;
+.course-home img.hero-institution-logo,
+body:not(.course-home) img.hero-institution-logo {
+  display: block !important;
+  width: 176px !important;
+  max-width: 46vw !important;
+  height: auto !important;
+  max-height: none !important;
   margin: 0 0 1.6rem;
   padding: 0;
   border: 0;
-  text-decoration: none;
-  background: transparent;
+  object-fit: contain;
+  object-position: left center;
   overflow: visible;
-  line-height: 0;
 }
 
-body:not(.course-home) .hero-institution-logo {
-  width: 164px;
-  max-width: 44vw;
-}
-
-.course-home .hero-institution-logo .institution-logo,
-body:not(.course-home) .hero-institution-logo .institution-logo {
-  display: block !important;
-  width: 100% !important;
-  height: auto !important;
-  max-width: none !important;
-  max-height: none !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  object-fit: contain !important;
-  overflow: visible !important;
-}
-
-.course-home .hero-institution-logo:focus-visible,
-body:not(.course-home) .hero-institution-logo:focus-visible {
-  outline: 3px solid #FF8996;
-  outline-offset: 5px;
-  border-radius: 4px;
+body:not(.course-home) img.hero-institution-logo {
+  width: 164px !important;
+  max-width: 44vw !important;
 }
 
 @media (max-width: 680px) {
-  .course-home .hero-institution-logo,
-  body:not(.course-home) .hero-institution-logo {
+  .course-home img.hero-institution-logo,
+  body:not(.course-home) img.hero-institution-logo {
     margin-bottom: 1.25rem;
   }
-  .course-home .hero-institution-logo { width: 152px; max-width: 52vw; }
-  body:not(.course-home) .hero-institution-logo { width: 144px; max-width: 50vw; }
+  .course-home img.hero-institution-logo {
+    width: 152px !important;
+    max-width: 52vw !important;
+  }
+  body:not(.course-home) img.hero-institution-logo {
+    width: 144px !important;
+    max-width: 50vw !important;
+  }
 }
 /* ---------- Fin logo institucional dentro del hero ---------- */
 
