@@ -701,37 +701,42 @@ body:not(.course-home) .feedback {
 
 
 /* ---------- Logo institucional dentro del hero ---------- */
+/* Se usa como fondo del contenedor para evitar recortes provocados por
+   reglas heredadas sobre elementos <img> en las páginas de contenido. */
 .course-home .hero-institution-logo,
 body:not(.course-home) .hero-institution-logo {
   display: block;
   margin: 0 0 1.6rem;
   padding: 0;
-  text-decoration: none;
-  background: transparent;
   border: 0;
+  text-decoration: none;
+  background-image: url("../img/logo-ucacue.png");
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: contain;
+  aspect-ratio: 263 / 150;
   overflow: visible;
-  line-height: 0;
 }
 
 .course-home .hero-institution-logo {
-  width: 178px;
+  width: 184px;
   max-width: 46vw;
 }
 
 body:not(.course-home) .hero-institution-logo {
-  width: 162px;
+  width: 168px;
   max-width: 44vw;
 }
 
+/* La imagen queda en el HTML por accesibilidad/estructura, pero el dibujo
+   visible lo hace el fondo para garantizar que se muestre completo. */
 .course-home .hero-institution-logo .institution-logo,
 body:not(.course-home) .hero-institution-logo .institution-logo {
-  display: block;
-  width: 100%;
-  max-width: none;
-  height: auto;
-  min-height: 1px;
-  object-fit: contain;
-  overflow: visible;
+  display: block !important;
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0 !important;
+  pointer-events: none;
 }
 
 .course-home .hero-institution-logo:focus-visible,
@@ -748,12 +753,12 @@ body:not(.course-home) .hero-institution-logo:focus-visible {
   }
 
   .course-home .hero-institution-logo {
-    width: 148px;
+    width: 154px;
     max-width: 52vw;
   }
 
   body:not(.course-home) .hero-institution-logo {
-    width: 138px;
+    width: 146px;
     max-width: 50vw;
   }
 }
