@@ -698,3 +698,61 @@ body:not(.course-home) .feedback {
     animation-iteration-count: 1 !important;
   }
 }
+
+
+/* ---------- Logo institucional dentro del hero ---------- */
+.course-home .hero-institution-logo,
+body:not(.course-home) .hero-institution-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: max-content;
+  max-width: 100%;
+  margin: 0 0 1.6rem;
+  padding: 0;
+  text-decoration: none;
+  background: transparent;
+  border: 0;
+}
+
+.course-home .hero-institution-logo .institution-logo {
+  width: 178px;
+  max-width: min(46vw, 178px);
+  height: auto;
+  object-fit: contain;
+}
+
+body:not(.course-home) .hero-institution-logo .institution-logo {
+  width: 162px;
+  max-width: min(44vw, 162px);
+  height: auto;
+  object-fit: contain;
+}
+
+.course-home .hero-institution-logo:focus-visible,
+body:not(.course-home) .hero-institution-logo:focus-visible {
+  outline: 3px solid #FF8996;
+  outline-offset: 5px;
+  border-radius: 4px;
+}
+
+@media (max-width: 680px) {
+  .course-home .hero-institution-logo,
+  body:not(.course-home) .hero-institution-logo {
+    margin-bottom: 1.25rem;
+  }
+
+  .course-home .hero-institution-logo .institution-logo {
+    width: 148px;
+  }
+
+  body:not(.course-home) .hero-institution-logo .institution-logo {
+    width: 138px;
+  }
+}
+/* ---------- Fin logo institucional dentro del hero ---------- */
+
+/* El logo institucional ya no se muestra en la barra de navegación de temas. */
+body:not(.course-home) .header-inner > .institution-logo-link {
+  display: none;
+}
